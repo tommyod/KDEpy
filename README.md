@@ -3,18 +3,23 @@
 Kernel Density Estimation in Python.
 This is a work in progress, the code is not ready to be used.
 If you are interested in participating in this project, you are very welcome to do so.
-The goal is to implement state-of-the-art KDE, and eventually have the most complete implementation in the Python universe.
+**The goal is to implement state-of-the-art KDE, and eventually have the most complete implementation in the Python universe.**
 It's a lofty goal, but it might be possible.
 
 # The basics of kernel density estimation
+
+Kernel density estimation accomplishes what a histogram does, but in a better way, since: (1) the bins are determined from the data and (2) the result is continuous.
+
+Given a kernel function *phi*, a bandwidth *h* and weights *w* summing to 1, the kernel density estimate *f_hat* looks something like the following. 
 
 ![](https://latex.codecogs.com/gif.latex?%5Chat%7Bf%7D%28x%29%20%3D%20%5Cfrac%7B1%7D%7Bh%7D%20%5Csum_%7Bi%20%3D%201%7D%5E%7BN%7D%20%5C%20w%28x_i%29%20%5C%20%5Cphi%5Cleft%20%28%20%5Cfrac%7Bx%20-%20x_i%7D%7Bh%7D%20%5Cright%20%29)
 
 
 # Contributing to this project
 
-You are very we
-
+Whatever your mathematical and Python background is, you are very welcome to contribute to KDEpy.
+I hope to write a short tutorial on how to contribute.
+For the time being, open an *Issue* if you would like to contribute but you are unsure how to.
 
 # General guidelines and TODO
 
