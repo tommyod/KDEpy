@@ -109,6 +109,26 @@ measurements](https://arxiv.org/pdf/1202.2194.pdf)
 - [Kernel density estimation - 26 slides](http://research.cs.tamu.edu/prism/lectures/pr/pr_l7.pdf)
 - [Density Estimation - 32 pages](http://www.stat.cmu.edu/~larry/=sml/densityestimation.pdf)
 
+# Computation
+
+https://www.ics.uci.edu/~ihler/code/kde.html
+
+http://www-stat.wharton.upenn.edu/~lzhao/papers/MyPublication/Fast_jcgs.2010.pdf
+
+
+https://indico.cern.ch/event/397113/contributions/1837849/attachments/1213965/1771772/main.pdf
+
+http://www.cs.ubc.ca/~nando/papers/empirical.pdf
+
+http://iopscience.iop.org/article/10.1088/1742-6596/762/1/012042/pdf
+
+https://arxiv.org/pdf/1206.5278.pdf
+
+
+https://www.researchgate.net/publication/228773329_Insights_on_fast_kernel_density_estimation_algorithms
+
+
+
 
 
 

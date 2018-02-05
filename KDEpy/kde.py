@@ -9,7 +9,11 @@ Created on Sun Feb  4 10:52:17 2018
 import numpy as np
 import time
 import collections.abc 
-from kernel_funcs import _kernel_functions
+
+try:
+    from kernel_funcs import _kernel_functions
+except:
+    from KDEpy.kernel_funcs import _kernel_functions
 
 class KDE(object):
     
@@ -137,16 +141,18 @@ def main():
     """
     %load_ext line_profiler
     %lprun -f slow_functions.main slow_functions.main()
+    
+    %lprun -f KDE.evaluate_sorted main()
 
     """
     import matplotlib.pyplot as plt
     np.random.seed(123)
-    n = 2**15
+    n = 2**16
     print(n)
-    data = np.concatenate([np.random.randn(n), np.random.randn(n) + 5])*1
+    data = np.concatenate([np.random.randn(n), np.random.randn(n) + 5])*15
     
     
-    data = np.array([0, 0.1, 0.2, 0.3, 0.4, 2, 3, 4])
+    #data = np.array([0, 0.1, 0.2, 0.3, 0.4, 2, 3, 4])
     
     kde = KDE(kernel = 'gaussian', bw = 0.6)
     kde.fit(data)
@@ -160,7 +166,7 @@ def main():
     speed = time.perf_counter() - st
     print('Computation in', speed)
     
-
+    return
     
     st = time.perf_counter()
     y_naive = kde.evaluate_naive(x, weights = weights)
