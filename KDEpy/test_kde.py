@@ -3,22 +3,21 @@
 """
 Tests.
 """
-
-try:
-    from kde import (KDE)
-except ValueError:
-    pass
+import numpy as np
+from KDEpy import KDE
 
 
-def test_closest_pair_line():
+def test_defaults():
     """
     Test closest pair of points in a line.
     """
-    assert 1 + 1 == 2
-    
+    kde = KDE('box')
+    kde.fit(np.array([0]))
+    x = np.array([0])
+    y = kde.evaluate_naive(x)
+    assert np.allclose(y, np.array([1.]))
 
-
-    
+ 
 if __name__ == "__main__":
     import pytest
     # --durations=10  <- May be used to show potentially slow tests
