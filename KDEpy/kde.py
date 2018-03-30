@@ -34,11 +34,16 @@ class KDE(object):
         self.bw = bw
 
     
-    def fit(self, data):
+    def fit(self, data, boundaries=None):
         """
         Fit the kernel density estimator to the data.
+        Boundaries may be a tuple.
         """
         self._data = np.asarray_chkfinite(data)
+        
+        if not boundaries:
+            boundaries = (-np.inf, np.inf)
+        self.boundaries = boundaries
         
         if np.all(np.diff(self._data) >= 0):
             self._data_sorted = True
