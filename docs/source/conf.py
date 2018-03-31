@@ -20,8 +20,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'KDEpy'
-copyright = '2018, Tommy Odland'
-author = 'Tommy Odland'
+copyright = '2018, tommyod'
+author = 'tommyod'
 
 # The short X.Y version
 version = ''
@@ -44,6 +44,10 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
+    'sphinx.ext.napoleon',
+    'sphinx.ext.autosummary',
+    'sphinx.ext.extlinks',
+    'numpydoc'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -79,7 +83,7 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = 'classic'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -134,7 +138,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'KDEpy.tex', 'KDEpy Documentation',
-     'Tommy Odland', 'manual'),
+     'tommyod', 'manual'),
 ]
 
 
