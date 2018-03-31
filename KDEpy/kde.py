@@ -61,7 +61,7 @@ class KDE(object):
          
     def _set_weights(self, weights):
         if weights is None:
-            weights = np.ones_like(self._data)
+            weights = np.asfarray(np.ones_like(self._data))
         weights = weights / np.sum(weights)
         return weights
     
@@ -78,7 +78,9 @@ class KDE(object):
         weights : np.array of weights for the data points, must sum to unity
         
         """
-        grid_points = grid_points.astype(float)
+        # Return the array converted to a float type
+        grid_points = np.asfarray(grid_points)
+
         # If no weights are passed, weight each data point as unity
         weights = self._set_weights(weights)
         
@@ -103,7 +105,7 @@ class KDE(object):
         
         # The relationship between the desired bandwidth and the original
         # bandwidth of the kernel function
-        bw_scale = self.bw / abs(self.kernel.right_bw + self.kernel.left_bw)
+        bw_scale = self.bw / abs(self.kernel.right_bw - self.kernel.left_bw)
         
         # Compute the bandwidth to the left and to the right of the center
         left_bw = self.kernel.left_bw * bw_scale

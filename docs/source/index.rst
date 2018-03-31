@@ -52,6 +52,9 @@ Doctest example:
    :maxdepth: 2
    :caption: Contents:
 
+   intro_kde
+   notebook.ipynb
+
 
 
 

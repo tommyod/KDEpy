@@ -47,7 +47,8 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.autosummary',
     'sphinx.ext.extlinks',
-    'numpydoc'
+    'numpydoc',
+    'nbsphinx'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -72,7 +73,7 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path .
-exclude_patterns = []
+exclude_patterns = ['_build', '**.ipynb_checkpoints']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -83,13 +84,28 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'classic'
+html_theme = 'alabaster'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    # 'logo': 'logo.png',
+    'github_user': 'tommyod',
+    'github_repo': 'KDEpy',
+    'github_button': True,
+    'github_banner': True,
+    'travis_button': True,
+    'show_powered_by': False,
+    'font_family': '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,\
+        "Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji"\
+        ,"Segoe UI Symbol"',
+    'font_size': '15px',
+    'head_font_family': '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,\
+        "Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji"\
+        ,"Segoe UI Symbol"'
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -105,6 +121,8 @@ html_static_path = ['_static']
 # 'searchbox.html']``.
 #
 # html_sidebars = {}
+
+html_show_sphinx = False
 
 
 # -- Options for HTMLHelp output ---------------------------------------------

@@ -8,6 +8,15 @@ Created on Sun Feb  4 20:52:43 2018
 
 import numpy as np
 import collections.abc
+import numbers
+
+# In R, the following are implemented:
+# "gaussian", "rectangular", "triangular", "epanechnikov", 
+# "biweight", "cosine" or "optcosine"
+
+# Wikipedia
+# uniform, trinagular, epanechnikov, quartic,triweight, tricube,
+# gaussian, cosine, logistic, sigmoid, silverman
 
 
 def epanechnikov(x):
@@ -35,9 +44,45 @@ def tri(x):
     return out
 
 
+def biweight(x):
+    out = np.zeros_like(x)
+    mask = np.logical_and((x < 1), (x > -1))
+    out[mask] = ((15 / 16) * (1 - x**2)**2)[mask]
+    return out
+
+
+def triweight(x):
+    out = np.zeros_like(x)
+    mask = np.logical_and((x < 1), (x > -1))
+    out[mask] = ((35 / 32) * (1 - x**2)**3)[mask]
+    return out
+
+
+def tricube(x):
+    out = np.zeros_like(x)
+    mask = np.logical_and((x < 1), (x > -1))
+    out[mask] = ((70 / 81) * (1 - np.abs(x)**3)**3)[mask]
+    return out
+
+
+def cosine(x):
+    out = np.zeros_like(x)
+    mask = np.logical_and((x < 1), (x > -1))
+    out[mask] = ((np.pi / 4) * np.cos((np.pi * x) / 2))[mask]
+    return out
+
+
+def logistic(x):
+    return 1 / (2 + 2 * np.cosh(x))
+
+
+def sigmoid(x):
+    return (1 / (np.pi * np.cosh(x)))
+
+
 class Kernel(collections.abc.Callable):
     
-    def __init__(self, function, expected_value=0, left_bw=1, right_bw=1):
+    def __init__(self, function, var=1, support=(-3, 3)):
         """
         Initialize a new kernel function.
         
@@ -47,27 +92,54 @@ class Kernel(collections.abc.Callable):
         left_bw: support to the right
         """
         self.function = function
-        self.expected_value = expected_value
-        self.left_bw = left_bw
-        self.right_bw = right_bw
+        self.var = var
+        self.support = support
+        self.finite_support = np.all(np.isfinite(np.array(self.support)))
+        assert self.support[0] < self.support[1]
     
     def evaluate(self, x, bw=1):
         """
         Evaluate the kernel.
         """
-        real_bw = (bw / (self.left_bw + self.right_bw))
+        
+        # If x is a number, convert it to a length-1 NumPy vector
+        if isinstance(x, numbers.Number):
+            x = np.asarray_chkfinite([x])
+        else:
+            x = np.asarray_chkfinite(x)
+            
+        # Scale the function
+        real_bw = bw / np.sqrt(self.var)
         return self.function(x / real_bw) / real_bw
     
     def __call__(self, *args, **kwargs):
         return self.evaluate(*args, **kwargs)
     
     
-gaussian = Kernel(gaussian, 0, 3, 3)
-box = Kernel(box, 0, 1, 1)
-tri = Kernel(tri, 0, 1, 1)
-epa = Kernel(epanechnikov, 0, 1, 1)
+gaussian = Kernel(gaussian, var=1, support=(-np.inf, np.inf))
+box = Kernel(box, var=1 / 3, support=(-1, 1))
+tri = Kernel(tri, var=1 / 6, support=(-1, 1))
+epa = Kernel(epanechnikov, var=1 / 5, support=(-1, 1))
+biweight = Kernel(biweight, var=1 / 7, support=(-1, 1))
+triweight = Kernel(triweight, var=1 / 9, support=(-1, 1))
+tricube = Kernel(tricube, var=35 / 243, support=(-1, 1))
+cosine = Kernel(cosine, var=(1 - (8 / np.pi**2)), support=(-1, 1))
+logistic = Kernel(logistic, var=(np.pi**2 / 3), support=(-np.inf, np.inf))
+sigmoid = Kernel(sigmoid, var=(np.pi**2 / 4), support=(-np.inf, np.inf))
 
 _kernel_functions = {'gaussian': gaussian,
                      'box': box,
                      'tri': tri,
-                     'epa': epa}
+                     'epa': epa,
+                     'biweight': biweight,
+                     'triweight': triweight,
+                     'tricube': tricube,
+                     'cosine': cosine,
+                     'logistic': logistic,
+                     'sigmoid': sigmoid}
+
+
+if __name__ == "__main__":
+    import pytest
+    # --durations=10  <- May be used to show potentially slow tests
+    pytest.main(args=['.', '--doctest-modules', '-v'])
