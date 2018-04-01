@@ -27,7 +27,7 @@ Minimal working example
 Here's a minimal working example::
 
     >>> from KDEpy import KDE
-    >>> import numpy as npmake 
+    >>> import numpy as np
     >>> from scipy.stats import norm
     >>> data = norm(loc=0, scale=1).rvs(100)
     >>> x = np.linspace(-3, 3)
