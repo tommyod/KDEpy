@@ -51,8 +51,8 @@ setup(
         'Development Status :: 3 - Alpha',
 
         # Indicate who your project is intended for
-        #'Intended Audience :: End Users/Desktop',
-        #'Intended Audience :: Healthcare Industry',
+        # 'Intended Audience :: End Users/Desktop',
+        # 'Intended Audience :: Healthcare Industry',
 
         # Pick your license as you wish (should match "license" above)
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
