@@ -93,8 +93,13 @@ class Kernel(collections.abc.Callable):
         """
         self.function = function
         self.var = var
-        self.support = support
-        self.finite_support = np.all(np.isfinite(np.array(self.support)))
+        self.finite_support = np.all(np.isfinite(np.array(support)))
+        
+        # If the function has finite support, scale the support so that it
+        # corresponds to the support of the function when it is scaled to have
+        # unit variance.
+        self.support = tuple(supp / np.sqrt(self.var) for supp in support)
+            
         assert self.support[0] < self.support[1]
     
     def evaluate(self, x, bw=1):
@@ -108,12 +113,12 @@ class Kernel(collections.abc.Callable):
         else:
             x = np.asarray_chkfinite(x)
             
-        # Scale the function
+        # Scale the function, such that bw=1 corresponds to the function having
+        # a standard deviation (or variance) equal to 1
         real_bw = bw / np.sqrt(self.var)
         return self.function(x / real_bw) / real_bw
     
-    def __call__(self, *args, **kwargs):
-        return self.evaluate(*args, **kwargs)
+    __call__ = evaluate
     
     
 gaussian = Kernel(gaussian, var=1, support=(-np.inf, np.inf))
@@ -143,3 +148,5 @@ if __name__ == "__main__":
     import pytest
     # --durations=10  <- May be used to show potentially slow tests
     pytest.main(args=['.', '--doctest-modules', '-v'])
+    
+    print(box.support)

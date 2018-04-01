@@ -20,12 +20,9 @@ class TestKernelFunctions():
         """
 
         if function.finite_support:
-            # When bw=1, the function is scaled by the standard deviation
-            # so that std(f) = 1. Divide by standard deviation to get
-            # the integration limits.
-            a, b = tuple(s / np.sqrt(function.var) for s in function.support)
+            a, b = function.support
         else:
-            a, b = -30, 30
+            a, b = -5 * function.var, 5 * function.var
         integral, abserr = quad(function, a=a, b=b)
         assert np.isclose(integral, 1)
             
@@ -38,10 +35,9 @@ class TestKernelFunctions():
         """
 
         if function.finite_support:
-            a, b = tuple(s / np.sqrt(function.var) for s in function.support)
-            x = np.linspace(a, b)
+            x = np.linspace(*function.support)
         else:
-            x = np.linspace(-50, 50)
+            x = np.linspace(-5 * function.var, 5 * function.var)
         y = function(x)
         diffs_left = np.diff(y[x <= 0])
         diffs_right = np.diff(y[x >= 0])
@@ -56,15 +52,13 @@ class TestKernelFunctions():
         """
 
         if function.finite_support:
-            a, b = tuple(s / np.sqrt(function.var) for s in function.support)
-            x = np.linspace(a, b)
+            x = np.linspace(*function.support)
         else:
-            x = np.linspace(-20, 20)
+            x = np.linspace(-5 * function.var, 5 * function.var)
         y = function(x)
         assert np.all(y >= 0)
     
  
 if __name__ == "__main__":
-    import pytest
     # --durations=10  <- May be used to show potentially slow tests
     pytest.main(args=['.', '--doctest-modules', '-v'])

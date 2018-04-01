@@ -5,6 +5,7 @@ Created on Sun Feb  4 10:52:17 2018
 
 @author: tommy
 """
+import pytest
 import numbers
 import numpy as np
 from KDEpy.kernel_funcs import _kernel_functions
@@ -94,7 +95,8 @@ class KDE(object):
         
         return evaluated 
     
-    def _eval_sorted(self, data_sorted, weights_sorted, grid_point, len_data):
+    def _eval_sorted(self, data_sorted, weights_sorted, grid_point, len_data,
+                     tolerance):
         """
         Evaluate the sorted weights.
         
@@ -103,18 +105,40 @@ class KDE(object):
         Runs in O(log(`data`)) + O(`datapoints close to grid_point`).
         """
         
-        # The relationship between the desired bandwidth and the original
-        # bandwidth of the kernel function
-        bw_scale = self.bw / abs(self.kernel.right_bw - self.kernel.left_bw)
+        # ---------------------------------------------------------------------
+        # -------- Compute the support to the left and right of the kernel ----
+        # ---------------------------------------------------------------------
         
-        # Compute the bandwidth to the left and to the right of the center
-        left_bw = self.kernel.left_bw * bw_scale
-        right_bw = self.kernel.right_bw * bw_scale
-
-        j = np.searchsorted(data_sorted, grid_point + right_bw, side='right')
+        # If the kernel has finite support, find the support by scaling the 
+        # variance. This is done when a call is made later on.
+        if self.kernel.finite_support:
+            left_support = self.kernel.support[0] 
+            right_support = self.kernel.support[1] 
+        else:
+            # Compute the support up to a tolerance
+            # This code assumes the kernel is symmetric about 0
+            # TODO: Extend this code for non-symmetric kernels
+            
+            # Scale relative tolerance to the height of the kernel at 0
+            tolerance = self.kernel(0, bw=self.bw) * tolerance
+            # Sample the x values and the function to the left of 0
+            x_samples = np.linspace(-self.kernel.var * 10, 0, num=2**10)
+            sampled_func = self.kernel(x_samples, bw=self.bw) - tolerance
+            # Use binary search to find when the function equals the tolerance
+            i = np.searchsorted(sampled_func, 0, side='right') - 1
+            left_support, right_support = x_samples[i], abs(x_samples[i])
+            assert self.kernel(x_samples[i], bw=self.bw) <= tolerance
+            
+        # ---------------------------------------------------------------------
+        # -------- Use binary search to only compute for points close by ------
+        # ---------------------------------------------------------------------
+        
+        j = np.searchsorted(data_sorted, grid_point + right_support, 
+                            side='right')
         # i = np.searchsorted(data_sorted[:j], grid_point - left_bw, 
         # side='left')
-        i = np.searchsorted(data_sorted, grid_point - left_bw, side='left')
+        i = np.searchsorted(data_sorted, grid_point + left_support, 
+                            side='left')
         i = np.maximum(0, i)
         j = np.minimum(len_data, j)
         
@@ -128,7 +152,7 @@ class KDE(object):
         weighted_estimates = np.dot(kernel_estimates, weights_subset)
         return np.sum(weighted_estimates)
     
-    def evaluate_sorted(self, grid_points, weights=None):
+    def evaluate_sorted(self, grid_points, weights=None, tolerance=10e-6):
         """
         Evaluated by sorting and using binary search.
         
@@ -150,7 +174,7 @@ class KDE(object):
         
         for i, grid_point in enumerate(grid_points):
             evaluated[i] = self._eval_sorted(data_sorted, weights_sorted, 
-                                             grid_point, len_data)
+                                             grid_point, len_data, tolerance)
 
         # Normalize, but do not divide by zero
         return evaluated
@@ -170,11 +194,18 @@ def main():
     
     x = np.linspace(-5, 5)
     data = np.random.random(10)
-    KDE(bw='silverman').fit(data).evaluate_naive(x)
+    y = KDE('box', bw=1).fit(data).evaluate_sorted(x)
     
+    print(y)
     
+
 if __name__ == '__main__':
     main()
+    
+
+if __name__ == "__main__":
+    # --durations=10  <- May be used to show potentially slow tests
+    pytest.main(args=['.', '--doctest-modules', '-v'])
     
     
     
