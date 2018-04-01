@@ -37,7 +37,7 @@ Here's some code::
    >>> print('test')
    test
    >>> 2 + 2
-   3
+   4
 
 
 Doctest example:
