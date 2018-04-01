@@ -6,60 +6,59 @@
 KDEpy
 =====
 
-Example
--------
+KDEpy implements univariate kernel density estimators.
 
-The package works roughly like this.
-Since Pythagoras, we know that :math:`a^2 + b^2 = c^2`.
+Highlights
+----------
 
-.. code-block:: python
-   :linenos:
+KDEpy is a Python library for kernel density estimation.
 
-   from KDEpy import KDE
-   kde = KDE()
+Currently, the following features are implemented:
 
-
-.. code-block:: ipython
-
-   >>> print('test')
-
-
-.. code-block:: python
-   :linenos:
-
-   from KDEpy import KDE
-   kde = KDE()
+* **Many kernels**: There are 10 kernel functions implemented.
+* **Weighted KDE**: The user may weight the data.
+* **Weighted KDE**: The user may weight the data.
 
 
 
-Here's some code::
+Minimal working example
+-----------------------
 
-   >>> print('test')
-   test
-   >>> 2 + 2
-   4
+Here's a minimal working example::
+
+    >>> from KDEpy import KDE
+    >>> import numpy as npmake 
+    >>> from scipy.stats import norm
+    >>> data = norm(loc=0, scale=1).rvs(100)
+    >>> x = np.linspace(-3, 3)
+    >>> y = KDE(kernel='gaussian', bw=0.5).fit(data).evaluate(x)
+
+.. image:: _static/img/minimal_working_example.png
+   :width: 400 px
+   :target: #
+
+It's really that simple.
 
 
-Doctest example:
-
-.. doctest::
-
-   >>> 2 + 2
-   4
-
+Table of contents
+-----------------
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
    intro_kde
    notebook.ipynb
 
 
+Contribute
+----------
+
+You are very welcome to contribute.
+To do so, please go to GitHub.
 
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`

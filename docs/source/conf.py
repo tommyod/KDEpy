@@ -92,6 +92,7 @@ html_theme = 'alabaster'
 #
 html_theme_options = {
     # 'logo': 'logo.png',
+    # 'logo': 'logo.png',
     'github_user': 'tommyod',
     'github_repo': 'KDEpy',
     'github_button': True,
@@ -104,7 +105,8 @@ html_theme_options = {
     'font_size': '15px',
     'head_font_family': '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,\
         "Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji"\
-        ,"Segoe UI Symbol"'
+        ,"Segoe UI Symbol"',
+    'page_width': '940px'
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
