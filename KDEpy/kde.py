@@ -42,12 +42,15 @@ class KDE(object):
                 
         self.bw = bw
 
-    def fit(self, data, boundaries=None):
+    def fit(self, data, weights=None, boundaries=None):
         """
         Fit the kernel density estimator to the data.
         Boundaries may be a tuple.
         """
         self._data = np.asarray_chkfinite(data)
+
+        # If no weights are passed, weight each data point as unity
+        self.weights = self._set_weights(weights)
         
         if not boundaries:
             boundaries = (-np.inf, np.inf)
@@ -72,7 +75,7 @@ class KDE(object):
         
         return _bw_methods[self.bw](self._data)
         
-    def evaluate_naive(self, grid_points, weights=None):
+    def evaluate_naive(self, grid_points):
         """
         Naive evaluation. Used primarily for testing.
         grid_points : np.array, evaluation points
@@ -81,16 +84,13 @@ class KDE(object):
         """
         # Return the array converted to a float type
         grid_points = np.asfarray(grid_points)
-
-        # If no weights are passed, weight each data point as unity
-        weights = self._set_weights(weights)
         
         # Create zeros on the grid points
         evaluated = np.zeros_like(grid_points)
         
         # For every data point, compute the kernel and add to the grid
         bw = self._bw_selection()
-        for weight, data_point in zip(weights, self._data):
+        for weight, data_point in zip(self.weights, self._data):
             evaluated += weight * self.kernel(grid_points - data_point, bw=bw)
         
         return evaluated 
@@ -152,7 +152,7 @@ class KDE(object):
         weighted_estimates = np.dot(kernel_estimates, weights_subset)
         return np.sum(weighted_estimates)
     
-    def evaluate_sorted(self, grid_points, weights=None, tolerance=10e-6):
+    def evaluate_sorted(self, grid_points, tolerance=10e-6):
         """
         Evaluated by sorting and using binary search.
         
@@ -163,7 +163,7 @@ class KDE(object):
         #    return self.evaluate_naive(grid_points, weights = weights)
             
         # If no weights are passed, weight each data point as unity
-        weights = self._set_weights(weights)
+        weights = self.weights
             
         # Sort the data and the weights
         indices = np.argsort(self._data)

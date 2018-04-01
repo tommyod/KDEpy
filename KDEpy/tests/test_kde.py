@@ -102,6 +102,37 @@ class TestNaiveKDE():
                            atol=10e-2, rtol=0)
         
         
+    @pytest.mark.parametrize("data, weights", 
+                             [(np.array([0, 1, 2]), np.array([1, 5, 1])),
+                              (np.array([-9, 1, 9]), np.array([3, 5, 1])),
+                              (np.array([-3, 0, 2]), np.array([4, 5, 0]))])
+    def test_weighted_naive(self, data, weights):
+        x = np.linspace(np.min(data), np.max(data), num=10)
+        kde = KDE(kernel='gaussian', bw=1).fit(data, weights=weights)
+        y1 = kde.evaluate_naive(x)
+        
+        data_weighted = np.repeat(data, weights)
+        kde = KDE(kernel='gaussian', bw=1).fit(data_weighted)
+        y2 = kde.evaluate_naive(x)
+
+        assert np.allclose(y1, y2)
+        
+    @pytest.mark.parametrize("data, weights", 
+                             [(np.array([0, 1, 2]), np.array([1, 5, 1])),
+                              (np.array([-9, 1, 9]), np.array([3, 5, 1])),
+                              (np.array([-3, 0, 2]), np.array([4, 5, 0]))])
+    def test_weighted_sorted(self, data, weights):
+        x = np.linspace(np.min(data), np.max(data), num=10)
+        kde = KDE(kernel='gaussian', bw=1).fit(data, weights=weights)
+        y1 = kde.evaluate_sorted(x)
+        
+        data_weighted = np.repeat(data, weights)
+        kde = KDE(kernel='gaussian', bw=1).fit(data_weighted)
+        y2 = kde.evaluate_sorted(x)
+
+        assert np.allclose(y1, y2)
+        
+        
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
     pytest.main(args=['.', '--doctest-modules', '-v'])
