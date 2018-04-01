@@ -38,8 +38,9 @@ setup(
 
     # Author details
     author='tommyod',
+    author_email='tod001@uib.no',
     # Choose your license
-    license='GPLv3',
+    license='GNU GPLv3',
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
@@ -50,8 +51,8 @@ setup(
         'Development Status :: 3 - Alpha',
 
         # Indicate who your project is intended for
-        'Intended Audience :: End Users/Desktop',
-        'Intended Audience :: Healthcare Industry',
+        #'Intended Audience :: End Users/Desktop',
+        #'Intended Audience :: Healthcare Industry',
 
         # Pick your license as you wish (should match "license" above)
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
@@ -64,7 +65,7 @@ setup(
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
     packages=find_packages('.', exclude=['contrib', 'docs', 'tests']),
-    package_dir={'': '.'},
+    package_dir={'KDEpy': 'KDEpy'},
 
     # Alternatively, if you want to distribute just a my_module.py, uncomment
     # this:
@@ -74,7 +75,7 @@ setup(
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    # install_requires=['jinja2'],
+    install_requires=['numpy>=1.14.2', 'scipy>=1.0.1'],
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
