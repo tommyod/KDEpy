@@ -86,7 +86,7 @@ class Kernel(collections.abc.Callable):
         """
         Initialize a new kernel function.
         
-        function: callable, numpy.arr -> numpy.arr
+        function: callable, numpy.arr -> numpy.arr, should integrate to 1
         expected_value : peak, typically 0
         left_bw: support to the left
         left_bw: support to the right
