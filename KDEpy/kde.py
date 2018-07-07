@@ -14,7 +14,7 @@ from KDEpy.kernel_funcs import _kernel_functions
 from KDEpy.bw_selection import _bw_methods
 
 
-class KDEbase(ABC):
+class BaseKDE(ABC):
     """
     Abstract Base Class for every kernel density estimator.
     """
@@ -41,8 +41,10 @@ class KDEbase(ABC):
             self.bw = bw
         elif isinstance(bw, str):
             self.bw = bw
+        elif isinstance(bw, (np.ndarray, Sequence)):
+            self.bw = bw
         else:
-            raise ValueError(f'Bandwidth must be > 0 or a string.')
+            raise ValueError(f'Bandwidth must be > 0, array-like or a string.')
         
     
     @abstractmethod
@@ -65,7 +67,7 @@ class KDEbase(ABC):
             
         assert len(data.shape) == 2
         obs, dims = data.shape
-        print(obs, dims)
+
         if not obs > 0:
             raise ValueError('Data must contain at least one data point.')
         assert dims > 0
@@ -130,11 +132,10 @@ class KDEbase(ABC):
         return self.evaluate(*args, **kwargs)
 
 
-class NaiveKDE(KDEbase):
+class NaiveKDE(BaseKDE):
     
     def __init__(self, kernel='gaussian', bw=1):
         super().__init__(kernel, bw)
-        print(self.kernel)
     
     def fit(self, data, weights=None):
         super().fit(data)
@@ -159,12 +160,11 @@ class NaiveKDE(KDEbase):
         
         # For every data point, compute the kernel and add to the grid
         bw = self.bw
-        for weight, data_point in zip(self.weights, self.data):
-            print(weight, data_point, grid_points, grid_points - data_point)
+        if isinstance(bw, numbers.Number):
+            bw = np.asfarray(np.ones_like(self.data) * bw)
+        for weight, data_point, bw in zip(self.weights, self.data, bw):
             evaluated += weight * self.kernel(grid_points - data_point, bw=bw)
-            print(evaluated)
             
-        print(evaluated)
         obs, dims = evaluated.shape
         if self._user_supplied_grid:
             if dims == 1:
@@ -174,13 +174,7 @@ class NaiveKDE(KDEbase):
             if dims == 1:
                 return grid_points.ravel(), evaluated.ravel()
             return grid_points, evaluated 
-            
-        
-        
-    
-    
-    
-    
+
 
 class KDE(ABC, object):
     
@@ -352,41 +346,76 @@ class KDE(ABC, object):
     def evaluate(self, *args, **kwargs):    
         return self.evaluate_naive(*args, **kwargs)
 
-       
-def main():
-    """
-    %load_ext line_profiler
-    %lprun -f slow_functions.main slow_functions.main()
-    
-    %lprun -f KDE.evaluate_sorted main()
-
-    """
-    
-    x = np.linspace(-5, 5)
-    data = np.random.random(10)
-    y = KDE('box', bw=1).fit(data).evaluate_sorted(x)
-    
-    print(y)
-    
 
 if __name__ == '__main__':
     main()
     
     import matplotlib.pyplot as plt
     
-    k = NaiveKDE(kernel='gaussian', bw=5)
-    k.fit(np.array([1, 3, 11, 35, 99]))
-    x = np.linspace(0, 100, num = 2**6)
-    y = k.evaluate(x)
-    plt.plot(x, y)
     
-    x = np.linspace(0, 100, num = 2**8)
-    y = k.evaluate(x)
-    plt.plot(x, y)
+    # Basic example of the naive KDE
+    # -----------------------------------------
+    data = [3, 3.5, 4, 6, 8]
+    kernel = 'box'
+    bw = 1
     
-    x = np.linspace(0, 100, num = 2**10)
-    y = k.evaluate(x)
+    kde = NaiveKDE(kernel=kernel, bw=bw)
+    kde.fit(data)
+    
+    x = np.linspace(0, 10, num=1024)
+    for d in data:
+        k = NaiveKDE(kernel=kernel, bw=bw).fit([d]).evaluate(x) / len(data)
+        plt.plot(x, k, color='k', ls='--')
+        
+    y = kde.evaluate(x)  
     plt.plot(x, y)
+    plt.scatter(data, np.zeros_like(data))
+    plt.show()
+    
+    # Naive KDE with weights
+    # -----------------------------------------
+    data = [3, 3.5, 4, 6, 8]
+    weights = np.array([1, 1, 1, 1, 5])
+    weights = weights / np.sum(weights)
+    kernel = 'gaussian'
+    bw = 1
+    
+    kde = NaiveKDE(kernel=kernel, bw=bw)
+    kde.fit(data, weights=weights)
+    
+    x = np.linspace(0, 10, num=1024)
+    for d, w in zip(data, weights):
+        k = NaiveKDE(kernel=kernel, bw=bw).fit([d], weights=[w]).evaluate(x)
+        plt.plot(x, k, color='k', ls='--')
+        
+    y = kde.evaluate(x)  
+    plt.plot(x, y)
+    plt.scatter(data, np.zeros_like(data))
+    plt.show()
+    
+    # Naive KDE with variable h
+    # -----------------------------------------
+    data = [2, 3, 4, 5, 6, 7]
+    bws = [1, 2, 3, 4, 5, 6]
+    bws = [1/k for k in bws]
+    kernel = 'gaussian'
+    
+    kde = NaiveKDE(kernel=kernel, bw=bws)
+    kde.fit(data)
+    
+    x = np.linspace(0, 10, num=1024)
+    for d, bw in zip(data, bws):
+        k = NaiveKDE(kernel=kernel, bw=bw).fit([d]).evaluate(x) / len(data)
+        plt.plot(x, k, color='k', ls='--')
+        
+    y = kde.evaluate(x)  
+    plt.plot(x, y)
+    plt.scatter(data, np.zeros_like(data))
+    plt.show()
+    
+    
+    
+    
     
 
 if __name__ == "__main__":
