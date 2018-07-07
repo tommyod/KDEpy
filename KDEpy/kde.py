@@ -8,6 +8,8 @@ Created on Sun Feb  4 10:52:17 2018
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
 import pytest
+import sys
+import warnings
 import numbers
 import numpy as np
 from KDEpy.kernel_funcs import _kernel_functions
@@ -17,9 +19,19 @@ from KDEpy.bw_selection import _bw_methods
 class BaseKDE(ABC):
     """
     Abstract Base Class for every kernel density estimator.
+    
+    This class is never instantiated, it merely defines some common methods
+    which never subclass must implement. In summary, it facilitates:
+        
+        - The `_available_kernels` parameter
+        - Correct handling of `kernel` and `bw` in __init__
+        - Forces subclasses to implement `fit(data)`, converts `data` to 
+          correct shape (obs, dims)
+        - Forces subclasses to implement `evaluate(grid_points)`, with handling
     """
     
     _available_kernels = _kernel_functions
+    _bw_methods = _bw_methods
     
     @abstractmethod
     def __init__(self, kernel, bw):
@@ -35,24 +47,29 @@ class BaseKDE(ABC):
         
         self.kernel = self._available_kernels[kernel]
         
-        
-        # Verify that the choice of bandwidth is valid, and set the bandwidth
-        if isinstance(bw, numbers.Number) and bw > 0:
+        # bw may either be a positive number, a string, or array-like such that
+        # each point in the data has a uniue bw
+        if (isinstance(bw, numbers.Number) and bw > 0):
             self.bw = bw
         elif isinstance(bw, str):
-            self.bw = bw
+            kernel = kernel.strip().lower()
+            amethods = sorted(list(self._bw_methods.keys()))
+            if bw not in amethods:
+                msg = f'Kernel not recognized. Options are: {amethods}'
+                raise ValueError(msg)
+            self.bw = self._bw_methods[bw]
         elif isinstance(bw, (np.ndarray, Sequence)):
             self.bw = bw
         else:
             raise ValueError(f'Bandwidth must be > 0, array-like or a string.')
         
-    
     @abstractmethod
     def fit(self, data):
         """
         Fit the kernel density estimator to the data.
         """
         
+        # In the end, the data should be an ndarray of shape (obs, dims)
         if isinstance(data, Sequence):
             data = np.asfarray(data).reshape(-1, 1)
         elif isinstance(data, np.ndarray):
@@ -71,19 +88,31 @@ class BaseKDE(ABC):
         if not obs > 0:
             raise ValueError('Data must contain at least one data point.')
         assert dims > 0
-        self.data = data
+        self.data = np.asfarray(data)
     
     @abstractmethod
     def evaluate(self, grid_points=None):
         """
         Evaluate the kernel density estimator.
-        """
         
+        grid_points: positive integer (number of points), or a grid Sequence 
+                     or ndarray of shape (obs, dims)
+        """
+        if not hasattr(self, 'data'):
+            raise ValueError('Must call fit before evaluating.')
+        
+        # If no information is supplied at all, call the autogrid method
         if grid_points is None:
             self._user_supplied_grid = False
-            if not hasattr(self, 'data'):
-                raise ValueError('Must call fit before evaluating.')
             grid_points = self._autogrid(self.data)
+            
+        # If a number is specified, interpret it as the number of grid points
+        elif isinstance(grid_points, numbers.Number):
+            if not (isinstance(grid_points, numbers.Integral) 
+                    and grid_points > 0):
+                raise ValueError('grid_points must be positive integer.')
+            self._user_supplied_grid = False
+            grid_points = self._autogrid(self.data, num_points=grid_points)
             
         else:
             self._user_supplied_grid = True
@@ -104,6 +133,24 @@ class BaseKDE(ABC):
             raise ValueError('Grid must contain at least one data point.') 
             
         self.grid_points = grid_points
+        
+        assert hasattr(self, '_user_supplied_grid')
+        
+    def _evalate_return_logic(self, evaluated, grid_points):
+        """
+        Return based on inputs.
+        """
+        obs, dims = evaluated.shape
+        if self._user_supplied_grid:
+            if dims == 1:
+                return evaluated.ravel()
+            return evaluated 
+        else:
+            if dims == 1:
+                return grid_points.ravel(), evaluated.ravel()
+            return grid_points, evaluated 
+        
+        
                 
             
     @staticmethod
@@ -112,7 +159,7 @@ class BaseKDE(ABC):
         number of grid : must be a power of two
         percentile : is how far out we go out
         """
-        assert np.allclose(np.log2(num_points) % 1, 0)
+        #assert np.allclose(np.log2(num_points) % 1, 0)
         
         obs, dims = data.shape
         minimums, maximums = data.min(axis=0), data.max(axis=0)
@@ -133,21 +180,34 @@ class BaseKDE(ABC):
 
 
 class NaiveKDE(BaseKDE):
+    """
+    The class for a naive implementation of the KDE.
+    """
     
     def __init__(self, kernel='gaussian', bw=1):
+        """
+        Initialize a naive KDE.
+        """
         super().__init__(kernel, bw)
     
     def fit(self, data, weights=None):
         super().fit(data)
         
         if weights is not None and len(weights) == len(data):
-            self.weights = weights
+            self.weights = np.asfarray(weights)
         else:
             self.weights = np.ones_like(data) / len(data)
+            
+        weights_sum = np.sum(self.weights)
+        if not np.allclose(weights_sum, 1):
+            msg = f'The weights do not sum to unity, they sum to {weights_sum}'
+            warnings.warn(msg, stacklevel=2)
             
         return self
     
     def evaluate(self, grid_points=None):
+        """Evaluate on the grid points.
+        """
         
         # This method sets self.grid points and verifies it
         super().evaluate(grid_points)
@@ -162,18 +222,13 @@ class NaiveKDE(BaseKDE):
         bw = self.bw
         if isinstance(bw, numbers.Number):
             bw = np.asfarray(np.ones_like(self.data) * bw)
+        elif callable(bw):
+            bw = np.asfarray(np.ones_like(self.data) * bw(self.data))
+
         for weight, data_point, bw in zip(self.weights, self.data, bw):
             evaluated += weight * self.kernel(grid_points - data_point, bw=bw)
             
-        obs, dims = evaluated.shape
-        if self._user_supplied_grid:
-            if dims == 1:
-                return evaluated.ravel()
-            return evaluated 
-        else:
-            if dims == 1:
-                return grid_points.ravel(), evaluated.ravel()
-            return grid_points, evaluated 
+        return self._evalate_return_logic(evaluated, grid_points)
 
 
 class KDE(ABC, object):
@@ -367,7 +422,8 @@ if __name__ == '__main__':
         k = NaiveKDE(kernel=kernel, bw=bw).fit([d]).evaluate(x) / len(data)
         plt.plot(x, k, color='k', ls='--')
         
-    y = kde.evaluate(x)  
+    y = kde.evaluate(x)
+    plt.title('Basic example of the naive KDE')
     plt.plot(x, y)
     plt.scatter(data, np.zeros_like(data))
     plt.show()
@@ -388,7 +444,8 @@ if __name__ == '__main__':
         k = NaiveKDE(kernel=kernel, bw=bw).fit([d], weights=[w]).evaluate(x)
         plt.plot(x, k, color='k', ls='--')
         
-    y = kde.evaluate(x)  
+    y = kde.evaluate(x)
+    plt.title('Naive KDE with weights')
     plt.plot(x, y)
     plt.scatter(data, np.zeros_like(data))
     plt.show()
@@ -409,6 +466,28 @@ if __name__ == '__main__':
         plt.plot(x, k, color='k', ls='--')
         
     y = kde.evaluate(x)  
+    plt.title('Naive KDE with variable h')
+    plt.plot(x, y)
+    plt.scatter(data, np.zeros_like(data))
+    plt.show()
+    
+    # Naive KDE with silverman
+    # -----------------------------------------
+    data = [2, 3, 4, 5, 6, 7]
+    bws = [1, 2, 3, 4, 5, 6]
+    bws = [1/k for k in bws]
+    kernel = 'gaussian'
+    
+    kde = NaiveKDE(kernel=kernel, bw='silverman')
+    kde.fit(data)
+    
+    x = np.linspace(0, 10, num=1024)
+    for d, bw in zip(data, bws):
+        k = NaiveKDE(kernel=kernel, bw='silverman').fit([d]).evaluate(x) / len(data)
+        plt.plot(x, k, color='k', ls='--')
+        
+    y = kde.evaluate(x)  
+    plt.title('Naive KDE with silverman')
     plt.plot(x, y)
     plt.scatter(data, np.zeros_like(data))
     plt.show()
@@ -420,7 +499,7 @@ if __name__ == '__main__':
 
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
-    # pytest.main(args=['.', '--doctest-modules', '-v'])
+    #pytest.main(args=['.', '--doctest-modules', '-v'])
     pass
     
     
