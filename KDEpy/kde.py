@@ -10,10 +10,12 @@ from collections.abc import Sequence
 import pytest
 import sys
 import warnings
+from scipy.spatial import cKDTree
 import numbers
 import numpy as np
 from KDEpy.kernel_funcs import _kernel_functions
 from KDEpy.bw_selection import _bw_methods
+import time
 
 
 class BaseKDE(ABC):
@@ -70,17 +72,7 @@ class BaseKDE(ABC):
         """
         
         # In the end, the data should be an ndarray of shape (obs, dims)
-        if isinstance(data, Sequence):
-            data = np.asfarray(data).reshape(-1, 1)
-        elif isinstance(data, np.ndarray):
-            if len(data.shape) == 1:
-                data = data.reshape(-1, 1)
-            elif len(data.shape) == 2:
-                pass
-            else:
-                raise ValueError('Data must be of shape (obs, dims)')
-        else:
-            raise TypeError('Data must be of shape (obs, dims)')
+        data = self._process_sequence(data)
             
         assert len(data.shape) == 2
         obs, dims = data.shape
@@ -116,17 +108,7 @@ class BaseKDE(ABC):
             
         else:
             self._user_supplied_grid = True
-            if isinstance(grid_points, Sequence):
-                grid_points = np.asfarray(grid_points).reshape(-1, 1)
-            elif isinstance(grid_points, np.ndarray):
-                if len(grid_points.shape) == 1:
-                    grid_points = grid_points.reshape(-1, 1)
-                elif len(grid_points.shape) == 2:
-                    pass
-                else:
-                    raise ValueError('Grid must be of shape (obs, dims)')
-            else:
-                raise TypeError('Grid must be of shape (obs, dims)')
+            grid_points = self._process_sequence(grid_points)
                 
         obs, dims = grid_points.shape
         if not obs > 0:
@@ -135,6 +117,24 @@ class BaseKDE(ABC):
         self.grid_points = grid_points
         
         assert hasattr(self, '_user_supplied_grid')
+        
+    def _process_sequence(self, sequence_array_like):
+        """
+        """
+        if isinstance(sequence_array_like, Sequence):
+            out = np.asfarray(sequence_array_like).reshape(-1, 1)
+        elif isinstance(sequence_array_like, np.ndarray):
+            if len(sequence_array_like.shape) == 1:
+                out = sequence_array_like.reshape(-1, 1)
+            elif len(sequence_array_like.shape) == 2:
+                out = sequence_array_like
+            else:
+                raise ValueError('Grid must be of shape (obs, dims)')
+        else:
+            raise TypeError('Grid must be of shape (obs, dims)')
+            
+        return out
+        
         
     def _evalate_return_logic(self, evaluated, grid_points):
         """
@@ -196,12 +196,14 @@ class NaiveKDE(BaseKDE):
         if weights is not None and len(weights) == len(data):
             self.weights = np.asfarray(weights)
         else:
-            self.weights = np.ones_like(data) / len(data)
+            self.weights = np.ones_like(self.data)
             
-        weights_sum = np.sum(self.weights)
-        if not np.allclose(weights_sum, 1):
-            msg = f'The weights do not sum to unity, they sum to {weights_sum}'
-            warnings.warn(msg, stacklevel=2)
+        self.weights = self.weights / np.sum(self.weights)
+            
+        #weights_sum = np.sum(self.weights)
+        #if not np.allclose(weights_sum, 1):
+        #    msg = f'The weights do not sum to unity, they sum to {weights_sum}'
+        #    warnings.warn(msg, stacklevel=2)
             
         return self
     
@@ -227,6 +229,80 @@ class NaiveKDE(BaseKDE):
 
         for weight, data_point, bw in zip(self.weights, self.data, bw):
             evaluated += weight * self.kernel(grid_points - data_point, bw=bw)
+            
+        return self._evalate_return_logic(evaluated, grid_points)
+    
+    
+class TreeKDE(BaseKDE):
+    """
+    The calss for a tree implementation of the KDE.
+    """
+    
+    def __init__(self, kernel='gaussian', bw=1):
+        """
+        Initialize a naive KDE.
+        """
+        super().__init__(kernel, bw)
+    
+    def fit(self, data, weights=None):
+        super().fit(data)
+        
+        if weights is not None and len(weights) == len(data):
+            self.weights = np.asfarray(weights)
+        else:
+            self.weights = np.ones_like(self.data)
+            
+        self.weights = self.weights / np.sum(self.weights)
+            
+        return self
+    
+    def evaluate(self, grid_points=None, weights=None, eps=0):
+        """Evaluate on the grid points.
+        """
+        
+        # This method sets self.grid points and verifies it
+        super().evaluate(grid_points)
+        self.weights = self._process_sequence(self.weights)
+        
+        # Return the array converted to a float type
+        grid_points = np.asfarray(self.grid_points)
+        
+        # Create zeros on the grid points
+        evaluated = np.zeros_like(grid_points)
+        
+        # For every data point, compute the kernel and add to the grid
+        bw = self.bw
+        if isinstance(bw, numbers.Number):
+            bw = np.asfarray(np.ones_like(self.data) * bw)
+        elif callable(bw):
+            bw = np.asfarray(np.ones_like(self.data) * bw(self.data))
+        
+            
+        bw = np.asfarray(bw)
+        bw = bw.reshape(-1, 1) # a number
+        tree = cKDTree(self.data)
+        
+        kernel_radius = self.kernel.support[1]
+        assert -self.kernel.support[0] == self.kernel.support[1]
+        assert self.kernel.finite_support
+            
+            
+        maximal_bw = np.max(self.bw)
+        for i, grid_point in enumerate(grid_points):
+
+            indices = tree.query_ball_point(x=grid_point, 
+                                            r=kernel_radius * maximal_bw, 
+                                            p=2., eps=eps)
+
+            values = grid_point - self.data[indices]
+            kernel_estimates = self.kernel(values, bw=bw[indices])
+            weights_subset = self.weights[indices]
+            
+            assert kernel_estimates.shape == weights_subset.shape
+            assert kernel_estimates.shape == bw[indices].shape
+
+            weighted_estimates = np.dot(kernel_estimates.ravel(), weights_subset.ravel())
+            evaluated[i] += weighted_estimates
             
         return self._evalate_return_logic(evaluated, grid_points)
 
@@ -402,8 +478,11 @@ class KDE(ABC, object):
         return self.evaluate_naive(*args, **kwargs)
 
 
+if __name__ == "__main__":
+    # --durations=10  <- May be used to show potentially slow tests
+    pytest.main(args=['.', '--doctest-modules', '-v'])
+
 if __name__ == '__main__':
-    main()
     
     import matplotlib.pyplot as plt
     
@@ -411,19 +490,34 @@ if __name__ == '__main__':
     # Basic example of the naive KDE
     # -----------------------------------------
     data = [3, 3.5, 4, 6, 8]
-    kernel = 'box'
+    kernel = 'gaussian'
     bw = 1
     
+    plt.figure(figsize=(10, 4))
+    plt.title('Basic example of the naive KDE')
+    
+    plt.subplot(1, 2, 1)
     kde = NaiveKDE(kernel=kernel, bw=bw)
     kde.fit(data)
-    
     x = np.linspace(0, 10, num=1024)
     for d in data:
         k = NaiveKDE(kernel=kernel, bw=bw).fit([d]).evaluate(x) / len(data)
         plt.plot(x, k, color='k', ls='--')
         
     y = kde.evaluate(x)
-    plt.title('Basic example of the naive KDE')
+    plt.plot(x, y)
+    plt.scatter(data, np.zeros_like(data))
+    
+    
+    plt.subplot(1, 2, 2)
+    kde = NaiveKDE(kernel=kernel, bw=bw)
+    kde.fit(data)
+    x = np.linspace(0, 10, num=1024)
+    for d in data:
+        k = NaiveKDE(kernel=kernel, bw=bw).fit([d]).evaluate(x) / len(data)
+        plt.plot(x, k, color='k', ls='--')
+        
+    y = kde.evaluate(x)
     plt.plot(x, y)
     plt.scatter(data, np.zeros_like(data))
     plt.show()
@@ -441,7 +535,7 @@ if __name__ == '__main__':
     
     x = np.linspace(0, 10, num=1024)
     for d, w in zip(data, weights):
-        k = NaiveKDE(kernel=kernel, bw=bw).fit([d], weights=[w]).evaluate(x)
+        k = NaiveKDE(kernel=kernel, bw=bw).fit([d], weights=[w]).evaluate(x) * w
         plt.plot(x, k, color='k', ls='--')
         
     y = kde.evaluate(x)
@@ -493,14 +587,93 @@ if __name__ == '__main__':
     plt.show()
     
     
+    # Comparing tree and naive
+    # -----------------------------------------
+    data = [3, 3.5, 4, 6, 8]
+    kernel = 'triweight'
+    bw =  [3, 0.3, 1, 0.3, 2]
+    weights = [1, 2, 3, 4, 5]
     
+    plt.figure(figsize=(10, 4))
+    plt.title('Basic example of the naive KDE')
+    
+    plt.subplot(1, 2, 1)
+    kde = NaiveKDE(kernel=kernel, bw=bw)
+    kde.fit(data, weights)
+    x = np.linspace(0, 10, num=1024)
+    for d, b in zip(data, bw):
+        k = NaiveKDE(kernel=kernel, bw=b).fit([d]).evaluate(x) / len(data)
+        plt.plot(x, k, color='k', ls='--')
+        
+    y = kde.evaluate(x)
+    plt.plot(x, y)
+    plt.scatter(data, np.zeros_like(data))
+    
+    
+    plt.subplot(1, 2, 2)
+    kde = TreeKDE(kernel=kernel, bw=bw)
+    kde.fit(data, weights)
+    x = np.linspace(0, 10, num=1024)
+    for d, b in zip(data, bw):
+        k = NaiveKDE(kernel=kernel, bw=b).fit([d]).evaluate(x) / len(data)
+        plt.plot(x, k, color='k', ls='--')
+        
+    y = kde.evaluate(x)
+    plt.plot(x, y)
+    plt.scatter(data, np.zeros_like(data))
+    plt.show()
     
     
 
-if __name__ == "__main__":
-    # --durations=10  <- May be used to show potentially slow tests
-    #pytest.main(args=['.', '--doctest-modules', '-v'])
-    pass
     
+    # Comparing tree and naive
+    # -----------------------------------------
+    data = [3, 3.5, 4, 6, 8]
+    data = np.array(data)
+    data = list(np.random.random(5))
+    kernel = 'triweight'
+    bw =  [3, 0.3, 1, 0.3, 2]
+    weights = [1, 2, 3, 4, 5]
+    np.random.seed(123)
+    n = 120
+    data = np.random.gamma(5, scale=2.5, size=n) * 10
+    bw = np.random.random(n) + 5 + 1
+    weights = np.random.random(n) / 1 + 1
+    
+    plt.figure(figsize=(10, 4))
+    plt.title('Basic example of the naive KDE')
+    
+    plt.subplot(1, 2, 1)
+    kde = NaiveKDE(kernel=kernel, bw=bw)
+    kde.fit(data, weights)
+    x = np.linspace(-4, 360, num=1024)
+    for d, b in zip(data, bw):
+        break
+        k = NaiveKDE(kernel=kernel, bw=b).fit([d]).evaluate(x) / len(data)
+        plt.plot(x, k, color='k', ls='--')
+        
+    st = time.perf_counter()
+    y = kde.evaluate(x)
+    print(time.perf_counter() - st)
+    plt.plot(x, y)
+    plt.scatter(data, np.zeros_like(data))
+    
+
+    plt.subplot(1, 2, 2)
+    kde = TreeKDE(kernel=kernel, bw=bw)
+    kde.fit(data, weights)
+    x = np.linspace(-4, 360, num=1024)
+    for d, b in zip(data, bw):
+        break
+        k = NaiveKDE(kernel=kernel, bw=b).fit([d]).evaluate(x) / len(data)
+        plt.plot(x, k, color='k', ls='--')
+        
+    st = time.perf_counter()
+    y = kde.evaluate(x)
+    print(time.perf_counter() - st)
+    plt.plot(x, y)
+    plt.scatter(data, np.zeros_like(data))
+
+    plt.show()
     
     

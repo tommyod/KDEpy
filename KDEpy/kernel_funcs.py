@@ -150,3 +150,5 @@ if __name__ == "__main__":
     pytest.main(args=['.', '--doctest-modules', '-v'])
     
     print(box.support)
+    print(_kernel_functions['gaussian']([0, 1, 2]))
+    
