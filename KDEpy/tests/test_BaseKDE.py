@@ -5,12 +5,14 @@ API tests. Since BaseKDE is an abstract class, the testing is done using the
 naiveKDE class instead.
 """
 import numpy as np
-from KDEpy.kde import NaiveKDE, BaseKDE
+from KDEpy.NaiveKDE import NaiveKDE
 import itertools
 import pytest
 
 
-args = itertools.product([0.5, 1, 3], BaseKDE._available_kernels)
+args = itertools.product([0.5, 1, 3], NaiveKDE._available_kernels)
+
+
 @pytest.mark.parametrize("bw, kernel", args)
 def test_1d_data_inputs(bw, kernel):
     """
@@ -60,6 +62,7 @@ def test_common_calling_patterns():
     y2 = k.evaluate(x)
     
     assert np.allclose(y1, y2)
+   
     
 def test_weights():
     """
@@ -75,7 +78,6 @@ def test_weights():
     assert np.allclose(y1, y2)
     
     
-
 def test_data_must_have_length():
     """
     Test that an error is raised when the data has no length.
@@ -86,6 +88,7 @@ def test_data_must_have_length():
     
     with pytest.raises(ValueError):
         k.fit(np.array(input_data)) 
+        
         
 def test_grid_must_have_length():
     """
