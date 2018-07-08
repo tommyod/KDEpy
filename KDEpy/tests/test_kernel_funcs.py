@@ -5,14 +5,14 @@ Tests.
 """
 import numpy as np
 from scipy.integrate import quad
-from KDEpy import KDE
+from KDEpy.BaseKDE import BaseKDE
 import pytest
 
 
 class TestKernelFunctions():
     
     @pytest.mark.parametrize("fname, function", 
-                             list(KDE._available_kernels.items()))
+                             list(BaseKDE._available_kernels.items()))
     def test_integral_unity(self, fname, function):
         """
         Verify that all available kernel functions have an integral evaluating
@@ -27,7 +27,7 @@ class TestKernelFunctions():
         assert np.isclose(integral, 1)
             
     @pytest.mark.parametrize("fname, function", 
-                             list(KDE._available_kernels.items()))
+                             list(BaseKDE._available_kernels.items()))
     def test_monotonic_decreasing(self, fname, function):
         """
         Verify that all available kernel functions decrease away from their 
@@ -45,7 +45,7 @@ class TestKernelFunctions():
         assert np.all(diffs_left >= 0)
                      
     @pytest.mark.parametrize("fname, function", 
-                             list(KDE._available_kernels.items()))
+                             list(BaseKDE._available_kernels.items()))
     def test_non_negative(self, fname, function):
         """
         Verify that all available kernel functions are non-negative.

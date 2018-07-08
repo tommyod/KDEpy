@@ -4,11 +4,10 @@
 Tests.
 """
 import numpy as np
-from KDEpy import KDE
-import itertools
+from KDEpy.NaiveKDE import NaiveKDE
 import pytest
 
-kernel_funcs = list(KDE._available_kernels.values())
+kernel_funcs = list(NaiveKDE._available_kernels.values())
 
 
 class TestNaiveKDE():
@@ -51,7 +50,7 @@ class TestNaiveKDE():
         """
         data = np.array([0, 0.1, 1])
         x = np.linspace(-1, 1, num=n)
-        y = KDE(kernel, bw=bw).fit(data).evaluate_naive(x)
+        y = NaiveKDE(kernel, bw=bw).fit(data).evaluate(x)
         assert np.allclose(y, expected_result, atol=10**(-2.7))
 
     @pytest.mark.parametrize("bw, n, expected_result", 
@@ -82,60 +81,8 @@ class TestNaiveKDE():
         """
         data = np.array([0, 0.1, 1])
         x = np.linspace(-1, 1, num=n)
-        y = KDE(kernel='gaussian', bw=bw).fit(data).evaluate_naive(x)
+        y = NaiveKDE(kernel='gaussian', bw=bw).fit(data).evaluate(x)
         assert np.allclose(y, expected_result)
-        
-    @pytest.mark.parametrize("data, bw, n, kernel",
-                             list(itertools.product([np.array([0, 0.1, 1]), 
-                                                     np.array([0, 10, 20])],
-                                                    [0.1, 0.5, 1], 
-                                                    [1, 5, 10],
-                                                    kernel_funcs)))
-    def test_naive_vs_sorted_eval(self, data, bw, n, kernel):
-        """
-        Test the naive algorithm versus the sorted evaluation.
-        """
-        x = np.linspace(np.min(data), np.max(data), num=n)
-        kde = KDE(kernel=kernel, bw=bw).fit(data)
-        assert np.allclose(kde.evaluate_naive(x), 
-                           kde.evaluate_sorted(x, tolerance=10e-3), 
-                           atol=10e-2, rtol=0)
-        
-    @pytest.mark.parametrize("data, weights, kernel", 
-                             list(itertools.product(
-                                  [np.array([0, 0.1, 2]), 
-                                   np.array([-5, 2, 5])],
-                                  [np.array([1, 3, 2]), 
-                                   np.array([0, 3, 1])],
-                                  kernel_funcs)))
-    def test_weighted_naive(self, data, weights, kernel):
-        x = np.linspace(np.min(data), np.max(data), num=10)
-        kde = KDE(kernel=kernel, bw=1).fit(data, weights=weights)
-        y1 = kde.evaluate_naive(x)
-        
-        data_weighted = np.repeat(data, weights)
-        kde = KDE(kernel=kernel, bw=1).fit(data_weighted)
-        y2 = kde.evaluate_naive(x)
-
-        assert np.allclose(y1, y2)
-        
-    @pytest.mark.parametrize("data, weights, kernel", 
-                             list(itertools.product(
-                                  [np.array([0, 0.1, 2]), 
-                                   np.array([-5, 2, 5])],
-                                  [np.array([1, 3, 2]), 
-                                   np.array([0, 3, 1])],
-                                  kernel_funcs)))
-    def test_weighted_sorted(self, data, weights, kernel):
-        x = np.linspace(np.min(data), np.max(data), num=10)
-        kde = KDE(kernel=kernel, bw=1).fit(data, weights=weights)
-        y1 = kde.evaluate_sorted(x)
-        
-        data_weighted = np.repeat(data, weights)
-        kde = KDE(kernel=kernel, bw=1).fit(data_weighted)
-        y2 = kde.evaluate_sorted(x)
-
-        assert np.allclose(y1, y2)
         
         
 if __name__ == "__main__":
