@@ -4,7 +4,7 @@
 Tests.
 """
 import numpy as np
-from KDEpy.NaiveKDE import NaiveKDE
+from KDEpy.TreeKDE import TreeKDE
 import itertools
 import pytest
 
@@ -21,14 +21,14 @@ def test_additivity(data, split_index):
     x = np.linspace(-10, 10)
     
     # Fit to add data
-    y = NaiveKDE().fit(data).evaluate(x)
+    y = TreeKDE('epa').fit(data).evaluate(x)
     
     # Fit to splits, and compensate for smaller data using weights
     weight_1 = split_index / len(data)
-    y_1 = NaiveKDE().fit(data[:split_index]).evaluate(x) * weight_1
+    y_1 = TreeKDE('epa').fit(data[:split_index]).evaluate(x) * weight_1
     
     weight_2 = (len(data) - split_index) / len(data)
-    y_2 = NaiveKDE().fit(data[split_index:]).evaluate(x) * weight_2
+    y_2 = TreeKDE('epa').fit(data[split_index:]).evaluate(x) * weight_2
     
     # Additive property of the functions
     assert np.allclose(y, y_1 + y_2)
@@ -57,7 +57,7 @@ def test_additivity_with_weights(data, split_index):
     weights = weights / np.sum(weights)
     
     # Fit to add data
-    y = NaiveKDE().fit(data, weights).evaluate(x)
+    y = TreeKDE('epa').fit(data, weights).evaluate(x)
     
     # Split up the data and the weights
     data = list(data)
@@ -68,10 +68,10 @@ def test_additivity_with_weights(data, split_index):
     weights_second_split = weights[split_index:]
     
     # Fit to splits, and compensate for smaller data using weights
-    y_1 = (NaiveKDE().fit(data_first_split, weights_first_split)
+    y_1 = (TreeKDE('epa').fit(data_first_split, weights_first_split)
            .evaluate(x) * sum(weights_first_split))
     
-    y_2 = (NaiveKDE().fit(data_second_split, weights_second_split)
+    y_2 = (TreeKDE('epa').fit(data_second_split, weights_second_split)
            .evaluate(x) * sum(weights_second_split))
     
     # Additive property of the functions
@@ -116,40 +116,8 @@ def test_against_R_density(kernel, bw, n, expected_result):
     """
     data = np.array([0, 0.1, 1])
     x = np.linspace(-1, 1, num=n)
-    y = NaiveKDE(kernel, bw=bw).fit(data).evaluate(x)
+    y = TreeKDE(kernel, bw=bw).fit(data).evaluate(x)
     assert np.allclose(y, expected_result, atol=10**(-2.7))
-
-
-@pytest.mark.parametrize("bw, n, expected_result", 
-                         [(1, 3, np.array([0.17127129, 
-                                           0.34595518, 
-                                           0.30233275])),
-                          (0.1, 5, np.array([2.56493684e-22, 
-                                             4.97598466e-06, 
-                                             2.13637668e+00, 
-                                             4.56012216e-04,
-                                             1.32980760e+00])),
-                          (0.01, 3, np.array([0., 
-                                              13.29807601, 
-                                              13.29807601]))])
-def test_against_scipy_density(bw, n, expected_result):
-    """
-    Test against the following function call in SciPy:
-        
-        data = np.array([0, 0.1, 1])
-        x = np.linspace(-1, 1, {n})
-        bw = {bw}/np.asarray(data).std(ddof=1)
-        density_estimate = gaussian_kde(dataset = data, bw_method = bw)
-        y = density_estimate.evaluate(x)
-        
-    # Note that scipy weights its bandwidth by the covariance of the
-    # input data.  To make the results comparable to the other methods,
-    # we divide the bandwidth by the sample standard deviation here.
-    """
-    data = np.array([0, 0.1, 1])
-    x = np.linspace(-1, 1, num=n)
-    y = NaiveKDE(kernel='gaussian', bw=bw).fit(data).evaluate(x)
-    assert np.allclose(y, expected_result)
  
         
 if __name__ == "__main__":

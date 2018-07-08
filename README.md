@@ -46,12 +46,20 @@ I hope to follow these guidelines for this project:
 
 The list below roughly shows what needs to be done.
 
-- [ ] Implement univariate, fixed bandwidth KDEs naively
+- [X] univariate BaseKDE
+- [X] univariate NaiveKDE
+- [ ] univariate TreeKDE
+- [ ] univariate FFTKDE
+- [ ] univariate DiffusionKDE
+
+- [X] Implement univariate, fixed bandwidth KDEs naively
+- [X] Implement **weighted**, fixed bandwidth, univariate KDEs naively
+- [X] Implement variable bandwidth KDEs naively
+- [X] Implement TreeKDE, test against other implementations
 - [ ] Implement Scott and Silverman rules for bandwidth selection
 - [ ] Make sure that speed and functionally matches `statsmodels`, `scikit-learn` and `scipy`
-- [ ] Implement **weighted**, fixed bandwidth, univariate KDEs
-- [ ] Implement variable bandwidth KDEs 
 - [ ] Implement methods taking care of boundaries
+- [ ] Make sure TreeKDE works without finite support too
 
 
 
