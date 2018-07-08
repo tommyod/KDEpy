@@ -26,12 +26,12 @@ Minimal working example
 
 Here's a minimal working example::
 
-    >>> from KDEpy import KDE
+    >>> from KDEpy import NaiveKDE
     >>> import numpy as np
     >>> from scipy.stats import norm
     >>> data = norm(loc=0, scale=1).rvs(100)
     >>> x = np.linspace(-3, 3)
-    >>> y = KDE(kernel='gaussian', bw=0.5).fit(data).evaluate(x)
+    >>> y = NaiveKDE(kernel='gaussian', bw=0.5).fit(data).evaluate(x)
 
 .. image:: _static/img/minimal_working_example.png
    :width: 400 px
