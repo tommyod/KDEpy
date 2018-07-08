@@ -3,7 +3,6 @@ notifications:
   email: false
 python:
   - '3.6'
-  - '3.5'
 before_install:
   - pip install pep8
   - pip install flake8
