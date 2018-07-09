@@ -9,6 +9,7 @@ Created on Sun Feb  4 20:52:43 2018
 import numpy as np
 import collections.abc
 import numbers
+from scipy.spatial import distance
 
 # In R, the following are implemented:
 # "gaussian", "rectangular", "triangular", "epanechnikov", 
@@ -149,6 +150,5 @@ if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
     pytest.main(args=['.', '--doctest-modules', '-v'])
     
-    print(box.support)
-    print(_kernel_functions['gaussian']([0, 1, 2]))
+    
     

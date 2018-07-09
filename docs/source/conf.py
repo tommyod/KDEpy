@@ -15,6 +15,7 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
+from KDEpy import __version__
 
 
 # -- Project information -----------------------------------------------------
@@ -26,7 +27,7 @@ author = 'tommyod'
 # The short X.Y version
 version = ''
 # The full version, including alpha/beta/rc tags
-release = '0.1'
+release = __version__
 
 
 # -- General configuration ---------------------------------------------------
@@ -48,7 +49,12 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.extlinks',
     'numpydoc',
-    'nbsphinx'
+    'nbsphinx',
+    'matplotlib.sphinxext.only_directives',
+    'matplotlib.sphinxext.plot_directive',
+    'IPython.sphinxext.ipython_directive',
+    'IPython.sphinxext.ipython_console_highlighting',
+    'sphinx.ext.inheritance_diagram'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -73,10 +79,16 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path .
-exclude_patterns = ['_build', '**.ipynb_checkpoints']
+exclude_patterns = ['_build', 'build', '**.ipynb_checkpoints']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
+
+plot_pre_code = r"""
+from matplotlib import pyplot as plt
+import numpy as np
+np.random.seed(42)
+"""
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -122,7 +134,15 @@ html_static_path = ['_static']
 # default: ``['localtoc.html', 'relations.html', 'sourcelink.html',
 # 'searchbox.html']``.
 #
-# html_sidebars = {}
+html_sidebars = {
+    '**': [
+        'about.html',
+        'navigation.html',
+        'relations.html',
+        'searchbox.html',
+        'donate.html',
+    ]
+}
 
 html_show_sphinx = False
 

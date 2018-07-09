@@ -6,7 +6,7 @@
 KDEpy
 =====
 
-KDEpy implements univariate kernel density estimators.
+KDEpy is a Python library which implements kernel density estimators.
 
 Highlights
 ----------
@@ -16,8 +16,8 @@ KDEpy is a Python library for kernel density estimation.
 Currently, the following features are implemented:
 
 * **Many kernels**: There are 10 kernel functions implemented.
-* **Weighted KDE**: The user may weight the data.
-* **Weighted KDE**: The user may weight the data.
+* **Data weights**: Individual data points might be weighed.
+* **Variable bandwidth**: The kernel bandwidth :math:`h` may be adjusted.
 
 
 
@@ -29,9 +29,8 @@ Here's a minimal working example::
     >>> from KDEpy import NaiveKDE
     >>> import numpy as np
     >>> from scipy.stats import norm
-    >>> data = norm(loc=0, scale=1).rvs(100)
-    >>> x = np.linspace(-3, 3)
-    >>> y = NaiveKDE(kernel='gaussian', bw=0.5).fit(data).evaluate(x)
+    >>> data = norm(loc=0, scale=1).rvs(100) # Generate 100 points
+    >>> x, y = NaiveKDE(kernel='gaussian', bw=0.5).fit(data).evaluate()
 
 .. image:: _static/img/minimal_working_example.png
    :width: 400 px
@@ -40,14 +39,39 @@ Here's a minimal working example::
 It's really that simple.
 
 
-Table of contents
------------------
+
+.. plot::
+   :include-source:
+
+   import matplotlib.pyplot as plt
+   import numpy as np
+   from KDEpy import NaiveKDE
+   from scipy.stats import norm
+
+   # Generate a distribution and some data
+   np.random.seed(42)
+   dist = norm(loc=0, scale=1)
+   data = dist.rvs(100) # Generate 100 points
+
+   # Compute kernel density estimate on a grid
+   x, y = NaiveKDE(kernel='gaussian', bw='silverman').fit(data).evaluate()
+
+   plt.figure(figsize=(7, 3))
+   plt.plot(x, y, label='KDE estimate')
+   plt.plot(x, dist.pdf(x), label='True distribution')
+   plt.grid(True, ls='--', zorder=-15); plt.legend(); plt.show()
+
+
+Navigation
+----------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
-   intro_kde
+   index.rst
+   intro_kde.rst
    notebook.ipynb
+   literature.rst
 
 
 Contribute
