@@ -72,6 +72,7 @@ class NaiveKDE(BaseKDE):
         
         # Create zeros on the grid points
         evaluated = np.zeros_like(grid_points)
+        print('eval:', evaluated.shape)
         
         # For every data point, compute the kernel and add to the grid
         bw = self.bw
