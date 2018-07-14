@@ -9,7 +9,6 @@ Created on Sun Feb  4 20:52:43 2018
 import numpy as np
 import collections.abc
 import numbers
-from scipy.spatial import distance
 from scipy.special import gamma
 
 # In R, the following are implemented:
@@ -24,6 +23,7 @@ from scipy.special import gamma
 # All kernel functions integrate to unity
 
 # TODO: Make sure kernels integrate to unity in 2D too
+
 
 def trig_integral(k):
     """
@@ -47,12 +47,13 @@ def trig_integral(k):
     Is = 2 / np.pi
     
     if k <= 0:
-        return (Is, Ic)
+        return Is, Ic
 
     for i in range(1, k + 1):
-        Ic, Is = (2 / np.pi) * (1 - (i)*Is), (2 / np.pi)*(i)*Ic
+        Ic, Is = (2 / np.pi) * (1 - i * Is), (2 / np.pi) * i * Ic
         
-    return (Is, Ic)
+    return Is, Ic
+
 
 def euclidean_norm(x):
     """
@@ -74,6 +75,7 @@ def infinity_norm(x):
     """
     return np.abs(x).max(axis=1).reshape(-1, 1)
 
+
 def taxicab_norm(x):
     """
     The taxicab norm of an array of shape (obs, dims)
@@ -85,7 +87,7 @@ def volume_hypershpere(d):
     """
     The volume of a d-dimensional hypersphere of radius 1.
     """
-    return (np.pi ** (d / 2.)) / gamma((d / 2.) + 1)
+    return (np.pi**(d / 2.)) / gamma((d / 2.) + 1)
 
 
 def volume_hypercube(d):
@@ -103,66 +105,64 @@ def volume_dual_hypercube(d):
 
 
 def epanechnikov(x, dims=1):
-    #obs, dims = x.shape
     normalization = volume_hypershpere(dims) * (2 / (dims + 2))
-    dist_sq = x**2 #euclidean_norm_sq(x)
+    dist_sq = x**2 
     out = np.zeros_like(dist_sq)
     mask = dist_sq < 1
-    out[mask] =  (1 - dist_sq)[mask] / normalization
+    out[mask] = (1 - dist_sq)[mask] / normalization
     return out
 
 
 def gaussian(x, dims=1):
-    #obs, dims = x.shape
     normalization = (2 * np.pi)**(dims / 2)
-    dist_sq = x**2 #euclidean_norm_sq(x)
+    dist_sq = x**2
     return np.exp(-dist_sq / 2) / normalization
 
 
 def box(x, dims=1):
-    normalization = volume_hypershpere(dims) #* (2 / (dims + 2))
-    dist = x #euclidean_norm(x)
-    out = np.zeros_like(dist)
-    mask = dist < 1
-    out[mask] = 1 / normalization #2**dims
+    normalization = volume_hypershpere(dims)
+    out = np.zeros_like(x)
+    mask = x < 1
+    out[mask] = 1 / normalization
     return out
 
 
 def tri(x, dims=1):
     normalization = volume_hypershpere(dims) * (1 / (dims + 1))
-    dist = x #euclidean_norm(x)
-    out = np.zeros_like(dist)
-    mask = dist < 1
-    out[mask] = np.maximum(0, 1 - dist)[mask] / normalization #2**dims
+    out = np.zeros_like(x)
+    mask = x < 1
+    out[mask] = np.maximum(0, 1 - x)[mask] / normalization 
     return out
 
 
 def biweight(x, dims=1):
-    #obs, dims = x.shape
-    normalization = volume_hypershpere(dims) * (8 / ((dims + 2) * (dims + 4)))
-    dist_sq = x**2 #euclidean_norm_sq(x)
+    normalization = (volume_hypershpere(dims) * 
+                     (8 / ((dims + 2) * (dims + 4))))
+    dist_sq = x**2
     out = np.zeros_like(dist_sq)
     mask = dist_sq < 1
-    out[mask] = np.maximum(0, (1 - dist_sq)**2)[mask] / normalization #2**dims
+    out[mask] = np.maximum(0, (1 - dist_sq)**2)[mask] / normalization
     return out
 
 
 def triweight(x, dims=1):
-    normalization = volume_hypershpere(dims) * (48 / ((dims + 2) * (dims + 4) * (dims + 6)))
-    dist_sq = x**2 #euclidean_norm_sq(x)
+    normalization = (volume_hypershpere(dims) * 
+                     (48 / ((dims + 2) * (dims + 4) * (dims + 6))))
+    dist_sq = x**2
     out = np.zeros_like(dist_sq)
     mask = dist_sq < 1
-    out[mask] = np.maximum(0, (1 - dist_sq)**3)[mask] / normalization #2**dims
+    out[mask] = np.maximum(0, (1 - dist_sq)**3)[mask] / normalization
     return out
 
 
 def tricube(x, dims=1):
-    normalization = volume_hypershpere(dims) * (162 / ((dims + 3) * (dims + 6) * (dims + 9)))
-    dist = x #euclidean_norm_sq(x)
-    out = np.zeros_like(dist)
-    mask = dist < 1
-    out[mask] = np.maximum(0, (1 - dist**3)**3)[mask] / normalization #2**dims
+    normalization = (volume_hypershpere(dims) * 
+                     (162 / ((dims + 3) * (dims + 6) * (dims + 9))))
+    out = np.zeros_like(x)
+    mask = x < 1
+    out[mask] = np.maximum(0, (1 - x**3)**3)[mask] / normalization
     return out
+
 
 def cosine(x, dims=1):
     Is, Ic = trig_integral(dims - 1)
@@ -174,13 +174,13 @@ def cosine(x, dims=1):
 
 
 def logistic(x, dims=1):
-    dist = (x * x).sum(axis = 1).reshape(-1, 1)
+    dist = (x * x).sum(axis=1).reshape(-1, 1)
     dist = np.sqrt(dist)
     return 1 / (2 + 2 * np.cosh(dist))
 
 
 def sigmoid(x, dims=1):
-    dist = (x * x).sum(axis = 1).reshape(-1, 1)
+    dist = (x * x).sum(axis=1).reshape(-1, 1)
     dist = np.sqrt(dist)
     return (1 / (np.pi * np.cosh(dist)))
 
@@ -236,7 +236,6 @@ class Kernel(collections.abc.Callable):
             
         return self.function(distances / real_bw, dims) / (real_bw**dims)
             
-    
     __call__ = evaluate
     
     
@@ -270,14 +269,13 @@ if __name__ == "__main__":
     pytest.main(args=['.', '--doctest-modules', '-v'])
     
     import matplotlib.pyplot as plt
-    from mpl_toolkits.mplot3d import Axes3D
     import scipy
     for name, func in _kernel_functions.items():
         
         if name != 'cosine':
             continue
 
-        print('-'*2**7)
+        print('-' * 2**7)
         print(name)
         print(func([-1, 0, 1]))
         print(func(np.array([[0, -1], [0, 0], [0, 1]])))
@@ -285,7 +283,7 @@ if __name__ == "__main__":
         
         # Plot in 1D
         n = 50
-        x = np.linspace(-3, 3, num=n*3)
+        x = np.linspace(-3, 3, num=n * 3)
         plt.plot(x, func(x))
         plt.show()
         
@@ -294,7 +292,7 @@ if __name__ == "__main__":
         linspace = np.linspace(-3, 3, num=n)
 
         x, y = linspace, linspace
-        k = np.array(np.meshgrid(x, y)).T.reshape(-1,2)
+        k = np.array(np.meshgrid(x, y)).T.reshape(-1, 2)
         z = func(k).reshape((n, n))
         
         x, y = np.meshgrid(x, y)
@@ -307,7 +305,6 @@ if __name__ == "__main__":
         angle = 90
         ax.view_init(30, angle)
 
-        
         plt.show()
         
         # Perform integration 1D
@@ -323,7 +320,8 @@ if __name__ == "__main__":
             return func([[x1, x2]])
         
         ans, err = scipy.integrate.nquad(int2D, [[-4, 4], [-4, 4]],
-                                         opts={'epsabs':10e-3, 'epsrel':10e-3})
+                                         opts={'epsabs': 10e-3, 
+                                               'epsrel': 10e-3})
         print(f'2D integration result: {ans}')
         assert np.allclose(ans, 1, rtol=10e-3, atol=10e-3)
         
@@ -332,14 +330,7 @@ if __name__ == "__main__":
             return func([[x1, x2, x3]])
         
         ans, err = scipy.integrate.nquad(int3D, [[-4, 4], [-4, 4], [-4, 4]],
-                                         opts={'epsabs':10e-1, 'epsrel':10e-1})
+                                         opts={'epsabs': 10e-1, 
+                                               'epsrel': 10e-1})
         print(f'3D integration result: {ans}')
         assert np.allclose(ans, 1, rtol=10e-3, atol=10e-3)
-        
-
-        
-
-    
-    
-    
-    

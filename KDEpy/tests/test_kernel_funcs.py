@@ -48,12 +48,11 @@ class TestKernelFunctions():
             return function([[x1, x2]])
         
         ans, err = scipy.integrate.nquad(int2D, [[a, b], [a, b]],
-                                         opts={'epsabs':10e-2, 
-                                               'epsrel':10e-2})
+                                         opts={'epsabs': 10e-2, 
+                                               'epsrel': 10e-2})
 
         assert np.allclose(ans, 1, rtol=10e-2, atol=10e-2)
 
-            
     @pytest.mark.parametrize("fname, function", 
                              list(BaseKDE._available_kernels.items()))
     def test_monotonic_decreasing(self, fname, function):
