@@ -70,6 +70,7 @@ Navigation
 
    index.rst
    intro_kde.rst
+   kernels.rst
    notebook.ipynb
    literature.rst
 
