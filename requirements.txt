@@ -5,3 +5,4 @@ numpy>=1.14.2
 numpydoc>=0.7.0
 scipy>=1.0.1
 nbsphinx>=0.3.2
+pytest>=3.6.2
