@@ -25,11 +25,41 @@ from scipy.special import gamma
 
 # TODO: Make sure kernels integrate to unity in 2D too
 
+def trig_integral(k):
+    """
+    Returns the solutions to
+    Is(k) = int_0^1 sin(pi * x / 2) x^k dx
+    Ic(k) = int_0^1 cos(pi * x / 2) x^k dx
+    using a recursive formula. Returns a tuple (Is, Ic).
+    
+    Examples
+    --------
+    >>> import numpy as np
+    >>> Is, Ic = trig_integral(2) # Verify with solution from WolframAlpha
+    >>> np.allclose([Is, Ic], [0.29454, 0.12060], rtol=10e-5, atol=10e-5)
+    True
+    >>> Is, Ic = trig_integral(3) # Verify with solution from WolframAlpha
+    >>> np.allclose([Is, Ic], [0.23032, 0.074080], rtol=10e-5, atol=10e-5)
+    True
+    """
+
+    Ic = 2 / np.pi
+    Is = 2 / np.pi
+    
+    if k <= 0:
+        return (Is, Ic)
+
+    for i in range(1, k + 1):
+        Ic, Is = (2 / np.pi) * (1 - (i)*Is), (2 / np.pi)*(i)*Ic
+        
+    return (Is, Ic)
+
 def euclidean_norm(x):
     """
     The 2 norm of an array of shape (obs, dims)
     """
     return np.sqrt((x * x).sum(axis=1)).reshape(-1, 1)
+
 
 def euclidean_norm_sq(x):
     """
@@ -37,11 +67,18 @@ def euclidean_norm_sq(x):
     """
     return (x * x).sum(axis=1).reshape(-1, 1)
 
+
 def infinity_norm(x):
     """
     The infinity norm of an array of shape (obs, dims)
     """
     return np.abs(x).max(axis=1).reshape(-1, 1)
+
+def taxicab_norm(x):
+    """
+    The taxicab norm of an array of shape (obs, dims)
+    """
+    return np.abs(x).sum(axis=1).reshape(-1, 1)
 
 
 def volume_hypershpere(d):
@@ -58,90 +95,91 @@ def volume_hypercube(d):
     return np.power(2., d)
 
 
-def epanechnikov(x):
-    obs, dims = x.shape
+def volume_dual_hypercube(d):
+    """
+    The volume of a d-dimensional cross-polytope of radius 1.
+    """
+    return scipy.special.factorial(d) / np.power(2., d)
+
+
+def epanechnikov(x, dims=1):
+    #obs, dims = x.shape
     normalization = volume_hypershpere(dims) * (2 / (dims + 2))
-    dist_sq = euclidean_norm_sq(x)
+    dist_sq = x**2 #euclidean_norm_sq(x)
     out = np.zeros_like(dist_sq)
     mask = dist_sq < 1
     out[mask] =  (1 - dist_sq)[mask] / normalization
     return out
 
 
-def gaussian(x):
-    obs, dims = x.shape
+def gaussian(x, dims=1):
+    #obs, dims = x.shape
     normalization = (2 * np.pi)**(dims / 2)
-    dist_sq = euclidean_norm_sq(x)
+    dist_sq = x**2 #euclidean_norm_sq(x)
     return np.exp(-dist_sq / 2) / normalization
 
 
-def box(x):
-    obs, dims = x.shape
+def box(x, dims=1):
     normalization = volume_hypershpere(dims) #* (2 / (dims + 2))
-    dist = euclidean_norm(x)
+    dist = x #euclidean_norm(x)
     out = np.zeros_like(dist)
     mask = dist < 1
     out[mask] = 1 / normalization #2**dims
     return out
 
-def tri(x):
-    obs, dims = x.shape
+
+def tri(x, dims=1):
     normalization = volume_hypershpere(dims) * (1 / (dims + 1))
-    dist = euclidean_norm(x)
+    dist = x #euclidean_norm(x)
     out = np.zeros_like(dist)
     mask = dist < 1
     out[mask] = np.maximum(0, 1 - dist)[mask] / normalization #2**dims
     return out
 
 
-def biweight(x):
-    obs, dims = x.shape
+def biweight(x, dims=1):
+    #obs, dims = x.shape
     normalization = volume_hypershpere(dims) * (8 / ((dims + 2) * (dims + 4)))
-    dist_sq = euclidean_norm_sq(x)
+    dist_sq = x**2 #euclidean_norm_sq(x)
     out = np.zeros_like(dist_sq)
     mask = dist_sq < 1
     out[mask] = np.maximum(0, (1 - dist_sq)**2)[mask] / normalization #2**dims
     return out
 
 
-    dist = (x*x).sum(axis = 1).reshape(-1, 1)
-    out = np.zeros_like(dist)
-    mask = np.logical_and((dist < 1), (dist > -1))
-    out[mask] = ((15 / 16) * (1 - dist)**2)[mask]
+def triweight(x, dims=1):
+    normalization = volume_hypershpere(dims) * (48 / ((dims + 2) * (dims + 4) * (dims + 6)))
+    dist_sq = x**2 #euclidean_norm_sq(x)
+    out = np.zeros_like(dist_sq)
+    mask = dist_sq < 1
+    out[mask] = np.maximum(0, (1 - dist_sq)**3)[mask] / normalization #2**dims
     return out
 
 
-def triweight(x):
-    dist = (x * x).sum(axis = 1).reshape(-1, 1)
+def tricube(x, dims=1):
+    normalization = volume_hypershpere(dims) * (162 / ((dims + 3) * (dims + 6) * (dims + 9)))
+    dist = x #euclidean_norm_sq(x)
     out = np.zeros_like(dist)
-    mask = np.logical_and((dist < 1), (dist > -1))
-    out[mask] = ((35 / 32) * (1 - dist)**3)[mask]
+    mask = dist < 1
+    out[mask] = np.maximum(0, (1 - dist**3)**3)[mask] / normalization #2**dims
+    return out
+
+def cosine(x, dims=1):
+    Is, Ic = trig_integral(dims - 1)
+    normalization = volume_hypershpere(dims) * Ic
+    out = np.zeros_like(x)
+    mask = x < 1
+    out[mask] = np.cos((np.pi * x) / 2)[mask] / (normalization * dims)
     return out
 
 
-def tricube(x):
-    dist = (x * x).sum(axis = 1).reshape(-1, 1)
-    out = np.zeros_like(dist)
-    mask = np.logical_and((dist < 1), (dist > -1))
-    out[mask] = ((70 / 81) * (1 - dist**(3/2))**3)[mask]
-    return out
-
-
-def cosine(x):
-    dist = (x * x).sum(axis = 1).reshape(-1, 1)
-    out = np.zeros_like(dist)
-    mask = np.logical_and((dist < 1), (dist > -1))
-    out[mask] = ((np.pi / 4) * np.cos((np.pi * np.sqrt(dist)) / 2))[mask]
-    return out
-
-
-def logistic(x):
+def logistic(x, dims=1):
     dist = (x * x).sum(axis = 1).reshape(-1, 1)
     dist = np.sqrt(dist)
     return 1 / (2 + 2 * np.cosh(dist))
 
 
-def sigmoid(x):
+def sigmoid(x, dims=1):
     dist = (x * x).sum(axis = 1).reshape(-1, 1)
     dist = np.sqrt(dist)
     return (1 / (np.pi * np.cosh(dist)))
@@ -149,7 +187,7 @@ def sigmoid(x):
 
 class Kernel(collections.abc.Callable):
     
-    def __init__(self, function, var=1, support=(-3, 3), norm=2):
+    def __init__(self, function, var=1, support=(-3, 3)):
         """
         Initialize a new kernel function.
         
@@ -161,7 +199,6 @@ class Kernel(collections.abc.Callable):
         self.function = function
         self.var = var
         self.finite_support = np.all(np.isfinite(np.array(support)))
-        self.norm = norm
         
         # If the function has finite support, scale the support so that it
         # corresponds to the support of the function when it is scaled to have
@@ -170,7 +207,7 @@ class Kernel(collections.abc.Callable):
             
         assert self.support[0] < self.support[1]
     
-    def evaluate(self, x, bw=1):
+    def evaluate(self, x, bw=1, norm=2):
         """
         Evaluate the kernel.
         """
@@ -188,7 +225,17 @@ class Kernel(collections.abc.Callable):
         # a standard deviation (or variance) equal to 1
         real_bw = bw / np.sqrt(self.var)
         obs, dims = x.shape
-        return self.function(x / real_bw) / (real_bw**dims)
+        if norm == 2:
+            distances = euclidean_norm(x)
+        elif norm == np.infty:
+            distances = infinity_norm(x)
+        elif norm == 1:
+            distances = taxicab_norm(x)
+        else:
+            assert False
+            
+        return self.function(distances / real_bw, dims) / (real_bw**dims)
+            
     
     __call__ = evaluate
     
@@ -213,7 +260,8 @@ _kernel_functions = {'gaussian': gaussian,
                      'tricube': tricube,
                      'cosine': cosine,
                      'logistic': logistic,
-                     'sigmoid': sigmoid}
+                     'sigmoid': sigmoid
+                     }
 
 
 if __name__ == "__main__":
@@ -225,6 +273,9 @@ if __name__ == "__main__":
     from mpl_toolkits.mplot3d import Axes3D
     import scipy
     for name, func in _kernel_functions.items():
+        
+        if name != 'cosine':
+            continue
 
         print('-'*2**7)
         print(name)
@@ -263,27 +314,29 @@ if __name__ == "__main__":
         def int1D(x1):
             return func(x1)
         
-        ans, err = scipy.integrate.nquad(int1D, [[-5, 5]])
+        ans, err = scipy.integrate.nquad(int1D, [[-4, 4]])
         print(f'1D integration result: {ans}')
-        assert np.allclose(ans, 1, rtol=10e-2, atol=10e-2)
+        assert np.allclose(ans, 1, rtol=10e-3, atol=10e-3)
         
         # Perform integration 2D
         def int2D(x1, x2):
             return func([[x1, x2]])
         
-        ans, err = scipy.integrate.nquad(int2D, [[-5, 5], [-5, 5]],
-                                         opts={'epsabs':10e-2, 'epsrel':10e-2})
+        ans, err = scipy.integrate.nquad(int2D, [[-4, 4], [-4, 4]],
+                                         opts={'epsabs':10e-3, 'epsrel':10e-3})
         print(f'2D integration result: {ans}')
-        assert np.allclose(ans, 1, rtol=10e-2, atol=10e-2)
+        assert np.allclose(ans, 1, rtol=10e-3, atol=10e-3)
         
         # Perform integration 3D
         def int3D(x1, x2, x3):
             return func([[x1, x2, x3]])
         
-        ans, err = scipy.integrate.nquad(int3D, [[-5, 5], [-5, 5], [-5, 5]],
+        ans, err = scipy.integrate.nquad(int3D, [[-4, 4], [-4, 4], [-4, 4]],
                                          opts={'epsabs':10e-1, 'epsrel':10e-1})
         print(f'3D integration result: {ans}')
-        #assert np.allclose(ans, 1)
+        assert np.allclose(ans, 1, rtol=10e-3, atol=10e-3)
+        
+
         
 
     

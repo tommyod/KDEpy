@@ -16,11 +16,12 @@ class NaiveKDE(BaseKDE):
     The class for a naive implementation of the KDE.
     """
     
-    def __init__(self, kernel='gaussian', bw=1):
+    def __init__(self, kernel='gaussian', bw=1, norm=2):
         """
         Initialize a naive KDE.
         """
         super().__init__(kernel, bw)
+        self.norm = norm
     
     def fit(self, data, weights=None):
         """Fit the KDE to the data.
@@ -82,7 +83,8 @@ class NaiveKDE(BaseKDE):
             bw = np.asfarray(np.ones_like(self.data) * bw(self.data))
 
         for weight, data_point, bw in zip(self.weights, self.data, bw):
-            evaluated += weight * self.kernel(grid_points - data_point, bw=bw)
+            evaluated += weight * self.kernel(grid_points - data_point, 
+                                              bw=bw)
             
         return self._evalate_return_logic(evaluated, grid_points)
 

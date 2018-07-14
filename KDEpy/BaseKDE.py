@@ -76,6 +76,7 @@ class BaseKDE(ABC):
             self.bw = bw
         else:
             raise ValueError(f'Bandwidth must be > 0, array-like or a string.')
+            
         
     @abstractmethod
     def fit(self, data):
