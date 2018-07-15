@@ -9,7 +9,8 @@ Created on Sun Feb  4 20:52:43 2018
 import numpy as np
 import collections.abc
 import numbers
-from scipy.special import gamma
+from scipy.special import gamma, factorial, factorial2
+from scipy.stats import norm
 
 # In R, the following are implemented:
 # "gaussian", "rectangular", "triangular", "epanechnikov", 
@@ -23,6 +24,49 @@ from scipy.special import gamma
 # All kernel functions integrate to unity
 
 # TODO: Make sure kernels integrate to unity in 2D too
+
+
+
+def gauss_integral(n):
+    """
+    Solve the integral
+    \int_0^1 exp(-0.5 * x * x) x^n dx
+    
+    See
+    https://en.wikipedia.org/wiki/List_of_integrals_of_Gaussian_functions
+    
+    Examples
+    --------
+    >>> # Some tests against WolframAlpha
+    >>> ans = gauss_integral(0)
+    >>> np.allclose(ans, 1.25331)
+    True
+    >>> ans = gauss_integral(1)
+    >>> np.allclose(ans, 1)
+    True
+    >>> ans = gauss_integral(2)
+    >>> np.allclose(ans, 1.25331)
+    True
+    >>> ans = gauss_integral(3)
+    >>> np.allclose(ans, 2)
+    True
+    >>> ans = gauss_integral(4)
+    >>> np.allclose(ans, 3.75994)
+    True
+    >>> ans = gauss_integral(5)
+    >>> np.allclose(ans, 8)
+    True
+    >>> ans = gauss_integral(6)
+    >>> np.allclose(ans, 18.7997)
+    True
+    """
+    factor = np.sqrt(np.pi * 2)
+    if n % 2 == 0:
+        return factor * factorial2(n - 1) / 2
+    elif n % 2 == 1:
+        return factor * norm.pdf(0) * factorial2(n - 1)
+    else:
+        raise ValueError('n must be odd or even.')
 
 
 def trig_integral(k):
@@ -53,6 +97,22 @@ def trig_integral(k):
         Ic, Is = (2 / np.pi) * (1 - i * Is), (2 / np.pi) * i * Ic
         
     return Is, Ic
+
+
+def p_norm(x, p):
+    """
+    The 2 norm of an array of shape (obs, dims)
+    
+    Examples
+    --------
+    >>> x = np.arange(9).reshape((3, 3))
+    >>> p = 2
+    >>> np.allclose(p_norm(x, p), euclidean_norm(x))
+    True
+    """
+    if np.isinf(p):
+        return infinity_norm(x)
+    return np.power(np.power(np.abs(x), p).sum(axis=1), 1/p).reshape(-1, 1)
 
 
 def euclidean_norm(x):
@@ -101,11 +161,11 @@ def volume_dual_hypercube(d):
     """
     The volume of a d-dimensional cross-polytope of radius 1.
     """
-    return scipy.special.factorial(d) / np.power(2., d)
+    return np.power(2., d) / factorial(d) #/ np.power(2., d)
 
 
-def epanechnikov(x, dims=1):
-    normalization = volume_hypershpere(dims) * (2 / (dims + 2))
+def epanechnikov(x, dims=1, volume_func=volume_hypershpere):
+    normalization = volume_func(dims) * (2 / (dims + 2))
     dist_sq = x**2 
     out = np.zeros_like(dist_sq)
     mask = dist_sq < 1
@@ -113,30 +173,35 @@ def epanechnikov(x, dims=1):
     return out
 
 
-def gaussian(x, dims=1):
+def gaussian(x, dims=1, volume_func=volume_hypershpere):
     normalization = (2 * np.pi)**(dims / 2)
+    normalization = volume_func(dims) * dims * gauss_integral(dims-1)
     dist_sq = x**2
     return np.exp(-dist_sq / 2) / normalization
 
 
-def box(x, dims=1):
-    normalization = volume_hypershpere(dims)
+def box(x, dims=1, volume_func=volume_hypershpere):
+    normalization = volume_func(dims)
     out = np.zeros_like(x)
     mask = x < 1
     out[mask] = 1 / normalization
     return out
 
+def exponential(x, dims=1, volume_func=volume_hypershpere):
+    normalization = volume_func(dims) * gamma(dims) * dims
+    return np.exp(-x) / normalization
 
-def tri(x, dims=1):
-    normalization = volume_hypershpere(dims) * (1 / (dims + 1))
+
+def tri(x, dims=1, volume_func=volume_hypershpere):
+    normalization = volume_func(dims) * (1 / (dims + 1))
     out = np.zeros_like(x)
     mask = x < 1
     out[mask] = np.maximum(0, 1 - x)[mask] / normalization 
     return out
 
 
-def biweight(x, dims=1):
-    normalization = (volume_hypershpere(dims) * 
+def biweight(x, dims=1, volume_func=volume_hypershpere):
+    normalization = (volume_func(dims) * 
                      (8 / ((dims + 2) * (dims + 4))))
     dist_sq = x**2
     out = np.zeros_like(dist_sq)
@@ -145,8 +210,8 @@ def biweight(x, dims=1):
     return out
 
 
-def triweight(x, dims=1):
-    normalization = (volume_hypershpere(dims) * 
+def triweight(x, dims=1, volume_func=volume_hypershpere):
+    normalization = (volume_func(dims) * 
                      (48 / ((dims + 2) * (dims + 4) * (dims + 6))))
     dist_sq = x**2
     out = np.zeros_like(dist_sq)
@@ -155,8 +220,8 @@ def triweight(x, dims=1):
     return out
 
 
-def tricube(x, dims=1):
-    normalization = (volume_hypershpere(dims) * 
+def tricube(x, dims=1, volume_func=volume_hypershpere):
+    normalization = (volume_func(dims) * 
                      (162 / ((dims + 3) * (dims + 6) * (dims + 9))))
     out = np.zeros_like(x)
     mask = x < 1
@@ -164,9 +229,9 @@ def tricube(x, dims=1):
     return out
 
 
-def cosine(x, dims=1):
+def cosine(x, dims=1, volume_func=volume_hypershpere):
     Is, Ic = trig_integral(dims - 1)
-    normalization = volume_hypershpere(dims) * Ic
+    normalization = volume_func(dims) * Ic
     out = np.zeros_like(x)
     mask = x < 1
     out[mask] = np.cos((np.pi * x) / 2)[mask] / (normalization * dims)
@@ -225,21 +290,24 @@ class Kernel(collections.abc.Callable):
         # a standard deviation (or variance) equal to 1
         real_bw = bw / np.sqrt(self.var)
         obs, dims = x.shape
-        if norm == 2:
-            distances = euclidean_norm(x)
-        elif norm == np.infty:
-            distances = infinity_norm(x)
+        
+        if norm == np.infty:
+            volume_func = volume_hypercube
         elif norm == 1:
-            distances = taxicab_norm(x)
+            volume_func = volume_dual_hypercube
         else:
-            assert False
+            volume_func = volume_hypershpere
             
-        return self.function(distances / real_bw, dims) / (real_bw**dims)
+        distances = p_norm(x, norm)
+            
+        return (self.function(distances / real_bw, dims, volume_func) / 
+                (real_bw**dims))
             
     __call__ = evaluate
     
     
 gaussian = Kernel(gaussian, var=1, support=(-np.inf, np.inf))
+exp = Kernel(exponential, var=4, support=(-np.inf, np.inf))
 box = Kernel(box, var=1 / 3, support=(-1, 1))
 tri = Kernel(tri, var=1 / 6, support=(-1, 1))
 epa = Kernel(epanechnikov, var=1 / 5, support=(-1, 1))
@@ -250,7 +318,11 @@ cosine = Kernel(cosine, var=(1 - (8 / np.pi**2)), support=(-1, 1))
 logistic = Kernel(logistic, var=(np.pi**2 / 3), support=(-np.inf, np.inf))
 sigmoid = Kernel(sigmoid, var=(np.pi**2 / 4), support=(-np.inf, np.inf))
 
+
+
+
 _kernel_functions = {'gaussian': gaussian,
+                     'exponential': exp,
                      'box': box,
                      'tri': tri,
                      'epa': epa,
@@ -258,8 +330,8 @@ _kernel_functions = {'gaussian': gaussian,
                      'triweight': triweight,
                      'tricube': tricube,
                      'cosine': cosine,
-                     'logistic': logistic,
-                     'sigmoid': sigmoid
+                     #'logistic': logistic,
+                     #'sigmoid': sigmoid
                      }
 
 
@@ -269,11 +341,13 @@ if __name__ == "__main__":
     pytest.main(args=['.', '--doctest-modules', '-v'])
     
     import matplotlib.pyplot as plt
+    from mpl_toolkits.mplot3d import Axes3D
     import scipy
     for name, func in _kernel_functions.items():
+        break
+
         
-        if name != 'cosine':
-            continue
+        
 
         print('-' * 2**7)
         print(name)
