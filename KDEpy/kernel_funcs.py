@@ -23,9 +23,6 @@ from scipy.stats import norm
 # All kernel functions take x of shape (obs, dims) and returns (obs, 1)
 # All kernel functions integrate to unity
 
-# TODO: Make sure kernels integrate to unity in 2D too
-
-
 
 def gauss_integral(n):
     """
@@ -37,27 +34,11 @@ def gauss_integral(n):
     
     Examples
     --------
-    >>> # Some tests against WolframAlpha
-    >>> ans = gauss_integral(0)
-    >>> np.allclose(ans, 1.25331)
-    True
-    >>> ans = gauss_integral(1)
-    >>> np.allclose(ans, 1)
-    True
-    >>> ans = gauss_integral(2)
-    >>> np.allclose(ans, 1.25331)
-    True
     >>> ans = gauss_integral(3)
     >>> np.allclose(ans, 2)
     True
     >>> ans = gauss_integral(4)
     >>> np.allclose(ans, 3.75994)
-    True
-    >>> ans = gauss_integral(5)
-    >>> np.allclose(ans, 8)
-    True
-    >>> ans = gauss_integral(6)
-    >>> np.allclose(ans, 18.7997)
     True
     """
     factor = np.sqrt(np.pi * 2)
@@ -80,10 +61,7 @@ def trig_integral(k):
     --------
     >>> import numpy as np
     >>> Is, Ic = trig_integral(2) # Verify with solution from WolframAlpha
-    >>> np.allclose([Is, Ic], [0.29454, 0.12060], rtol=10e-5, atol=10e-5)
-    True
-    >>> Is, Ic = trig_integral(3) # Verify with solution from WolframAlpha
-    >>> np.allclose([Is, Ic], [0.23032, 0.074080], rtol=10e-5, atol=10e-5)
+    >>> np.allclose([Is, Ic], [0.29454, 0.12060], rtol=10e-5)
     True
     """
 
@@ -112,7 +90,7 @@ def p_norm(x, p):
     """
     if np.isinf(p):
         return infinity_norm(x)
-    return np.power(np.power(np.abs(x), p).sum(axis=1), 1/p).reshape(-1, 1)
+    return np.power(np.power(np.abs(x), p).sum(axis=1), 1 / p).reshape(-1, 1)
 
 
 def euclidean_norm(x):
@@ -161,7 +139,7 @@ def volume_dual_hypercube(d):
     """
     The volume of a d-dimensional cross-polytope of radius 1.
     """
-    return np.power(2., d) / factorial(d) #/ np.power(2., d)
+    return np.power(2., d) / factorial(d)
 
 
 def epanechnikov(x, dims=1, volume_func=volume_hypershpere):
@@ -174,8 +152,7 @@ def epanechnikov(x, dims=1, volume_func=volume_hypershpere):
 
 
 def gaussian(x, dims=1, volume_func=volume_hypershpere):
-    normalization = (2 * np.pi)**(dims / 2)
-    normalization = volume_func(dims) * dims * gauss_integral(dims-1)
+    normalization = volume_func(dims) * dims * gauss_integral(dims - 1)
     dist_sq = x**2
     return np.exp(-dist_sq / 2) / normalization
 
@@ -186,6 +163,7 @@ def box(x, dims=1, volume_func=volume_hypershpere):
     mask = x < 1
     out[mask] = 1 / normalization
     return out
+
 
 def exponential(x, dims=1, volume_func=volume_hypershpere):
     normalization = volume_func(dims) * gamma(dims) * dims
@@ -238,13 +216,13 @@ def cosine(x, dims=1, volume_func=volume_hypershpere):
     return out
 
 
-def logistic(x, dims=1):
+def logistic(x, dims=1, volume_func=volume_hypershpere):
     dist = (x * x).sum(axis=1).reshape(-1, 1)
     dist = np.sqrt(dist)
     return 1 / (2 + 2 * np.cosh(dist))
 
 
-def sigmoid(x, dims=1):
+def sigmoid(x, dims=1, volume_func=volume_hypershpere):
     dist = (x * x).sum(axis=1).reshape(-1, 1)
     dist = np.sqrt(dist)
     return (1 / (np.pi * np.cosh(dist)))
@@ -318,9 +296,6 @@ cosine = Kernel(cosine, var=(1 - (8 / np.pi**2)), support=(-1, 1))
 logistic = Kernel(logistic, var=(np.pi**2 / 3), support=(-np.inf, np.inf))
 sigmoid = Kernel(sigmoid, var=(np.pi**2 / 4), support=(-np.inf, np.inf))
 
-
-
-
 _kernel_functions = {'gaussian': gaussian,
                      'exponential': exp,
                      'box': box,
@@ -330,8 +305,8 @@ _kernel_functions = {'gaussian': gaussian,
                      'triweight': triweight,
                      'tricube': tricube,
                      'cosine': cosine,
-                     #'logistic': logistic,
-                     #'sigmoid': sigmoid
+                     'logistic': logistic,
+                     'sigmoid': sigmoid
                      }
 
 
@@ -341,13 +316,9 @@ if __name__ == "__main__":
     pytest.main(args=['.', '--doctest-modules', '-v'])
     
     import matplotlib.pyplot as plt
-    from mpl_toolkits.mplot3d import Axes3D
+    # from mpl_toolkits.mplot3d import Axes3D
     import scipy
     for name, func in _kernel_functions.items():
-        break
-
-        
-        
 
         print('-' * 2**7)
         print(name)
@@ -397,14 +368,4 @@ if __name__ == "__main__":
                                          opts={'epsabs': 10e-3, 
                                                'epsrel': 10e-3})
         print(f'2D integration result: {ans}')
-        assert np.allclose(ans, 1, rtol=10e-3, atol=10e-3)
-        
-        # Perform integration 3D
-        def int3D(x1, x2, x3):
-            return func([[x1, x2, x3]])
-        
-        ans, err = scipy.integrate.nquad(int3D, [[-4, 4], [-4, 4], [-4, 4]],
-                                         opts={'epsabs': 10e-1, 
-                                               'epsrel': 10e-1})
-        print(f'3D integration result: {ans}')
         assert np.allclose(ans, 1, rtol=10e-3, atol=10e-3)

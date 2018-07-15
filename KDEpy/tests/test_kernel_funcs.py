@@ -7,9 +7,36 @@ import numpy as np
 import scipy
 from scipy.integrate import quad
 from KDEpy.BaseKDE import BaseKDE
+from KDEpy.kernel_funcs import (gauss_integral, trig_integral)
 import pytest
 import itertools
 
+
+class TestKernelHelperFunctions():
+    
+    @pytest.mark.parametrize("dim, expected", [(0, 1.25331),
+                                               (1, 1),
+                                               (2, 1.25331),
+                                               (3, 2),
+                                               (4, 3.75994),
+                                               (5, 8),
+                                               (6, 18.7997)])
+    def test_gauss_integral(self, dim, expected):
+        """
+        Test that the results of the integral are equal to those obtained
+        using WolframAlpha for small test cases.
+        """
+        assert np.allclose(gauss_integral(dim), expected, rtol=10e-5)
+        
+    @pytest.mark.parametrize("dim, expected", [(2, (0.29454, 0.12060)),
+                                               (3, (0.23032, 0.074080))])
+    def test_trig_integral(self, dim, expected):
+        """
+        Test that the results of the integral are equal to those obtained
+        using WolframAlpha for small test cases.
+        """
+        assert np.allclose(trig_integral(dim), expected, rtol=10e-5)
+    
 
 class TestKernelFunctions():
     
@@ -29,16 +56,15 @@ class TestKernelFunctions():
         assert np.isclose(integral, 1)
         
     @pytest.mark.parametrize("fname, function, p", 
-                             [(a[0], a[1], b) for (a, b) in list(itertools.product(
-                                     BaseKDE._available_kernels.items(),
-                                                    [1, 2, np.inf]))])
+                             [(a[0], a[1], b) for (a, b) in 
+                              list(itertools.product(
+                                   BaseKDE._available_kernels.items(),
+                                   [1, 2, np.inf]))])
     def test_integral_unity_2D_p_norm(self, fname, function, p):
         """
         Verify that all available kernel functions have an integral evaluating
         to unity in 2D using the 2-norm.
         """
-        #fname, function = fname_function
-        
         if fname in ('logistic', 'sigmoid', 'box'):
             return
         
@@ -57,22 +83,19 @@ class TestKernelFunctions():
 
         assert np.allclose(ans, 1, rtol=10e-3, atol=10e-3)
         
-    
-    # @pytest.mark.skip(reason="Slow test.")
+    @pytest.mark.skip(reason="Slow test.")
     @pytest.mark.parametrize("fname, function, p", 
-                             [(a[0], a[1], b) for (a, b) in list(itertools.product(
-                                     BaseKDE._available_kernels.items(),
-                                                    [1, 2, np.inf]))])
+                             [(a[0], a[1], b) for (a, b) in 
+                              list(itertools.product(
+                                   BaseKDE._available_kernels.items(),
+                                   [1, 2, np.inf]))])
     def test_integral_unity_3D_p_norm(self, fname, function, p):
         """
         Verify that all available kernel functions have an integral evaluating
         to unity in 2D using the 2-norm.
         """
-        #fname, function = fname_function
-        
         if fname in ('logistic', 'sigmoid', 'box'):
             return
-        
         
         if function.finite_support:
             a, b = function.support
@@ -89,7 +112,6 @@ class TestKernelFunctions():
 
         assert np.allclose(ans, 1, rtol=10e-2, atol=10e-2)
         
-
     @pytest.mark.parametrize("fname, function", 
                              list(BaseKDE._available_kernels.items()))
     def test_monotonic_decreasing(self, fname, function):

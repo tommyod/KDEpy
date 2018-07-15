@@ -4,32 +4,6 @@
 Created on Sun Feb  4 10:52:17 2018
 
 @author: tommy
-
-./binary_tree.pxi-465-cdef DTYPE_t _log_kernel_norm(DTYPE_t h, ITYPE_t d,
-./binary_tree.pxi-466-                              KernelType kernel) except -1:
-./binary_tree.pxi-473-    if kernel == GAUSSIAN_KERNEL:
-./binary_tree.pxi-474-        factor = 0.5 * d * LOG_2PI
-./binary_tree.pxi-475-    elif kernel == TOPHAT_KERNEL:
-./binary_tree.pxi:476:        factor = logVn(d)
-./binary_tree.pxi-477-    elif kernel == EPANECHNIKOV_KERNEL:
-./binary_tree.pxi:478:        factor = logVn(d) + log(2. / (d + 2.))
-./binary_tree.pxi-479-    elif kernel == EXPONENTIAL_KERNEL:
-./binary_tree.pxi-480-        factor = logSn(d - 1) + lgamma(d)
-./binary_tree.pxi-481-    elif kernel == LINEAR_KERNEL:
-./binary_tree.pxi:482:        factor = logVn(d) - log(d + 1.)
-./binary_tree.pxi-483-    elif kernel == COSINE_KERNEL:
-./binary_tree.pxi-484-        # this is derived from a chain rule integration
-./binary_tree.pxi-485-        factor = 0
-./binary_tree.pxi-486-        tmp = 2. / PI
-./binary_tree.pxi-487-        for k in range(1, d + 1, 2):
-./binary_tree.pxi-488-            factor += tmp
-./binary_tree.pxi-489-            tmp *= -(d - k) * (d - k - 1) * (2. / PI) ** 2
-./binary_tree.pxi-490-        factor = log(factor) + logSn(d - 1)
-./binary_tree.pxi-491-    else:
-./binary_tree.pxi-492-        raise ValueError("Kernel code not recognized")
-./binary_tree.pxi-493-    return -factor - d * log(h)
-
-
 """
 import pytest
 import numbers
