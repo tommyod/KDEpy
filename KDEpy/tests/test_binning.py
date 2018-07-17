@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Tests.
+Tests for binning functions.
 """
 import numpy as np
 
 from KDEpy.binning import (binning_numpy, binning_numba)
 import pytest
 
-def naivebinning(data, num_points, weights = None):
+
+def naivebinning(data, num_points, weights=None):
     """
     DO NOT USE.
     
@@ -27,7 +28,7 @@ def naivebinning(data, num_points, weights = None):
     weights = weights / np.sum(weights)
 
     # Prepare to transform data
-    n = num_points - 1 # Number of intervals
+    n = num_points - 1  # Number of intervals
     min_grid = np.min(data)
     max_grid = np.max(data)
     transformed_data = (data - min_grid) / (max_grid - min_grid) * n
@@ -86,9 +87,9 @@ class TestBinningFunctions():
         assert np.allclose(y1, y2)
         assert np.allclose(x1, x2)
         
-        
     @pytest.mark.parametrize("data, weights, ans", 
-                             [([1, 2, 2.5, 3], None, np.array([1., 1.5, 1.5]) / 4),
+                             [([1, 2, 2.5, 3], None, 
+                               np.array([1., 1.5, 1.5]) / 4),
                               ([1, 2, 2.5, 3], [2, 1, 3, 2], 
                                np.array([2, 2.5, 3.5]) / 8)])
     def test_binning_simple_examples(self, data, weights, ans):
@@ -98,6 +99,7 @@ class TestBinningFunctions():
             grid, y = func(data, 3, weights=weights)
             assert np.allclose(y, ans)
  
+    
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
     pytest.main(args=['.', '--doctest-modules', '-v', 

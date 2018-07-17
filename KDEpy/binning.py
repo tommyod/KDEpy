@@ -7,48 +7,45 @@ Created on Sun Feb  4 10:52:17 2018
 """
 import pytest
 import numpy as np
-import numba
 
-def naivebinning(data, num_points, weights=None):
+_numba_installed = True
+try:
+    import numba
+except ImportError:
+    _numba_installed = False
+    
+
+def binning(data, num_points=2**10, weights=None):
     """
-    DO NOT USE.
+    Compute binning by setting a linear grid and weighting points linearily
+    by their distance to the grid points. In addition, weight asssociated with
+    data points may be passed.
     
-    Only for testing purposes. Very slow.
-    
-    Time on 1 million data points: 2.16 s ± 45.8 ms
+    Parameters
+    ----------
+    data
+        The data points.
+    num_points
+        The number of points in the grid.
+    weights
+        The weights.
+        
+    Returns
+    -------
+    (grid, data)
+        Data weighted at each grid point.
+        
+    Examples
+    --------
+    >>> data = [1, 1.5, 1.5, 2, 2.8, 3]
+    >>> grid, data = binning(data, num_points=3)
+    >>> np.allclose(data, np.array([0.33333, 0.36667, 0.3]))
+    True
     """
-    
-    # Convert the data to numpy Arrays
-    data = np.asarray_chkfinite(data, dtype=np.float)
-    
-    if weights is None:
-        weights = np.ones_like(data)
-        
-    weights = np.asarray_chkfinite(weights, dtype=np.float)
-    weights = weights / np.sum(weights)
-
-    # Prepare to transform data
-    n = num_points - 1 # Number of intervals
-    min_grid = np.min(data)
-    max_grid = np.max(data)
-    transformed_data = (data - min_grid) / (max_grid - min_grid) * n
-    
-    result = np.zeros(num_points)
-    
-    # Go through data points and weights, use O(1) lookups and weight the
-    # data point linearily by distance and the perscribed weights
-    for data_point, w in zip(transformed_data, weights):
-        
-        # Retrieve the integral and fractional parts quickly
-        integral, fractional = int(data_point), (data_point) % 1
-        
-        # Add to the leftmost grid point, and the rightmost if possible
-        result[int(integral)] += (1 - fractional) * w
-        if (integral + 1) < len(result):
-            result[int(integral) + 1] += fractional * w
-
-    grid = np.linspace(min_grid, max_grid, num_points)
-    return grid, result
+    if _numba_installed:
+        return binning_numba(data, num_points, weights=None)
+    else:
+        return binning_numpy(data, num_points, weights=None)
 
 
 def binning_numpy(data, num_points, weights=None):
@@ -77,7 +74,7 @@ def binning_numpy(data, num_points, weights=None):
     # Compute the integral and fractional part of the data
     # The integral part is used for lookups, the fractional part is used
     # to weight the data
-    num_intervals = num_points - 1 # Number of intervals
+    num_intervals = num_points - 1  # Number of intervals
     fractional, integral = np.modf(transformed_data * num_intervals)
     integral = integral.astype(np.int)
 
@@ -91,7 +88,7 @@ def binning_numpy(data, num_points, weights=None):
     
     # Pre-compute these products, as they are used in the loop many times
     frac_weights = fractional * weights
-    neg_frac_weights = weights - frac_weights # (1 - fractional) * weights
+    neg_frac_weights = weights - frac_weights  # (1 - fractional) * weights
     
     result = np.zeros(num_points + 1)
     for grid_point in np.unique(integral):
@@ -118,9 +115,10 @@ def binning_weighted(transformed_data, weights, result):
         result[integral] += (1 - fractional) * weight
         
         if (integral + 1) < len(result):
-            result[integral + 1] +=  fractional * weight
+            result[integral + 1] += fractional * weight
             
     return result
+
 
 def binning_numba(data, num_points, weights=None):
     """
