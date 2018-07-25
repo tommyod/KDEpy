@@ -5,21 +5,33 @@ Tests for binning functions.
 """
 import numpy as np
 
-from KDEpy.binning import (binning_numpy, binning_numba)
+from KDEpy.binning import (linbin_numpy)
 import pytest
 
 
-def naivebinning(data, num_points, weights=None):
+def naivebinning(data, grid_points, weights=None):
     """
     DO NOT USE.
     
     Only for testing purposes. Very slow.
     
     Time on 1 million data points: 2.16 s ± 45.8 ms
+    
+    Examples
+    --------
+    >>> data = np.array([2, 2.5, 3, 4])
+    >>> naivebinning(data, np.arange(6), weights=None)
+    array([0.   , 0.   , 0.375, 0.375, 0.25 , 0.   ])
+    >>> naivebinning(data, np.arange(6), weights=np.arange(1, 5))
+    array([0. , 0. , 0.2, 0.4, 0.4, 0. ])
+    >>> data = np.array([2, 2.5, 3, 4])
+    >>> naivebinning(data, np.arange(1, 7), weights=None)
+    array([0.   , 0.375, 0.375, 0.25 , 0.   , 0.   ])
     """
     
     # Convert the data to numpy Arrays
     data = np.asarray_chkfinite(data, dtype=np.float)
+    grid_points = np.asarray_chkfinite(grid_points, dtype=np.float)
     
     if weights is None:
         weights = np.ones_like(data)
@@ -28,17 +40,17 @@ def naivebinning(data, num_points, weights=None):
     weights = weights / np.sum(weights)
 
     # Prepare to transform data
-    n = num_points - 1  # Number of intervals
-    min_grid = np.min(data)
-    max_grid = np.max(data)
+    n = len(grid_points) - 1  # Number of intervals
+    min_grid = np.min(grid_points)
+    max_grid = np.max(grid_points)
     transformed_data = (data - min_grid) / (max_grid - min_grid) * n
     
-    result = np.zeros(num_points)
+    result = np.zeros_like(grid_points, dtype=np.float)
     
     # Go through data points and weights, use O(1) lookups and weight the
     # data point linearily by distance and the perscribed weights
     for data_point, w in zip(transformed_data, weights):
-        
+
         # Retrieve the integral and fractional parts quickly
         integral, fractional = int(data_point), (data_point) % 1
         
@@ -47,8 +59,7 @@ def naivebinning(data, num_points, weights=None):
         if (integral + 1) < len(result):
             result[int(integral) + 1] += fractional * w
 
-    grid = np.linspace(min_grid, max_grid, num_points)
-    return grid, result
+    return result
 
 
 class TestBinningFunctions():
@@ -62,30 +73,13 @@ class TestBinningFunctions():
        
         """
         data = np.array(data)
-        x1, y1 = binning_numpy(data, 5, weights=None)
+        grid = np.linspace(np.min(data) - 1, np.max(data), num=5)
+        y1 = linbin_numpy(data, grid, weights=None)
         np.random.seed(123)
         p = np.random.permutation(len(data))
-        x2, y2 = binning_numpy(data[p], 5, weights=None)
+        y2 = linbin_numpy(data[p], grid, weights=None)
         
         assert np.allclose(y1, y2)
-        assert np.allclose(x1, x2)
-        
-    @pytest.mark.parametrize("data", [[1, 2, 3, 4, 5, 6],
-                                      [0.04, 0.54, 0.33, 0.85, 0.16],
-                                      [-4.12, 0.98, -4.3, -1.85],
-                                      [0, 0, 1]])
-    def test_invariance_under_permutations_numba_binning(self, data):
-        """
-       
-        """
-        data = np.array(data)
-        x1, y1 = binning_numba(data, 5, weights=None)
-        np.random.seed(123)
-        p = np.random.permutation(len(data))
-        x2, y2 = binning_numba(data[p], 5, weights=None)
-        
-        assert np.allclose(y1, y2)
-        assert np.allclose(x1, x2)
         
     @pytest.mark.parametrize("data, weights, ans", 
                              [([1, 2, 2.5, 3], None, 
@@ -94,14 +88,17 @@ class TestBinningFunctions():
                                np.array([2, 2.5, 3.5]) / 8)])
     def test_binning_simple_examples(self, data, weights, ans):
         
-        for func in [naivebinning, binning_numpy, binning_numba]:
+        grid = np.array([1, 2, 3])
+        for func in [naivebinning, linbin_numpy]:
             
-            grid, y = func(data, 3, weights=weights)
+            y = func(data, grid, weights=weights)
             assert np.allclose(y, ans)
  
     
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
-    pytest.main(args=['.', '--doctest-modules', '-v', 
-                      '--durations=15'
-                      ])
+    pytest.main(args=['.', '--doctest-modules', '-v', '--durations=15'])
+    data = np.array([2, 2.5, 3, 4])
+    a = naivebinning(data, np.arange(1, 5), weights=None)
+    
+    print(a)
