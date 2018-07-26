@@ -230,25 +230,22 @@ def sigmoid(x, dims=1, volume_func=volume_hypershpere):
 
 class Kernel(collections.abc.Callable):
     
-    def __init__(self, function, var=1, support=(-3, 3)):
+    def __init__(self, function, var=1, support=3):
         """
         Initialize a new kernel function.
         
         function: callable, numpy.arr -> numpy.arr, should integrate to 1
         expected_value : peak, typically 0
-        left_bw: support to the left
-        left_bw: support to the right
+        support: support of the function.
         """
         self.function = function
         self.var = var
-        self.finite_support = np.all(np.isfinite(np.array(support)))
+        self.finite_support = np.isfinite(support)
         
         # If the function has finite support, scale the support so that it
         # corresponds to the support of the function when it is scaled to have
         # unit variance.
-        self.support = tuple(supp / np.sqrt(self.var) for supp in support)
-            
-        assert self.support[0] < self.support[1]
+        self.support = support / np.sqrt(self.var)
     
     def evaluate(self, x, bw=1, norm=2):
         """
@@ -284,17 +281,17 @@ class Kernel(collections.abc.Callable):
     __call__ = evaluate
     
     
-gaussian = Kernel(gaussian, var=1, support=(-np.inf, np.inf))
-exp = Kernel(exponential, var=4, support=(-np.inf, np.inf))
-box = Kernel(box, var=1 / 3, support=(-1, 1))
-tri = Kernel(tri, var=1 / 6, support=(-1, 1))
-epa = Kernel(epanechnikov, var=1 / 5, support=(-1, 1))
-biweight = Kernel(biweight, var=1 / 7, support=(-1, 1))
-triweight = Kernel(triweight, var=1 / 9, support=(-1, 1))
-tricube = Kernel(tricube, var=35 / 243, support=(-1, 1))
-cosine = Kernel(cosine, var=(1 - (8 / np.pi**2)), support=(-1, 1))
-logistic = Kernel(logistic, var=(np.pi**2 / 3), support=(-np.inf, np.inf))
-sigmoid = Kernel(sigmoid, var=(np.pi**2 / 4), support=(-np.inf, np.inf))
+gaussian = Kernel(gaussian, var=1, support=np.inf)
+exp = Kernel(exponential, var=4, support=np.inf)
+box = Kernel(box, var=1 / 3, support=1)
+tri = Kernel(tri, var=1 / 6, support=1)
+epa = Kernel(epanechnikov, var=1 / 5, support=1)
+biweight = Kernel(biweight, var=1 / 7, support=1)
+triweight = Kernel(triweight, var=1 / 9, support=1)
+tricube = Kernel(tricube, var=35 / 243, support=1)
+cosine = Kernel(cosine, var=(1 - (8 / np.pi**2)), support=1)
+logistic = Kernel(logistic, var=(np.pi**2 / 3), support=np.inf)
+sigmoid = Kernel(sigmoid, var=(np.pi**2 / 4), support=np.inf)
 
 _kernel_functions = {'gaussian': gaussian,
                      'exponential': exp,

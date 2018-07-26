@@ -127,9 +127,7 @@ class FFTKDE(BaseKDE):
         
         # Find the real bandwidth, the support times the desired bw factor
         if self.kernel.finite_support:
-            # real_bw = self.bw / np.sqrt(self.kernel.var)
-            real_bw = max(abs(self.kernel.support[0]), 
-                          abs(self.kernel.support[1])) * self.bw
+            real_bw = self.kernel.support * self.bw
         else:
             # TODO: Make this more robust with threshold
             real_bw = 4 * self.bw

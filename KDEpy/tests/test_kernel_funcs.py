@@ -49,7 +49,7 @@ class TestKernelFunctions():
         """
 
         if function.finite_support:
-            a, b = function.support
+            a, b = -function.support, function.support
         else:
             a, b = -5 * function.var, 5 * function.var
         integral, abserr = quad(function, a=a, b=b)
@@ -69,7 +69,7 @@ class TestKernelFunctions():
             return
         
         if function.finite_support:
-            a, b = function.support
+            a, b = -function.support, function.support
         else:
             a, b = -4, 4
         
@@ -98,7 +98,7 @@ class TestKernelFunctions():
             return
         
         if function.finite_support:
-            a, b = function.support
+            a, b = -function.support, function.support
         else:
             a, b = -4, 4
         
@@ -121,7 +121,7 @@ class TestKernelFunctions():
         """
 
         if function.finite_support:
-            x = np.linspace(*function.support)
+            x = np.linspace(-function.support, function.support)
         else:
             x = np.linspace(-5 * function.var, 5 * function.var)
         y = function(x)
@@ -138,7 +138,7 @@ class TestKernelFunctions():
         """
 
         if function.finite_support:
-            x = np.linspace(*function.support)
+            x = np.linspace(-function.support, function.support)
         else:
             x = np.linspace(-5 * function.var, 5 * function.var)
         y = function(x)

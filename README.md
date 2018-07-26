@@ -18,7 +18,7 @@ It's a lofty goal, but it might be possible.
 
 Kernel density estimation accomplishes what a histogram does, but in a better way, since: (1) the bins are determined from the data and (2) the result is continuous.
 
-Given a kernel function *phi*, a bandwidth *h* and weights *w* summing to 1, the kernel density estimate *f_hat* looks something like the following. 
+Given a kernel function *phi*, a bandwidth *h* and weights *w* summing to 1, the kernel density estimate *f_hat* looks something like the following.
 
 ![](https://latex.codecogs.com/gif.latex?%5Chat%7Bf%7D%28x%29%20%3D%20%5Cfrac%7B1%7D%7Bh%7D%20%5Csum_%7Bi%20%3D%201%7D%5E%7BN%7D%20%5C%20w%28x_i%29%20%5C%20%5Cphi%5Cleft%20%28%20%5Cfrac%7Bx%20-%20x_i%7D%7Bh%7D%20%5Cright%20%29)
 
@@ -46,11 +46,12 @@ I hope to follow these guidelines for this project:
 
 The list below roughly shows what needs to be done.
 
-- [X] univariate BaseKDE
+- [X] univariate BaseKDE (todo: check if more common code can be moved)
 - [X] univariate NaiveKDE
-- [ ] univariate TreeKDE
-- [ ] univariate FFTKDE
+- [X] univariate TreeKDE
+- [X] univariate FFTKDE (implement linbin even faster in cython)
 - [ ] univariate DiffusionKDE
+- [ ] Refactor kernel funcs - add solver for effective bandwidth
 
 - [X] Implement univariate, fixed bandwidth KDEs naively
 - [X] Implement **weighted**, fixed bandwidth, univariate KDEs naively
@@ -142,12 +143,3 @@ https://arxiv.org/pdf/1206.5278.pdf
 
 
 https://www.researchgate.net/publication/228773329_Insights_on_fast_kernel_density_estimation_algorithms
-
-
-
-
-
-
-
-
-

@@ -72,8 +72,7 @@ class TreeKDE(BaseKDE):
         tree = cKDTree(self.data)
         
         # Compute the kernel radius
-        kernel_radius = self.kernel.support[1]
-        assert -self.kernel.support[0] == self.kernel.support[1]
+        kernel_radius = self.kernel.support
         assert self.kernel.finite_support
             
         # Since we iterate through grid points, we need the maximum bw to
