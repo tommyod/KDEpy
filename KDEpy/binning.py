@@ -59,13 +59,15 @@ def linbin_numpy(data, grid_points, weights=None):
     # Transform the data
     min_grid = np.min(grid_points)
     max_grid = np.max(grid_points)
-    transformed_data = (data - min_grid) / (max_grid - min_grid)
+    num_intervals = len(grid_points) - 1  # Number of intervals
+    dx = (max_grid - min_grid) / num_intervals
+    transformed_data = (data - min_grid) / dx
     
     # Compute the integral and fractional part of the data
     # The integral part is used for lookups, the fractional part is used
     # to weight the data
     num_intervals = len(grid_points) - 1  # Number of intervals
-    fractional, integral = np.modf(transformed_data * num_intervals)
+    fractional, integral = np.modf(transformed_data)
     integral = integral.astype(np.int)
 
     # Sort the integral values, and the fractional data and weights by
@@ -80,8 +82,14 @@ def linbin_numpy(data, grid_points, weights=None):
     frac_weights = fractional * weights
     neg_frac_weights = weights - frac_weights
     
+    # If the data is not a subset of the grid, the integral values will be
+    # outside of the grid. To solve the problem, we filter these values away
+    unique_integrals = np.unique(integral)
+    unique_integrals = unique_integrals[(unique_integrals >= 0) & 
+                                        (unique_integrals <= len(grid_points))]
+    
     result = np.asfarray(np.zeros(len(grid_points) + 1))
-    for grid_point in np.unique(integral):
+    for grid_point in unique_integrals:
         
         # Use binary search to find indices for the grid point
         # Then sum the data assigned to that grid point
@@ -239,7 +247,5 @@ if __name__ == "__main__":
     
     data = np.array([2, 2.5, 3, 4])
     grid_points = np.array([0, 1, 2, 3, 4, 5])
-    
     result = linbin_numpy(data, grid_points, weights=None)
-    
     print(result)
