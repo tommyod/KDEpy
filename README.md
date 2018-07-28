@@ -97,6 +97,11 @@ The list below roughly shows what needs to be done.
 
 # References
 
+## Books
+
+- Silverman, B. W. Density Estimation for Statistics and Data Analysis. Boca Raton: Chapman and Hall, 1986. -- Page 99 for reference to kd-tree
+- Wand, M. P., and M. C. Jones. Kernel Smoothing. London ; New York: Chapman and Hall/CRC, 1995. -- Page 182 for computation using linbin and fft
+
 ## Wikipedia and other articles
 
 - [Wiki - Kernel density estimation](https://en.wikipedia.org/wiki/Kernel_density_estimation)
@@ -127,6 +132,8 @@ measurements](https://arxiv.org/pdf/1202.2194.pdf)
 - [Density Estimation - 32 pages](http://www.stat.cmu.edu/~larry/=sml/densityestimation.pdf)
 
 # Computation
+
+- *An Algorithm for Finding Best Matches in Logarithmic Expected Time*, Friedman et al, DOI 10.1145/355744.355745
 
 https://www.ics.uci.edu/~ihler/code/kde.html
 

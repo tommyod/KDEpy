@@ -108,7 +108,10 @@ class BaseKDE(ABC):
         # If no information is supplied at all, call the autogrid method
         if grid_points is None:
             self._user_supplied_grid = False
-            grid_points = self._autogrid(self.data)
+            bw = (max(self.bw) if isinstance(self.bw, (np.ndarray, Sequence))
+                  else self.bw)
+            grid_points = self._autogrid(self.data, 
+                                         self.kernel.practical_support(bw))
             
         # If a number is specified, interpret it as the number of grid points
         elif isinstance(grid_points, numbers.Number):
@@ -163,7 +166,7 @@ class BaseKDE(ABC):
             return grid_points, evaluated 
         
     @staticmethod
-    def _autogrid(data, num_points=1024, percentile=0.05):
+    def _autogrid(data, kernel_support, num_points=1024, percentile=0.05):
         """
         Automatically select a grid if the user did not supply one.
         
@@ -178,7 +181,7 @@ class BaseKDE(ABC):
 
         generator = enumerate(zip(minimums, maximums, ranges))
         for i, (minimum, maximum, rang) in generator:
-            outside_borders = max(percentile * rang, 3)
+            outside_borders = max(percentile * rang, kernel_support)
             grid_points[:, i] = np.linspace(minimum - outside_borders,
                                             maximum + outside_borders,
                                             num=num_points // 2**(dims - 1))

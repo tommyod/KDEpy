@@ -130,7 +130,7 @@ class FFTKDE(BaseKDE):
             real_bw = self.kernel.support * self.bw
         else:
             # TODO: Make this more robust with threshold
-            real_bw = 4 * self.bw
+            real_bw = self.kernel.practical_support(self.bw)
             
         # Compute L, the number of dx'es to move out from 0 in kernel
         L = min(np.floor(real_bw / dx), num_grid_points - 1)

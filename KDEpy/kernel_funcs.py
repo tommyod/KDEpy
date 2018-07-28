@@ -11,6 +11,7 @@ import collections.abc
 import numbers
 from scipy.special import gamma, factorial, factorial2
 from scipy.stats import norm
+from scipy.optimize import brentq
 
 # In R, the following are implemented:
 # "gaussian", "rectangular", "triangular", "epanechnikov", 
@@ -246,6 +247,21 @@ class Kernel(collections.abc.Callable):
         # corresponds to the support of the function when it is scaled to have
         # unit variance.
         self.support = support / np.sqrt(self.var)
+        
+    def practical_support(self, bw, atol=10e-5):
+        """
+        Return the support for practical purposes.
+        """
+        # If the kernel has finite support, return the support accounting for
+        # the bw
+        if self.finite_support:
+            return self.support * bw
+        
+        # If the function does not have finite support, find a practical value
+        else:
+            def f(x):
+                return self.evaluate(x, bw=bw) - atol
+            return brentq(f, a=0, b=10 * bw, full_output=False)
     
     def evaluate(self, x, bw=1, norm=2):
         """
@@ -312,57 +328,79 @@ if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
     pytest.main(args=['.', '--doctest-modules', '-v'])
     
+    plot = False
+    if plot:
+        import matplotlib.pyplot as plt
+        from mpl_toolkits.mplot3d import Axes3D
+        a = Axes3D
+        import scipy
+        for name, func in _kernel_functions.items():
+    
+            print('-' * 2**7)
+            print(name)
+            print(func([-1, 0, 1]))
+            print(func(np.array([[0, -1], [0, 0], [0, 1]])))
+            print(func(np.array([[0, -1, 0], [0, 0, 0], [0, 1, 0]])))
+            
+            # Plot in 1D
+            n = 50
+            x = np.linspace(-3, 3, num=n * 3)
+            plt.plot(x, func(x))
+            plt.show()
+            
+            # Plot in 2D
+            n = 50
+            linspace = np.linspace(-3, 3, num=n)
+    
+            x, y = linspace, linspace
+            k = np.array(np.meshgrid(x, y)).T.reshape(-1, 2)
+            z = func(k).reshape((n, n))
+            
+            x, y = np.meshgrid(x, y)
+            
+            fig, ax = plt.subplots(subplot_kw=dict(projection='3d'))
+            
+            surf = ax.plot_surface(x, y, z, rstride=1, cstride=1,
+                                   linewidth=1, antialiased=True, shade=True)
+            
+            angle = 90
+            ax.view_init(30, angle)
+    
+            plt.show()
+            
+            # Perform integration 1D
+            def int1D(x1):
+                return func(x1)
+            
+            ans, err = scipy.integrate.nquad(int1D, [[-4, 4]])
+            print(f'1D integration result: {ans}')
+            assert np.allclose(ans, 1, rtol=10e-3, atol=10e-3)
+            
+            # Perform integration 2D
+            def int2D(x1, x2):
+                return func([[x1, x2]])
+            
+            ans, err = scipy.integrate.nquad(int2D, [[-4, 4], [-4, 4]],
+                                             opts={'epsabs': 10e-3, 
+                                                   'epsrel': 10e-3})
+            print(f'2D integration result: {ans}')
+            assert np.allclose(ans, 1, rtol=10e-3, atol=10e-3)
+        
+if __name__ == "__main__":
+    
+    bw = 2
+    print(gaussian.practical_support(bw))
+    print(epa.practical_support(bw))
     import matplotlib.pyplot as plt
-    # from mpl_toolkits.mplot3d import Axes3D
-    import scipy
-    for name, func in _kernel_functions.items():
-
-        print('-' * 2**7)
-        print(name)
-        print(func([-1, 0, 1]))
-        print(func(np.array([[0, -1], [0, 0], [0, 1]])))
-        print(func(np.array([[0, -1, 0], [0, 0, 0], [0, 1, 0]])))
-        
-        # Plot in 1D
-        n = 50
-        x = np.linspace(-3, 3, num=n * 3)
-        plt.plot(x, func(x))
-        plt.show()
-        
-        # Plot in 2D
-        n = 50
-        linspace = np.linspace(-3, 3, num=n)
-
-        x, y = linspace, linspace
-        k = np.array(np.meshgrid(x, y)).T.reshape(-1, 2)
-        z = func(k).reshape((n, n))
-        
-        x, y = np.meshgrid(x, y)
-        
-        fig, ax = plt.subplots(subplot_kw=dict(projection='3d'))
-        
-        surf = ax.plot_surface(x, y, z, rstride=1, cstride=1,
-                               linewidth=1, antialiased=True, shade=True)
-        
-        angle = 90
-        ax.view_init(30, angle)
-
-        plt.show()
-        
-        # Perform integration 1D
-        def int1D(x1):
-            return func(x1)
-        
-        ans, err = scipy.integrate.nquad(int1D, [[-4, 4]])
-        print(f'1D integration result: {ans}')
-        assert np.allclose(ans, 1, rtol=10e-3, atol=10e-3)
-        
-        # Perform integration 2D
-        def int2D(x1, x2):
-            return func([[x1, x2]])
-        
-        ans, err = scipy.integrate.nquad(int2D, [[-4, 4], [-4, 4]],
-                                         opts={'epsabs': 10e-3, 
-                                               'epsrel': 10e-3})
-        print(f'2D integration result: {ans}')
-        assert np.allclose(ans, 1, rtol=10e-3, atol=10e-3)
+    x = np.linspace(-10, 10, num=2**8)
+    y = gaussian(x, bw=bw)
+    plt.plot(x, y)
+    plt.scatter([-gaussian.practical_support(bw), 
+                 gaussian.practical_support(bw)], [0, 0])
+    
+    y = epa(x, bw=bw)
+    plt.plot(x, y)
+    plt.scatter([-epa.practical_support(bw), 
+                 epa.practical_support(bw)], [0, 0])
+    
+    
