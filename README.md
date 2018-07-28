@@ -8,20 +8,34 @@
 
 # KDEpy
 
-Kernel Density Estimation in Python.
-This is a work in progress, the code is not ready to be used.
+Implementations of various kernel density esimators (KDE) in Python.
+**This project is a work in progress**, and might change in the future.
 If you are interested in participating in this project, you are very welcome to do so.
 **The goal is to implement state-of-the-art KDE, and eventually have the most complete implementation in the Python universe.**
 It's a lofty goal, but it might be possible.
 
-# The basics of kernel density estimation
+```python
+from KDEpy import NaiveKDE, TreeKDE, FFTKDE
+np.random.seed(42)
+data = norm(loc=0, scale=1).rvs(2**3)
+x, y = NaiveKDE(kernel='gaussian', bw='silverman').fit(data).evaluate()
+plt.plot(x, y, label='KDE estimate')
+```
+![Plot](example.png)
 
-Kernel density estimation accomplishes what a histogram does, but in a better way, since: (1) the bins are determined from the data and (2) the result is continuous.
+Several algorithms are included:
 
-Given a kernel function *phi*, a bandwidth *h* and weights *w* summing to 1, the kernel density estimate *f_hat* looks something like the following.
+- `NaiveKDE` - A naive computation. Supports N-dimensional data, variable bandwidth, weighted data and many kernel functions. Slow on large data sets.
+- `TreeKDE` - A tree-based computation. Supports the same features as the naive algorithm, but is faster at the expense of small inaccuracy when using a kernel without finite support.
+- `FFTKDE` - A fast, FFT-based computation on univariate data. Supports weighted data and many kernels, but not variable bandwidth. Must be evaluated on an equidistant grid, the finer the grid the higher the accuracy.
 
-![](https://latex.codecogs.com/gif.latex?%5Chat%7Bf%7D%28x%29%20%3D%20%5Cfrac%7B1%7D%7Bh%7D%20%5Csum_%7Bi%20%3D%201%7D%5E%7BN%7D%20%5C%20w%28x_i%29%20%5C%20%5Cphi%5Cleft%20%28%20%5Cfrac%7Bx%20-%20x_i%7D%7Bh%7D%20%5Cright%20%29)
-
+```python
+data = norm(loc=0, scale=1).rvs(2**6)
+for bw in [0.1, 'silverman', 1.5]:
+    x, y = FFTKDE(kernel='triweight', bw=bw).fit(data).evaluate()
+    plt.plot(x, y, label=f'KDE estimate, bw={bw}')
+```
+![Plot](example2.png)
 
 # Contributing to this project
 

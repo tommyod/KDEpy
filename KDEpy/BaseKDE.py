@@ -108,8 +108,13 @@ class BaseKDE(ABC):
         # If no information is supplied at all, call the autogrid method
         if grid_points is None:
             self._user_supplied_grid = False
-            bw = (max(self.bw) if isinstance(self.bw, (np.ndarray, Sequence))
-                  else self.bw)
+            
+            if isinstance(self.bw, (np.ndarray, Sequence)):
+                bw = max(self.bw)
+            elif callable(self.bw):
+                bw = self.bw(self.data)
+            else:
+                bw = self.bw
             grid_points = self._autogrid(self.data, 
                                          self.kernel.practical_support(bw))
             

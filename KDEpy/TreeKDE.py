@@ -77,7 +77,7 @@ class TreeKDE(BaseKDE):
         # TODO: Verify that this is a good way to handle unbounded kernels
         # kernel_radius = self.kernel.support
         # assert self.kernel.finite_support
-        maximal_bw = np.max(self.bw)
+        maximal_bw = np.max(bw)
         if not eps > 0:
             raise ValueError('eps must be > 0.')
         kernel_radius = self.kernel.practical_support(maximal_bw, eps)
