@@ -59,12 +59,15 @@ class FFTKDE(BaseKDE):
         # are 1D if they are NumPy ndarrays
         class_name = type(self).__name__
         if isinstance(data, np.ndarray):
-            if not len(data.shape) == 1:
+            
+            if not ((len(data.shape) == 1) or (len(data.shape) == 2 and
+                                              data.shape[1] == 1)):
                 msg = 'The data for {} must be 1D'.format(class_name)
                 raise ValueError(msg)
                 
         if isinstance(weights, np.ndarray):
-            if not len(weights.shape) == 1:
+            if not ((len(weights.shape) == 1) or (len(weights.shape) == 2 and
+                                                 weights.shape[1] == 1)):
                 msg = 'The weights for {} must be 1D'.format(class_name)
                 raise ValueError(msg)
                 
