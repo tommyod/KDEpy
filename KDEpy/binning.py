@@ -244,8 +244,3 @@ def binning_numba(data, num_points, weights=None):
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
     pytest.main(args=['.', '--doctest-modules', '-v', '--capture=sys'])
-    
-    #data = np.array([2, 2.5, 3, 4])
-    #grid_points = np.array([0, 1, 2, 3, 4, 5])
-    #result = linbin_numpy(data, grid_points, weights=None)
-    #print(result)

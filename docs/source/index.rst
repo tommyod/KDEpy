@@ -70,6 +70,7 @@ Navigation
 
    index.rst
    intro_kde.rst
+   bandwidth.rst
    kernels.rst
    notebook.ipynb
    literature.rst

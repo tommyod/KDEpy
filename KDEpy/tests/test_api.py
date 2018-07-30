@@ -53,9 +53,9 @@ type_functions = [tuple,
 
 @pytest.mark.parametrize("kde, bw, kernel, type_func", 
                          itertools.product(kdes,
-                                           [0.1, 'silverman', 1],
-                                            ['epa', 'gaussian'],
-                                            type_functions))   
+                                           ['silverman', 'scott', 'ISJ', 0.5],
+                                           ['epa', 'gaussian'],
+                                           type_functions))   
 def test_api_types(kde, bw, kernel, type_func):
     """
     Test the api.
@@ -63,6 +63,8 @@ def test_api_types(kde, bw, kernel, type_func):
     # Test various input types
     data = [1, 2, 3]
     weights = [4, 5, 6]
+    data = np.random.randn(64)
+    weights = np.random.randn(64) + 10
     model = kde(kernel=kernel, bw=bw)
     x, y = model.fit(data, weights).evaluate()
     
@@ -74,4 +76,6 @@ def test_api_types(kde, bw, kernel, type_func):
 
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
-    pytest.main(args=['.', '--doctest-modules', '-v', '--capture=sys'])
+    pytest.main(args=['.', '--doctest-modules', '-v', '--capture=sys',
+                      '-k test_api_types'
+                      ])

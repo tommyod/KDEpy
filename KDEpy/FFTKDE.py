@@ -61,13 +61,13 @@ class FFTKDE(BaseKDE):
         if isinstance(data, np.ndarray):
             
             if not ((len(data.shape) == 1) or (len(data.shape) == 2 and
-                                              data.shape[1] == 1)):
+                                               data.shape[1] == 1)):
                 msg = 'The data for {} must be 1D'.format(class_name)
                 raise ValueError(msg)
                 
         if isinstance(weights, np.ndarray):
             if not ((len(weights.shape) == 1) or (len(weights.shape) == 2 and
-                                                 weights.shape[1] == 1)):
+                                                  weights.shape[1] == 1)):
                 msg = 'The weights for {} must be 1D'.format(class_name)
                 raise ValueError(msg)
                 
@@ -152,4 +152,5 @@ class FFTKDE(BaseKDE):
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
     pytest.main(args=['.', '--doctest-modules', '-v'])
+
     

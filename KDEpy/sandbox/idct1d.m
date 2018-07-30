@@ -10,6 +10,7 @@ data = real(ifft(weights.*data));
 % (5.94) in Jain
 out = zeros(nrows,1);
 out(1:2:nrows) = data(1:nrows/2);
+% nrows = int64(nrows)
 out(2:2:nrows) = data(nrows:-1:nrows/2+1);
 %   Reference:
 %      A. K. Jain, "Fundamentals of Digital Image

@@ -12,6 +12,7 @@ import numbers
 import numpy as np
 from KDEpy.kernel_funcs import _kernel_functions
 from KDEpy.bw_selection import _bw_methods
+from KDEpy.utils import autogrid
 
 
 class BaseKDE(ABC):
@@ -66,9 +67,8 @@ class BaseKDE(ABC):
         if (isinstance(bw, numbers.Number) and bw > 0):
             self.bw = bw
         elif isinstance(bw, str):
-            kernel = kernel.strip().lower()
             amethods = sorted(list(self._bw_methods.keys()))
-            if bw not in amethods:
+            if bw.lower() not in set(m.lower() for m in amethods):
                 msg = f'Kernel not recognized. Options are: {amethods}'
                 raise ValueError(msg)
             self.bw = self._bw_methods[bw]
@@ -115,8 +115,8 @@ class BaseKDE(ABC):
                 bw = self.bw(self.data)
             else:
                 bw = self.bw
-            grid_points = self._autogrid(self.data, 
-                                         self.kernel.practical_support(bw))
+            grid_points = autogrid(self.data, 
+                                   self.kernel.practical_support(bw))
             
         # If a number is specified, interpret it as the number of grid points
         elif isinstance(grid_points, numbers.Number):
@@ -124,7 +124,7 @@ class BaseKDE(ABC):
                     grid_points > 0):
                 raise ValueError('grid_points must be positive integer.')
             self._user_supplied_grid = False
-            grid_points = self._autogrid(self.data, num_points=grid_points)
+            grid_points = autogrid(self.data, num_points=grid_points)
             
         else:
             self._user_supplied_grid = True
@@ -169,30 +169,7 @@ class BaseKDE(ABC):
             if dims == 1:
                 return grid_points.ravel(), evaluated.ravel()
             return grid_points, evaluated 
-        
-    @staticmethod
-    def _autogrid(data, kernel_support, num_points=1024, percentile=0.05):
-        """
-        Automatically select a grid if the user did not supply one.
-        
-        number of grid : should be a power of two
-        percentile : is how far out we go out
-        """
-        obs, dims = data.shape
-        minimums, maximums = data.min(axis=0), data.max(axis=0)
-        ranges = maximums - minimums
-        
-        grid_points = np.empty(shape=(num_points // 2**(dims - 1), dims))
-
-        generator = enumerate(zip(minimums, maximums, ranges))
-        for i, (minimum, maximum, rang) in generator:
-            outside_borders = max(percentile * rang, kernel_support)
-            grid_points[:, i] = np.linspace(minimum - outside_borders,
-                                            maximum + outside_borders,
-                                            num=num_points // 2**(dims - 1))
-
-        return grid_points
-        
+  
     def __call__(self, *args, **kwargs):
         return self.evaluate(*args, **kwargs)
 
