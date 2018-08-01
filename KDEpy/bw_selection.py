@@ -8,8 +8,7 @@ import numpy as np
 from KDEpy.binning import linbin_numpy
 from KDEpy.utils import autogrid
 from scipy import fftpack
-from scipy.integrate import simps
-from scipy.optimize import fsolve, minimize
+from scipy.optimize import brentq
 
 _botev_notice = """Copyright (c) 2015, Zdravko Botev
 All rights reserved.
@@ -79,7 +78,8 @@ def _fixed_point(t, N, I_sq, a2):
                                       np.exp(-I_sq * np.pi**2 * t))
 
     # Norm of a function, should never be negative
-    assert f >= 0
+    if f <= 0:
+        return -1
     for s in reversed(range(2, ell)):
         # This could also be formulated using the double factorial n!!,
         # but this is faster so and requires an import less
@@ -105,31 +105,35 @@ def _fixed_point(t, N, I_sq, a2):
 
 def _root(function, N, args):
     """
+    Root finding algorithm. Based on MatLab implementation by Botev et al.
     
     >>> # From the matlab code
     >>> ints = np.arange(1, 51)
     >>> ans = _root(_fixed_point, N=50, args=(50, ints, ints))
     >>> assert np.allclose(ans, 5.203713947289470e-05)
     """
-    
-    # TODO: Optimize this for convergence. Should converge on [1, 2, 3] 
     # From the implementation by Botev, the original paper author
-    # Probably a rule of thumb of obtaining a feasible solution
-    N = max(min(1050, N), 250)
+    # Rule of thumb of obtaining a feasible solution
+    N = max(min(1050, N), 50)
     tol = 10e-12 + 0.01 * (N - 50) / 1000
-    # tol = 0.53 * N ** (-1. / 5)
     # While a solution is not found, increase the tolerance and try again
     found = 0
     while found == 0:
-        x, info, found, _ = fsolve(function, tol, args=args, full_output=1,
-                                   xtol=tol / 20)
-        tol *= 2.
+        try:
+            # Other viable solvers include: [brentq, brenth, ridder, bisect]
+            x, res = brentq(function, 0, tol, args=args, 
+                            full_output=True, disp=False)
+            found = 1 if res.converged else 0
+        except ValueError:
+            x = 0
+            tol *= 2.
+            found = 0
+        if x <= 0:
+            found = 0
 
         # If the tolerance grows too large, minimize the function
-        if tol >= 0.1:
-            res = minimize(function, tol, args=args)
-            x = res.x
-            break
+        if tol >= 1:
+            raise ValueError('Root finding did not converge. Need more data.')
             
     if not x > 0:
         raise ValueError('Root finding failed to find positive solution.')
@@ -138,8 +142,9 @@ def _root(function, N, args):
 
 def improved_sheather_jones(data):
     """
-    Improved Sheather Jones from the Botev paper.
+    Improved Sheather Jones from the Botev et al.
     
+    For more information, see:
     https://books.google.no/books?id=Trj9HQ7G8TUC&pg=PA328&lpg=PA328&dq=
     sheather+jones+why+use+dct&source=bl&ots=1ETdKd_6EF&sig=jZk4R515GB1xsn-
     VZVnjr-JfjSI&hl=en&sa=X&ved=2ahUKEwi1_czNncTcAhVGhqYKHaPiBtcQ6AEwA3oEC
@@ -148,14 +153,15 @@ def improved_sheather_jones(data):
     obs, dims = data.shape
     assert dims == 1
     
-    n = 2**12
-    xmesh = autogrid(data, kernel_support=6, num_points=n, percentile=0.1)
+    n = 2**10
+    # Setting `percentile` higher decreases the chance of overflow
+    xmesh = autogrid(data, kernel_support=6, num_points=n, percentile=0.5)
     data = data.ravel()
     xmesh = xmesh.ravel()
     
     # Create an equidistant grid
     R = np.max(data) - np.min(data)
-    dx = R / (n - 1)
+    # dx = R / (n - 1)
     data = data.ravel()
     N = len(np.unique(data))
 
@@ -172,7 +178,7 @@ def improved_sheather_jones(data):
     a2 = a[1:]**2 / 4
 
     # Solve for the optimal (in the AMISE sense) t
-    t_star = _root(_fixed_point, N, args=(N, I_sq, a2)).item(0)
+    t_star = _root(_fixed_point, N, args=(N, I_sq, a2))
 
     # Smooth the initial data using the computed optimal t  
     # Multiplication in frequency domain is convolution   
@@ -184,12 +190,6 @@ def improved_sheather_jones(data):
     
     # Due to overflow, some values might be smaller than zero, correct it
     density[density < 0] = 0.
-
-    # The integral of the density should be close to 1
-    assert np.allclose(np.sum(density * np.ones_like(density) * dx), 1, 
-                       atol=10e-3)
-    assert np.allclose(simps(density, dx=dx), 1, atol=10e-3)
-    
     bandwidth = np.sqrt(t_star) * R
     return bandwidth
 
