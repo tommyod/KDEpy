@@ -8,8 +8,9 @@ https://github.com/pypa/sampleproject
 """
 
 # Always prefer setuptools over distutils
-from setuptools import setup, find_packages, Extension, build_ext
+from setuptools import setup, find_packages, Extension
 from Cython.Build import cythonize
+from Cython.Distutils import build_ext
 import numpy as np
 # To use a consistent encoding
 from codecs import open
