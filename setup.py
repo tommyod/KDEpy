@@ -8,7 +8,7 @@ https://github.com/pypa/sampleproject
 """
 
 # Always prefer setuptools over distutils
-from setuptools import setup, find_packages
+from setuptools import setup, find_packages, Extension
 from Cython.Build import cythonize
 # To use a consistent encoding
 from codecs import open
@@ -23,6 +23,16 @@ def read(fname):
     return open(path.join(here, fname)).read()
 
 
+SRC_DIR = "KDEpy"
+
+ext_1 = Extension(SRC_DIR + ".cutils",
+                  [SRC_DIR + "/cutils.pyx"],
+                  libraries=[],
+include_dirs=[np.get_include()])
+
+EXTENSIONS = [ext_1]
+
+
 setup(
     name='KDEpy',
 
@@ -32,7 +42,7 @@ setup(
     version=VERSION,
 
     description='Kernel Density Estimation in Python.',
-    long_description='Kernel Density Estimation in Python.',  
+    long_description='Kernel Density Estimation in Python.',
     # read('README.rst'),
     # The project's main homepage.
     url='https://github.com/tommyod/KDEpy',
@@ -94,9 +104,11 @@ setup(
     package_data={
         '': ['templates/*', '*.tex', '*.html'],
     },
-            
+
     # For cython, see: http://cython.readthedocs.io/en/latest/src/tutorial/cython_tutorial.html
-    ext_modules = cythonize(path.join("KDEpy", "cutils.pyx")),
+    # ext_modules = cythonize(path.join(".", "KDEpy", "cutils.pyx")),
+    cmdclass={"build_ext": build_ext},
+    ext_modules=EXTENSIONS,
 
     # Although 'package_data' is the preferred approach, in some case you may
     # need to place data files outside of your packages. See:
