@@ -9,6 +9,7 @@ https://github.com/pypa/sampleproject
 
 # Always prefer setuptools over distutils
 from setuptools import setup, find_packages
+from Cython.Build import cythonize
 # To use a consistent encoding
 from codecs import open
 from os import path
@@ -93,6 +94,9 @@ setup(
     package_data={
         '': ['templates/*', '*.tex', '*.html'],
     },
+            
+    # For cython, see: http://cython.readthedocs.io/en/latest/src/tutorial/cython_tutorial.html
+    ext_modules = cythonize(path.join("KDEpy", "cutils.pyx")),
 
     # Although 'package_data' is the preferred approach, in some case you may
     # need to place data files outside of your packages. See:

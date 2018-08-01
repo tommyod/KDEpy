@@ -8,4 +8,4 @@ nbsphinx>=0.3.2
 pytest>=3.6.2
 matplotlib>=2.2.2
 ipython>=6.4.0
-numba>=0.38.1
+cython>=0.26
