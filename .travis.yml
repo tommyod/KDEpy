@@ -6,10 +6,7 @@ python:
 before_install:
   - pip install pep8
   - pip install flake8
-  - pip install cython
   - pip install -r requirements.txt
-install:
-  - python setup.py develop
 before_script:
   - flake8 --show-source --ignore=F811,W293,W391,W292,W291 --max-line-length=79 KDEpy
 script:

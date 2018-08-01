@@ -25,12 +25,11 @@ def read(fname):
     return open(path.join(here, fname)).read()
 
 
-SRC_DIR = "KDEpy"
+SRC_DIR = path.join(".", "KDEpy")
 
-ext_1 = Extension(SRC_DIR + ".cutils",
-                  [SRC_DIR + "/cutils.pyx"],
-                  libraries=[],
-include_dirs=[np.get_include()])
+ext_1 = Extension("cutils",
+                  ["cutils.pyx"],
+                  libraries=[])
 
 EXTENSIONS = [ext_1]
 
@@ -88,7 +87,9 @@ setup(
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=['numpy>=1.14.2', 'scipy>=1.0.1'],
+    install_requires=[
+    'numpy>=1.14.2',
+    'scipy>=1.0.1'],
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
@@ -109,8 +110,9 @@ setup(
 
     # For cython, see: http://cython.readthedocs.io/en/latest/src/tutorial/cython_tutorial.html
     # ext_modules = cythonize(path.join(".", "KDEpy", "cutils.pyx")),
-    cmdclass={"build_ext": build_ext},
-    ext_modules=EXTENSIONS,
+    # cmdclass={"build_ext": build_ext},
+    # include_dirs=[np.get_include()],
+    # ext_modules=EXTENSIONS,
 
     # Although 'package_data' is the preferred approach, in some case you may
     # need to place data files outside of your packages. See:
