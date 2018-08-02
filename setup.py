@@ -28,7 +28,7 @@ def read(fname):
 SRC_DIR = path.join(".", "KDEpy")
 
 ext_1 = Extension("cutils",
-                  ["cutils.pyx"],
+                  [path.join(SRC_DIR, "cutils.pyx")],
                   libraries=[])
 
 EXTENSIONS = [ext_1]
@@ -110,9 +110,9 @@ setup(
 
     # For cython, see: http://cython.readthedocs.io/en/latest/src/tutorial/cython_tutorial.html
     # ext_modules = cythonize(path.join(".", "KDEpy", "cutils.pyx")),
-    # cmdclass={"build_ext": build_ext},
-    # include_dirs=[np.get_include()],
-    # ext_modules=EXTENSIONS,
+    cmdclass={"build_ext": build_ext},
+    include_dirs=[np.get_include()],
+    ext_modules=EXTENSIONS,
 
     # Although 'package_data' is the preferred approach, in some case you may
     # need to place data files outside of your packages. See:
