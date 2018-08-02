@@ -8,13 +8,15 @@ Created on Sun Feb  4 10:52:17 2018
 import pytest
 import numpy as np
 
+import cutils
+
 try:
     import cutils
     _use_Cython = True
 except ModuleNotFoundError:
     _use_Cython = False
 
-_use_Cython = False
+_use_Cython = True
 
 
 def linbin_cython(data, grid_points, weights=None):
@@ -188,7 +190,6 @@ def linear_binning(data, grid_points, weights=None):
     if _use_Cython:
         return linbin_cython(data, grid_points, weights=None)
     else:
-        pass
         return linbin_numpy(data, grid_points, weights=None)
 
 
