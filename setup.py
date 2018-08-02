@@ -15,8 +15,8 @@ import numpy as np
 # To use a consistent encoding
 from codecs import open
 from os import path
-from KDEpy import __version__
-VERSION = __version__
+# from KDEpy import __version__
+VERSION = '0.2'
 
 here = path.abspath(path.dirname(__file__))
 
