@@ -8,15 +8,11 @@ Created on Sun Feb  4 10:52:17 2018
 import pytest
 import numpy as np
 
-import cutils
-
 try:
     import cutils
     _use_Cython = True
 except ModuleNotFoundError:
     _use_Cython = False
-
-_use_Cython = True
 
 
 def linbin_cython(data, grid_points, weights=None):
@@ -29,17 +25,6 @@ def linbin_cython(data, grid_points, weights=None):
     Time on 1 million data points: 30 ms
     Time on 10 million data points: 290 ms
     Time on 100 million data points: 2.86 s
-
-    Examples
-    --------
-    >>> data = np.array([2, 2.5, 3, 4])
-    >>> linbin_numpy(data, np.arange(6), weights=None)
-    array([0.   , 0.   , 0.375, 0.375, 0.25 , 0.   ])
-    >>> linbin_numpy(data, np.arange(6), weights=np.arange(1, 5))
-    array([0. , 0. , 0.2, 0.4, 0.4, 0. ])
-    >>> data = np.array([2, 2.5, 3, 4])
-    >>> linbin_numpy(data, np.arange(1, 7), weights=None)
-    array([0.   , 0.375, 0.375, 0.25 , 0.   , 0.   ])
     """
     # Convert the data and grid points
     data = np.asarray_chkfinite(data, dtype=np.float)
@@ -186,7 +171,6 @@ def linear_binning(data, grid_points, weights=None):
     >>> np.allclose(data, np.array([0.33333, 0.36667, 0.3]))
     True
     """
-    _use_Cython = True
     if _use_Cython:
         return linbin_cython(data, grid_points, weights=None)
     else:
