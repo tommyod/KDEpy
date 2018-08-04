@@ -18,9 +18,12 @@ except ModuleNotFoundError:
 def linbin_cython(data, grid_points, weights=None):
     """
     Linear binning using Cython. Assigns weights to grid points from data.
-
-    This function is fast for data sets upto approximately 1-10 million,
-    it uses vectorized NumPy functions to perform linear binning.
+    
+    from KDEpy.binning import linbin_cython
+    import numpy as np
+    data = np.random.randn(10**7)
+    %timeit linbin_cython(data, np.linspace(-8,8, num=2**10))
+    -> 547 ms ± 8.32 ms
 
     Time on 1 million data points: 30 ms
     Time on 10 million data points: 290 ms

@@ -5,6 +5,21 @@ Created on Mon Jul 16 20:30:38 2018
 @author: Tommy
 """
 
+cimport cython
+
+# boundscheck(False) -> Cython is free to assume that indexing will not cause 
+# any IndexErrors to be raised.
+
+# wraparound(False) ->  If set to False, Cython is allowed to neither check 
+# for nor correctly handle negative indices
+
+# cdivision(True) -> If set to False, Cython will adjust the remainder and 
+# quotient operators C types to match those of Python ints (which differ 
+# when the operands have opposite signs) and raise a ZeroDivisionError 
+# when the right operand is 0
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.cdivision(True)
 def iterate_data_weighted(double[:] transformed_data, double[:] weights, double[:] result):
     """
     Iterate over data points and weights and assign linear weights to nearest grid points.
@@ -23,6 +38,9 @@ def iterate_data_weighted(double[:] transformed_data, double[:] weights, double[
 
     return result
 
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.cdivision(True)
 def iterate_data(double[:] transformed_data, double[:] result):
     """
     Iterate over data points and assign linear weights to nearest grid points.

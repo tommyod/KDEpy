@@ -80,7 +80,7 @@ def trig_integral(k):
 
 def p_norm(x, p):
     """
-    The 2 norm of an array of shape (obs, dims)
+    The p-norm of an array of shape (obs, dims)
     
     Examples
     --------
@@ -91,6 +91,10 @@ def p_norm(x, p):
     """
     if np.isinf(p):
         return infinity_norm(x)
+    elif p == 2:
+        return euclidean_norm(x)
+    elif p == 1:
+        return taxicab_norm(x)
     return np.power(np.power(np.abs(x), p).sum(axis=1), 1 / p).reshape(-1, 1)
 
 
@@ -289,7 +293,10 @@ class Kernel(collections.abc.Callable):
         else:
             volume_func = volume_hypershpere
             
-        distances = p_norm(x, norm)
+        if dims > 1:
+            distances = p_norm(x, norm)
+        else:
+            distances = np.abs(x)
             
         return (self.function(distances / real_bw, dims, volume_func) / 
                 (real_bw**dims))

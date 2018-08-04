@@ -15,7 +15,45 @@ from KDEpy.BaseKDE import BaseKDE
    
 class TreeKDE(BaseKDE):
     """
-    The calss for a tree implementation of the KDE.
+    This class implements a tree-based computation of a kernel density 
+    estimate. It works by segmenting the space into 
+    
+    The
+    advantages are that choices of bandwidth, norms, weights and grids are
+    straightforward -- the user can do almost anything. The disadvantage is 
+    that computations are slow with on than a couple of thousand data points.
+
+    Parameters
+    ----------
+    kernel : str
+        The kernel function. See cls._available_kernels.keys() for choices.
+    bw : float, str or array-like
+        Bandwidth or bandwidth selection method. If a float is passed, it
+        is the standard deviation of the kernel. If a string it passed, it
+        is the bandwidth selection method, see cls._bw_methods.keys() for
+        choices. If an array-like it passed, it is the bandwidth of each
+        point.
+    norm : float
+        The p-norm used to compute the distances in higher dimensions.
+        
+    Examples
+    --------
+    >>> data = np.random.randn(2**10)
+    >>> # Automatic bw selection using Improved Sheather Jones
+    >>> x, y = NaiveKDE(bw='ISJ').fit(data).evaluate()
+    >>> # Explicit choice of kernel and bw (standard deviation of kernel)
+    >>> x, y = NaiveKDE(kernel='triweight', bw=0.5).fit(data).evaluate()
+    >>> weights = data + 10
+    >>> # Using a grid and weights for the data
+    >>> y = NaiveKDE(kernel='epa', bw=0.5).fit(data, weights).evaluate(x)
+    
+    References
+    ----------
+    - Silverman, B. W. Density Estimation for Statistics and Data Analysis. 
+      Boca Raton: Chapman and Hall, 1986.
+    - Wand, M. P., and M. C. Jones. Kernel Smoothing. 
+      London ; New York: Chapman and Hall/CRC, 1995.
+    - Scipy implementation, at ``scipy.stats.gaussian_kde``.
     """
     
     def __init__(self, kernel='gaussian', bw=1, norm=2.):

@@ -74,6 +74,7 @@ Navigation
    kernels.rst
    notebook.ipynb
    literature.rst
+   API.rst
 
 
 Contribute

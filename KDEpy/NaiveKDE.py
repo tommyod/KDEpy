@@ -13,25 +13,59 @@ from KDEpy.BaseKDE import BaseKDE
 
 class NaiveKDE(BaseKDE):
     """
-    The class for a naive implementation of the KDE.
+    This class implements a naive computation of a kernel density estimate. The
+    advantages are that choices of bandwidth, norms, weights and grids are
+    straightforward -- the user can do almost anything. The disadvantage is 
+    that computations are slow with on than a couple of thousand data points.
+
+    Parameters
+    ----------
+    kernel : str
+        The kernel function. See cls._available_kernels.keys() for choices.
+    bw : float, str or array-like
+        Bandwidth or bandwidth selection method. If a float is passed, it
+        is the standard deviation of the kernel. If a string it passed, it
+        is the bandwidth selection method, see cls._bw_methods.keys() for
+        choices. If an array-like it passed, it is the bandwidth of each
+        point.
+    norm : float
+        The p-norm used to compute the distances in higher dimensions.
+        
+    Examples
+    --------
+    >>> data = np.random.randn(2**10)
+    >>> # Automatic bw selection using Improved Sheather Jones
+    >>> x, y = NaiveKDE(bw='ISJ').fit(data).evaluate()
+    >>> # Explicit choice of kernel and bw (standard deviation of kernel)
+    >>> x, y = NaiveKDE(kernel='triweight', bw=0.5).fit(data).evaluate()
+    >>> weights = data + 10
+    >>> # Using a grid and weights for the data
+    >>> y = NaiveKDE(kernel='epa', bw=0.5).fit(data, weights).evaluate(x)
+    
+    References
+    ----------
+    - Silverman, B. W. Density Estimation for Statistics and Data Analysis. 
+      Boca Raton: Chapman and Hall, 1986.
+    - Wand, M. P., and M. C. Jones. Kernel Smoothing. 
+      London ; New York: Chapman and Hall/CRC, 1995.
+    - Scipy implementation, at ``scipy.stats.gaussian_kde``.
     """
     
     def __init__(self, kernel='gaussian', bw=1, norm=2):
-        """
-        Initialize a naive KDE.
-        """
         super().__init__(kernel, bw)
         self.norm = norm
     
     def fit(self, data, weights=None):
-        """Fit the KDE to the data.
+        """
+        Fit the KDE to the data. This validates the data and stores it. 
+        Computations are performed upon evaluation on a grid.
     
         Parameters
         ----------
-        data
-            The data points.
-        weights
-            The weights.
+        data: array-like
+            The data points. High dimensional data must have shape (obs, dims).
+        weights: array-like
+            One weight per data point. Must have same shape as the data.
             
         Returns
         -------
@@ -41,9 +75,11 @@ class NaiveKDE(BaseKDE):
         Examples
         --------
         >>> data = [1, 3, 4, 7]
-        >>> kde = NaiveKDE().fit(data)
+        >>> weights = [3, 4, 2, 1]
+        >>> kde = NaiveKDE().fit(data, weights=None)
+        >>> kde = NaiveKDE().fit(data, weights=weights)
+        >>> x, y = kde()
         """
-        
         # Sets self.data
         super().fit(data)
         
@@ -62,9 +98,29 @@ class NaiveKDE(BaseKDE):
         return self
     
     def evaluate(self, grid_points=None):
-        """Evaluate on the grid points.
         """
+        Evaluate on the grid points.
         
+        Parameters
+        ----------
+        grid_points: array-like or None
+            A grid (mesh) to evaluate on. High dimensional grids must have 
+            shape (obs, dims). If None, a grid will be automatically created.
+            
+        Returns
+        -------
+        y: array-like
+            If a grid is supplied, `y` is returned. If no grid is supplied,
+            a tuple (`x`, `y`) is returned.
+            
+        Examples
+        --------
+        >>> kde = NaiveKDE().fit([1, 3, 4, 7])
+        >>> # Two ways to evaluate, either with a grid or without
+        >>> x, y = kde.evaluate()
+        >>> # kde.evaluate() is equivalent to kde()
+        >>> y = kde(grid_points=np.linspace(0, 10, num=2**10))
+        """
         # This method sets self.grid points and verifies it
         super().evaluate(grid_points)
         
@@ -81,9 +137,9 @@ class NaiveKDE(BaseKDE):
         elif callable(bw):
             bw = np.asfarray(np.ones_like(self.data) * bw(self.data))
 
+        # TODO: Implementation w.r.t grid points for faster evaluation
         for weight, data_point, bw in zip(self.weights, self.data, bw):
-            evaluated += weight * self.kernel(grid_points - data_point, 
-                                              bw=bw)
+            evaluated += weight * self.kernel(grid_points - data_point, bw=bw)
             
         return self._evalate_return_logic(evaluated, grid_points)
 
