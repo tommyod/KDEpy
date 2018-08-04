@@ -1,29 +1,43 @@
 [![Build Status](https://travis-ci.org/tommyod/KDEpy.svg?branch=master)](https://travis-ci.org/tommyod/KDEpy)
 [![Documentation Status](https://readthedocs.org/projects/kdepy/badge/?version=latest)](http://kdepy.readthedocs.io/en/latest/?badge=latest)
 [![PyPI version](https://badge.fury.io/py/KDEpy.svg)](https://badge.fury.io/py/KDEpy)
-
-
 ---------
 
+# [KDEpy](https://kdepy.readthedocs.io/en/latest/)
 
-# KDEpy
+## About
 
-Implementations of various kernel density esimators (KDE) in Python.
-**This project is a work in progress**, and might change in the future.
-If you are interested in participating in this project, you are very welcome to do so.
-**The goal is to implement state-of-the-art KDE, and eventually have the most complete implementation in the Python universe.**
-It's a lofty goal, but it might be possible.
+This Python package which implements various kernel density esimators (KDE).
+The goal is to support state-of-the-art KDE, and eventually have the most complete implementation in the Python universe.
+As of now, three algorithms are implemented: `NaiveKDE`, `TreeKDE` and `FFTKDE`.
+Some highlights of the package include:
+- Choice between 9+ kernel functions in any p-norm. Normalized for common values of p.
+- Several methods for automatic bandwidth selection, including the Improved Sheather Jones algorithm (2010).
+- All KDEs support weighted data, some support non-equidistant grids.
+- A very fast 1D implementation of the `FFTKDE` can deal with tens of millions of data points.
+
+## Installation
+
+KDEpy is available on [PyPI](https://pypi.org/project/KDEpy/), and may be installed using `pip`:
+
+```bash
+pip install KDEpy
+```
+
+## Example code and documentation
+
+Below is an example using NumPy as `np` and `scipy.stats.norm` to plot a density estimate. See the [documentation](https://kdepy.readthedocs.io/en/latest/) for more examples.
 
 ```python
-from KDEpy import NaiveKDE, TreeKDE, FFTKDE
+from KDEpy import NaiveKDE
 np.random.seed(42)
 data = norm(loc=0, scale=1).rvs(2**3)
 x, y = NaiveKDE(kernel='gaussian', bw='silverman').fit(data).evaluate()
 plt.plot(x, y, label='KDE estimate')
 ```
-![Plot](example.png)
+![Plot](./example.png)
 
-Several algorithms are included:
+The package consists of three algorithms:
 
 - `NaiveKDE` - A naive computation. Supports N-dimensional data, variable bandwidth, weighted data and many kernel functions. Slow on large data sets.
 - `TreeKDE` - A tree-based computation. Supports the same features as the naive algorithm, but is faster at the expense of small inaccuracy when using a kernel without finite support.
@@ -35,17 +49,37 @@ for bw in [0.1, 'silverman', 1.5]:
     x, y = FFTKDE(kernel='triweight', bw=bw).fit(data).evaluate()
     plt.plot(x, y, label=f'KDE estimate, bw={bw}')
 ```
-![Plot](example2.png)
+![Plot](./example2.png)
 
-# Contributing to this project
+## Contributing
 
 Whatever your mathematical and Python background is, you are very welcome to contribute to KDEpy.
 I hope to write a short tutorial on how to contribute.
 For the time being, open an *Issue* if you would like to contribute but you are unsure how to.
 
-# General guidelines and TODO
+## Milestones
 
-## General guidelines for this project
+The list below roughly shows what needs to be done.
+
+- [X] univariate BaseKDE (todo: check if more common code can be moved)
+- [X] univariate NaiveKDE
+- [X] univariate TreeKDE
+- [X] univariate FFTKDE (implement linbin even faster in cython)
+- [ ] univariate DiffusionKDE
+- [X] Refactor kernel funcs - add solver for effective bandwidth
+
+- [X] Implement univariate, fixed bandwidth KDEs naively
+- [X] Implement **weighted**, fixed bandwidth, univariate KDEs naively
+- [X] Implement variable bandwidth KDEs naively
+- [X] Implement TreeKDE, test against other implementations
+- [X] Implement Scott and Silverman rules for bandwidth selection
+- [ ] Make sure that speed and functionally matches `statsmodels`, `scikit-learn` and `scipy`
+- [ ] Implement methods taking care of boundaries
+- [X] Make sure TreeKDE works without finite support too
+
+## Misc
+
+### General guidelines for this project
 
 I hope to follow these guidelines for this project:
 - Import as few external dependencies as possible, ideally only NumPy.
@@ -55,30 +89,6 @@ I hope to follow these guidelines for this project:
 - Employ object orientation, but resist the temptation to implement
   many methods - stick to the basics.
 - Follow PEP8
-
-## TODO
-
-The list below roughly shows what needs to be done.
-
-- [X] univariate BaseKDE (todo: check if more common code can be moved)
-- [X] univariate NaiveKDE
-- [X] univariate TreeKDE
-- [X] univariate FFTKDE (implement linbin even faster in cython)
-- [ ] univariate DiffusionKDE
-- [ ] Refactor kernel funcs - add solver for effective bandwidth
-
-- [X] Implement univariate, fixed bandwidth KDEs naively
-- [X] Implement **weighted**, fixed bandwidth, univariate KDEs naively
-- [X] Implement variable bandwidth KDEs naively
-- [X] Implement TreeKDE, test against other implementations
-- [ ] Implement Scott and Silverman rules for bandwidth selection
-- [ ] Make sure that speed and functionally matches `statsmodels`, `scikit-learn` and `scipy`
-- [ ] Implement methods taking care of boundaries
-- [ ] Make sure TreeKDE works without finite support too
-
-
-
-
 
 ---------------
 
