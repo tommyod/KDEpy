@@ -4,6 +4,10 @@
 Usage examples.
 """
 if True:
+    # For Travis CI
+    import matplotlib
+    matplotlib.use('Agg')
+    
     # --------- Minimal working example ---------
     import numpy as np
     import matplotlib.pyplot as plt
