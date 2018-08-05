@@ -78,6 +78,9 @@ def test_api_2D_data():
     """
     Test working on 2D data.
     """
+    # For Travis CI
+    import matplotlib
+    matplotlib.use('Agg')
     
     import matplotlib.pyplot as plt
     import numpy as np
