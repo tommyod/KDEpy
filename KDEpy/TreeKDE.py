@@ -16,13 +16,12 @@ from KDEpy.BaseKDE import BaseKDE
 class TreeKDE(BaseKDE):
     """
     This class implements a tree-based computation of a kernel density 
-    estimate. It works by segmenting the space into 
+    estimate. It works by segmenting the space recursively into smaller parts. 
+    This makes computing a kernel density estimate at a location easier, since 
+    we are able to query the tree structure for nearby points instead of having 
+    to evaluate the kernel function on all data points. For kernels without 
+    finite support, their support is approximated.
     
-    The
-    advantages are that choices of bandwidth, norms, weights and grids are
-    straightforward -- the user can do almost anything. The disadvantage is 
-    that computations are slow with on than a couple of thousand data points.
-
     Parameters
     ----------
     kernel : str
@@ -40,32 +39,56 @@ class TreeKDE(BaseKDE):
     --------
     >>> data = np.random.randn(2**10)
     >>> # Automatic bw selection using Improved Sheather Jones
-    >>> x, y = NaiveKDE(bw='ISJ').fit(data).evaluate()
+    >>> x, y = TreeKDE(bw='ISJ').fit(data).evaluate()
     >>> # Explicit choice of kernel and bw (standard deviation of kernel)
-    >>> x, y = NaiveKDE(kernel='triweight', bw=0.5).fit(data).evaluate()
+    >>> x, y = TreeKDE(kernel='triweight', bw=0.5).fit(data).evaluate()
     >>> weights = data + 10
     >>> # Using a grid and weights for the data
-    >>> y = NaiveKDE(kernel='epa', bw=0.5).fit(data, weights).evaluate(x)
+    >>> y = TreeKDE(kernel='epa', bw=0.5).fit(data, weights).evaluate(x)
     
     References
     ----------
+    - Friedman, Jerome H., Jon Louis Bentley, and Raphael Ari Finkel. 
+      An Algorithm for Finding Best Matches in Logarithmic Expected Time.
+      ACM Trans. Math. Softw. 3, no. 3 (September 1977): 209–226. 
+      https://doi.org/10.1145/355744.355745.
+    - Maneewongvatana, Songrit, and David M. Mount. 
+      It’s Okay to Be Skinny, If Your Friends Are Fat.
+      In Center for Geometric Computing 4th Annual Workshop on Computational 
+      Geometry, 2:1–8, 1999.
     - Silverman, B. W. Density Estimation for Statistics and Data Analysis. 
-      Boca Raton: Chapman and Hall, 1986.
-    - Wand, M. P., and M. C. Jones. Kernel Smoothing. 
-      London ; New York: Chapman and Hall/CRC, 1995.
-    - Scipy implementation, at ``scipy.stats.gaussian_kde``.
+      Boca Raton: Chapman and Hall, 1986. Page 99 for reference to kd-tree.
+    - Scipy implementation, at ``scipy.spatial.KDTree``.
     """
     
     def __init__(self, kernel='gaussian', bw=1, norm=2.):
-        """
-        Initialize a naive KDE.
-        """
         super().__init__(kernel, bw)
         self.norm = norm
     
     def fit(self, data, weights=None):
         """
-        Fit to data.
+        Fit the KDE to the data. This validates the data and stores it. 
+        Computations are performed upon evaluation on a grid.
+    
+        Parameters
+        ----------
+        data: array-like
+            The data points.
+        weights: array-like
+            One weight per data point. Must have same shape as the data.
+            
+        Returns
+        -------
+        self
+            Returns the instance.
+            
+        Examples
+        --------
+        >>> data = [1, 3, 4, 7]
+        >>> weights = [3, 4, 2, 1]
+        >>> kde = TreeKDE().fit(data, weights=None)
+        >>> kde = TreeKDE().fit(data, weights=weights)
+        >>> x, y = kde()
         """
         # Sets self.data
         super().fit(data)
@@ -84,9 +107,33 @@ class TreeKDE(BaseKDE):
             
         return self
     
-    def evaluate(self, grid_points=None, eps=10e-6):
+    def evaluate(self, grid_points=None, eps=10e-4):
         """
         Evaluate on the grid points.
+        
+        Parameters
+        ----------
+        grid_points: array-like or None
+            A 1D grid (mesh) to evaluate on. If None, a grid will be 
+            automatically created.
+        eps: float
+            The maximal total error in absolute terms when estimating the 
+            effective support of a kernel which has infinite support. Setting
+            this too high will produced a jagged estimate.
+            
+        Returns
+        -------
+        y: array-like
+            If a grid is supplied, `y` is returned. If no grid is supplied,
+            a tuple (`x`, `y`) is returned.
+            
+        Examples
+        --------
+        >>> kde = TreeKDE().fit([1, 3, 4, 7])
+        >>> # Two ways to evaluate, either with a grid or without
+        >>> x, y = kde.evaluate()
+        >>> # kde.evaluate() is equivalent to kde()
+        >>> y = kde(grid_points=np.linspace(0, 10, num=2**10))
         """
         
         # This method sets self.grid points and verifies it
@@ -112,9 +159,6 @@ class TreeKDE(BaseKDE):
         tree = cKDTree(self.data)
         
         # Compute the kernel radius
-        # TODO: Verify that this is a good way to handle unbounded kernels
-        # kernel_radius = self.kernel.support
-        # assert self.kernel.finite_support
         maximal_bw = np.max(bw)
         if not eps > 0:
             raise ValueError('eps must be > 0.')
@@ -122,14 +166,15 @@ class TreeKDE(BaseKDE):
             
         # Since we iterate through grid points, we need the maximum bw to
         # ensure that we get data points that are close enough
+        obs, dims = self.data.shape
         for i, grid_point in enumerate(grid_points):
 
             # Query for data points that are close to this grid point
             indices = tree.query_ball_point(x=grid_point, 
                                             r=kernel_radius,  # * maximal_bw, 
-                                            # TODO: Is this epsilon value ok?
                                             p=self.norm, 
-                                            eps=eps / self.data.shape[0])
+                                            # TODO: Is this epsilon value ok?
+                                            eps=eps * np.sqrt(obs))
 
             # Use broadcasting to find x-values (distances)
             x_values = grid_point - self.data[indices]
@@ -149,6 +194,7 @@ class TreeKDE(BaseKDE):
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
     pytest.main(args=['.', '--doctest-modules', '-v'])
+    pass
 
 if __name__ == '__main__':
     
@@ -242,10 +288,11 @@ if __name__ == '__main__':
     # Comparing tree and naive
     # -----------------------------------------
     kernel = 'gaussian'
-    data = np.sqrt(np.arange(100) + 1)
+    data = np.sqrt(np.arange(5) + 1)
+    # data = np.ones(100)
     bw = np.ones_like(data)
     weights = None
-    eps = 0.01
+    eps = 0.0001
 
     plt.figure(figsize=(10, 4))
     plt.title('Basic example of the naive KDE')
