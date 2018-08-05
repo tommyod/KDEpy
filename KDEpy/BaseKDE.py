@@ -106,7 +106,7 @@ class BaseKDE(ABC):
             raise ValueError('Must call fit before evaluating.')
         
         # If no information is supplied at all, call the autogrid method
-        if grid_points is None:
+        if grid_points is None or isinstance(grid_points, numbers.Integral):
             self._user_supplied_grid = False
             
             if isinstance(self.bw, (np.ndarray, Sequence)):
@@ -115,8 +115,10 @@ class BaseKDE(ABC):
                 bw = self.bw(self.data)
             else:
                 bw = self.bw
+                
             grid_points = autogrid(self.data, 
-                                   self.kernel.practical_support(bw))
+                                   self.kernel.practical_support(bw),
+                                   grid_points)
             
         # If a number is specified, interpret it as the number of grid points
         elif isinstance(grid_points, numbers.Number):
@@ -160,14 +162,19 @@ class BaseKDE(ABC):
         """
         Return either evaluation points y, or tuple (x, y) based on inputs.
         """
-        obs, dims = evaluated.shape
+        obs, dims = grid_points.shape
         if self._user_supplied_grid:
             if dims == 1:
                 return evaluated.ravel()
-            return evaluated 
+            elif dims == 2:
+                return evaluated
+            else:
+                return evaluated
         else:
             if dims == 1:
                 return grid_points.ravel(), evaluated.ravel()
+            elif dims == 2:
+                return grid_points, evaluated
             return grid_points, evaluated 
   
     def __call__(self, *args, **kwargs):

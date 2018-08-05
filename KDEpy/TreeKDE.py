@@ -95,16 +95,14 @@ class TreeKDE(BaseKDE):
         
         # If weights were passed
         if weights is not None:
-            if not len(weights) == len(data):
+            if not len(weights) == self.data.shape[0]:
                 raise ValueError('Length of data and weights must match.')
             else:
-                weights = self._process_sequence(weights)
-                self.weights = np.asfarray(weights)
+                weights = np.asarray_chkfinite(weights, dtype=np.float)
+                self.weights = weights.ravel() / np.sum(weights)
         else:
-            self.weights = np.ones_like(self.data)
-            
-        self.weights = self.weights / np.sum(self.weights)
-            
+            self.weights = weights
+    
         return self
     
     def evaluate(self, grid_points=None, eps=10e-4):
@@ -141,18 +139,19 @@ class TreeKDE(BaseKDE):
         
         # Return the array converted to a float type
         grid_points = np.asfarray(self.grid_points)
-        
+        grid_obs, grid_dims = grid_points.shape
         # Create zeros on the grid points
-        evaluated = np.zeros_like(grid_points)
+        evaluated = np.zeros(grid_obs)
         
         # For every data point, compute the kernel and add to the grid
+        obs, dims = self.data.shape
         bw = self.bw
         if isinstance(bw, numbers.Number):
-            bw = np.asfarray(np.ones_like(self.data) * bw)
+            bw = np.asfarray(np.ones(obs) * bw)
         elif callable(bw):
-            bw = np.asfarray(np.ones_like(self.data) * bw(self.data))
+            bw = np.asfarray(np.ones(obs) * bw(self.data))
         else:
-            bw = self._process_sequence(bw)
+            bw = np.asarray_chkfinite(bw, dtype=np.float)
         maximal_bw = np.max(self.bw)
 
         # Initialize the tree structure for fast lookups of neighbors
@@ -166,7 +165,6 @@ class TreeKDE(BaseKDE):
             
         # Since we iterate through grid points, we need the maximum bw to
         # ensure that we get data points that are close enough
-        obs, dims = self.data.shape
         for i, grid_point in enumerate(grid_points):
 
             # Query for data points that are close to this grid point
@@ -178,16 +176,20 @@ class TreeKDE(BaseKDE):
 
             # Use broadcasting to find x-values (distances)
             x_values = grid_point - self.data[indices]
-            kernel_estimates = self.kernel(x_values, bw=bw[indices])
-            weights_subset = self.weights[indices]
+            kernel_estimates = self.kernel(x_values, bw=bw[indices], 
+                                           norm=self.norm)
             
-            assert kernel_estimates.shape == weights_subset.shape
+            if self.weights is not None:
+                weights_subset = self.weights[indices]
+                assert kernel_estimates.shape == weights_subset.shape
             assert kernel_estimates.shape == bw[indices].shape
 
             # Unpack the (n, 1) arrays to (n,) and compute the doc product
-            evaluated[i] += np.dot(kernel_estimates.ravel(), 
-                                   weights_subset.ravel())
-            
+            if self.weights is not None:
+                evaluated[i] += np.dot(kernel_estimates, weights_subset)
+            else:
+                evaluated[i] += np.sum(kernel_estimates) / obs
+
         return self._evalate_return_logic(evaluated, grid_points)
 
 

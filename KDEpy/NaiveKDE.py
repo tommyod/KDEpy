@@ -91,7 +91,7 @@ class NaiveKDE(BaseKDE):
                 weights = self._process_sequence(weights)
                 self.weights = np.asfarray(weights)
         else:
-            self.weights = np.ones_like(self.data)
+            self.weights = np.ones(self.data.shape[0])
             
         self.weights = self.weights / np.sum(self.weights)
             
@@ -126,20 +126,21 @@ class NaiveKDE(BaseKDE):
         
         # Return the array converted to a float type
         grid_points = np.asfarray(self.grid_points)
-        
+        grid_obs, grid_dims = grid_points.shape
         # Create zeros on the grid points
-        evaluated = np.zeros_like(grid_points)
+        evaluated = np.zeros(grid_obs)
         
         # For every data point, compute the kernel and add to the grid
         bw = self.bw
         if isinstance(bw, numbers.Number):
-            bw = np.asfarray(np.ones_like(self.data) * bw)
+            bw = np.asfarray(np.ones(self.data.shape[0]) * bw)
         elif callable(bw):
-            bw = np.asfarray(np.ones_like(self.data) * bw(self.data))
+            bw = np.asfarray(np.ones(self.data.shape[0]) * bw(self.data))
 
         # TODO: Implementation w.r.t grid points for faster evaluation
         for weight, data_point, bw in zip(self.weights, self.data, bw):
-            evaluated += weight * self.kernel(grid_points - data_point, bw=bw)
+            evaluated += weight * self.kernel(grid_points - data_point, 
+                                              bw=bw, norm=self.norm)
             
         return self._evalate_return_logic(evaluated, grid_points)
 

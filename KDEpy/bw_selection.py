@@ -155,7 +155,7 @@ def improved_sheather_jones(data):
     
     n = 2**10
     # Setting `percentile` higher decreases the chance of overflow
-    xmesh = autogrid(data, kernel_support=6, num_points=n, percentile=0.5)
+    xmesh = autogrid(data, boundary_abs=6, num_points=n, boundary_rel=0.5)
     data = data.ravel()
     xmesh = xmesh.ravel()
     

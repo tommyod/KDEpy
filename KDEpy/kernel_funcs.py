@@ -95,35 +95,35 @@ def p_norm(x, p):
         return euclidean_norm(x)
     elif p == 1:
         return taxicab_norm(x)
-    return np.power(np.power(np.abs(x), p).sum(axis=1), 1 / p).reshape(-1, 1)
+    return np.power(np.power(np.abs(x), p).sum(axis=1), 1 / p)
 
 
 def euclidean_norm(x):
     """
     The 2 norm of an array of shape (obs, dims)
     """
-    return np.sqrt((x * x).sum(axis=1)).reshape(-1, 1)
+    return np.sqrt((x * x).sum(axis=1))
 
 
 def euclidean_norm_sq(x):
     """
     The squared 2 norm of an array of shape (obs, dims)
     """
-    return (x * x).sum(axis=1).reshape(-1, 1)
+    return (x * x).sum(axis=1)
 
 
 def infinity_norm(x):
     """
     The infinity norm of an array of shape (obs, dims)
     """
-    return np.abs(x).max(axis=1).reshape(-1, 1)
+    return np.abs(x).max(axis=1)
 
 
 def taxicab_norm(x):
     """
     The taxicab norm of an array of shape (obs, dims)
     """
-    return np.abs(x).sum(axis=1).reshape(-1, 1)
+    return np.abs(x).sum(axis=1)
 
 
 def volume_hypershpere(d):
@@ -222,15 +222,11 @@ def cosine(x, dims=1, volume_func=volume_hypershpere):
 
 
 def logistic(x, dims=1, volume_func=volume_hypershpere):
-    dist = (x * x).sum(axis=1).reshape(-1, 1)
-    dist = np.sqrt(dist)
-    return 1 / (2 + 2 * np.cosh(dist))
+    return 1 / (2 + 2 * np.cosh(x))
 
 
 def sigmoid(x, dims=1, volume_func=volume_hypershpere):
-    dist = (x * x).sum(axis=1).reshape(-1, 1)
-    dist = np.sqrt(dist)
-    return (1 / (np.pi * np.cosh(dist)))
+    return (1 / (np.pi * np.cosh(x)))
 
 
 class Kernel(collections.abc.Callable):
@@ -270,6 +266,13 @@ class Kernel(collections.abc.Callable):
     def evaluate(self, x, bw=1, norm=2):
         """
         Evaluate the kernel.
+        
+        Parameters
+        ----------
+        x : array-like
+            Must have shape (obs, dims).
+        bw : array-like
+            Must have shape (obs, ), or float.
         """
         
         # If x is a number, convert it to a length-1 NumPy vector
@@ -286,6 +289,7 @@ class Kernel(collections.abc.Callable):
         real_bw = bw / np.sqrt(self.var)
         obs, dims = x.shape
         
+        # Set the volume function for common norm values
         if norm == np.infty:
             volume_func = volume_hypercube
         elif norm == 1:
@@ -294,9 +298,9 @@ class Kernel(collections.abc.Callable):
             volume_func = volume_hypershpere
             
         if dims > 1:
-            distances = p_norm(x, norm)
+            distances = p_norm(x, norm).ravel()
         else:
-            distances = np.abs(x)
+            distances = np.abs(x).ravel()
             
         return (self.function(distances / real_bw, dims, volume_func) / 
                 (real_bw**dims))
@@ -330,7 +334,7 @@ _kernel_functions = {'gaussian': gaussian,
                      }
 
 
-if __name__ == "__main__":
+if __name__ == "__main__" and False:
     import pytest
     # --durations=10  <- May be used to show potentially slow tests
     pytest.main(args=['.', '--doctest-modules', '-v'])
@@ -393,7 +397,7 @@ if __name__ == "__main__":
             print(f'2D integration result: {ans}')
             assert np.allclose(ans, 1, rtol=10e-3, atol=10e-3)
         
-if __name__ == "__main__":
+if __name__ == "__main__" and False:
     
     bw = 2
     print(gaussian.practical_support(bw))
@@ -409,5 +413,3 @@ if __name__ == "__main__":
     plt.plot(x, y)
     plt.scatter([-epa.practical_support(bw), 
                  epa.practical_support(bw)], [0, 0])
-    
-    

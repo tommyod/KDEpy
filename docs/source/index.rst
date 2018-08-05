@@ -72,6 +72,7 @@ Navigation
    intro_kde.rst
    bandwidth.rst
    kernels.rst
+   examples.rst
    notebook.ipynb
    literature.rst
    API.rst

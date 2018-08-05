@@ -147,6 +147,6 @@ class TestKernelFunctions():
  
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
-    pytest.main(args=['.', '--doctest-modules', '-v', 
+    pytest.main(args=[__file__, '--doctest-modules', '-v', 
                       '--durations=15'
                       ])
