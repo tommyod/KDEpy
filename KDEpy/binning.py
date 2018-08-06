@@ -182,4 +182,113 @@ def linear_binning(data, grid_points, weights=None):
 
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
-    pytest.main(args=['.', '--doctest-modules', '-v', '--capture=sys'])
+    # pytest.main(args=['.', '--doctest-modules', '-v', '--capture=sys'])
+    from KDEpy.utils import cartesian, autogrid
+    import itertools
+    import functools
+    import operator
+    
+    ####################################
+#        # Convert the data and grid points
+#    data = np.asarray_chkfinite(data, dtype=np.float)
+#    grid_points = np.asarray_chkfinite(grid_points, dtype=np.float)
+#
+#    # Verify that the grid is equidistant
+#    diffs = np.diff(grid_points)
+#    assert np.allclose(np.ones_like(diffs) * diffs[0], diffs)
+#
+#    if weights is not None:
+#        weights = np.asarray_chkfinite(weights, dtype=np.float)
+#        weights = weights / np.sum(weights)
+#
+#    if (weights is not None) and (len(data) != len(weights)):
+#        raise ValueError('Length of data must match length of weights.')
+#
+#    # Transform the data
+#    min_grid = np.min(grid_points)
+#    max_grid = np.max(grid_points)
+#    num_intervals = len(grid_points) - 1  # Number of intervals
+#    dx = (max_grid - min_grid) / num_intervals
+#    transformed_data = (data - min_grid) / dx
+#
+#    result = np.asfarray(np.zeros(len(grid_points) + 1))
+    ###########################################################
+    
+    # Create data
+    data_orig = np.array([[0.6, 0.8],
+                     [1,   2],
+                     [1.8, 1.2]])
+    data_orig = np.concatenate((np.random.randn(25).reshape(-1, 1)/3 + 1, 
+                           np.random.randn(25).reshape(-1, 1)/6 + 1), axis=1)
+    
+    grid = autogrid(data_orig, boundary_abs=1, num_points=16, boundary_rel=0.05)
+    
+    # Create a grid
+    linspace = np.linspace(0, 2, num=6).reshape(-1, 1)
+    grid = np.concatenate((linspace, 
+                           linspace), axis=1)
+    
+    # Scale the data to the grid
+    min_grid = np.min(grid, axis=0)
+    max_grid = np.max(grid, axis=0)
+    num_intervals = (grid.shape[0] - 1)  # Number of intervals
+    dx = (max_grid - min_grid) / num_intervals
+    data = (data_orig - min_grid) / dx
+        
+    #
+    obs, dims = grid.shape
+    grid = cartesian(grid)
+    
+    
+
+        
+    
+
+    # Create results
+    result = np.zeros(grid.shape[0])
+        
+    print('-------------')
+    for observation in data:
+        print('--------------------------------')
+        print(observation)
+        
+        int_frac = [[(int(coordinate), 1 - (coordinate % 1)), 
+                     (int(coordinate) + 1,  (coordinate % 1))] for coordinate in observation]
+        #int_frac += [(int(coordinate) + 1, 1 - (coordinate % 1)) for coordinate in observation]
+        print(int_frac)
+        for cart_prod in itertools.product(*int_frac):
+            print('--------------------')
+            print(cart_prod)
+            index = sum((i * obs**c) for c, (i, j) in enumerate(reversed(cart_prod)))
+            
+            value = functools.reduce(operator.mul, (j for (i,j) in cart_prod))
+            print(index)
+            
+            print(f'Placing {value} at index {index}, i.e. {grid[index % obs**dims,:]}')
+            result[index % obs**dims] += value
+            
+    for grid_point, value in zip(grid, result):
+        print(f'{grid_point} -> {value}')
+        
+    print(sum(result), data.shape[0])
+    assert np.allclose(sum(result),  data.shape[0])
+    
+    
+    import matplotlib.pyplot as plt
+    
+    print(data)
+    plt.scatter(data_orig[:, 0], data_orig[:, 1])
+    
+    d = result.reshape(len(linspace), len(linspace))
+    plt.scatter(grid[:, 0], grid[:, 1], s = result**2 * 100, zorder = -1)
+    
+    plt.xticks(linspace.ravel())
+    plt.yticks(linspace.ravel())
+    plt.grid(True)
+    plt.show()
+
+        
+        
+        
+        
+    
