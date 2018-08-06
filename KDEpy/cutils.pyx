@@ -95,3 +95,78 @@ def iterate_data_weighted_N(double[:, :] data, double[:] weights, double[:] resu
             result[int(index % obs_tot)] += value * weight
             
     return result
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.cdivision(True)
+def iterate_data_weighted_2D(double[:, :] data, double[:] weights, 
+                             double[:] result, long[:] grid_num, 
+                             int obs_tot):
+    """
+    Iterate over data points and weights and assign linear weights to nearest grid points.
+    """
+    cdef int length_data, index, i, x_integral, y_integral
+    cdef double x, y, weight, x_fractional, y_fractional, value
+    
+    data_length = data.shape[0]
+    for i in range(data_length):
+        x, y = data[i,0], data[i,1]
+        weight = weights[i]
+        
+        x_integral = int(x)
+        x_fractional = (x % 1)
+        y_integral = int(y)
+        y_fractional = (y % 1)
+        
+        #  | ---------------------------------
+        #  |                   |              |
+        #  |-------------------X--------------|
+        #  |                   |              |
+        #  |                   |              |
+        #  |                   |              |
+        #  |                   |              |
+        #  | ---------------------------------
+
+        # Computations with few flops
+        xy = x_fractional * y_fractional
+        y_xy = y_fractional - xy
+        x_xy = x_fractional - xy
+        
+        # Bottom left
+        index = y_integral + x_integral * grid_num[1]
+        result[index % obs_tot] += (xy - x_fractional - y_fractional + 1) * weight
+        
+        # Bottom right
+        index = y_integral + (x_integral + 1) * grid_num[1]
+        result[index % obs_tot] += x_xy * weight
+        
+        # Top left
+        index = (y_integral + 1) + x_integral * grid_num[1]
+        result[index % obs_tot] += y_xy * weight
+        
+        # Top right
+        index = (y_integral + 1) + (x_integral + 1) * grid_num[1]
+        result[index % obs_tot] += xy * weight
+        
+#        # Bottom left
+#        index = y_integral + x_integral * grid_num[1]
+#        value = (1 - x_fractional) * (1 - y_fractional)
+#        result[index % obs_tot] += value * weight
+#        
+#        # Bottom right
+#        index = y_integral + (x_integral + 1) * grid_num[1]
+#        value = (x_fractional) * (1 - y_fractional)
+#        result[index % obs_tot] += value * weight
+#        
+#        # Top left
+#        index = (y_integral + 1) + x_integral * grid_num[1]
+#        value = (1 - x_fractional) * (y_fractional)
+#        result[index % obs_tot] += value * weight
+#        
+#        # Top right
+#        index = (y_integral + 1) + (x_integral + 1) * grid_num[1]
+#        value = (x_fractional) * (y_fractional)
+#        result[index % obs_tot] += value * weight
+
+    return result

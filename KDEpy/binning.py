@@ -290,12 +290,14 @@ if __name__ == "__main__":
     
     def linbin_2dim(data, grid_points, weights=None):
         """
-        N-dimensional linear binning.
+        2-dimensional linear binning.
         
         With :math:`N` data points, and :math:`n` grid points in each dimension
         :math:`d`, the running time is :math:`O(N2^d)`. For each point the
         algorithm finds the nearest points, of which there are two in each
         dimension.
+        
+        Approximately 200 times faster than pure python implementation.
         
         Parameters
         ----------
@@ -339,11 +341,12 @@ if __name__ == "__main__":
     
         # Create results
         result = np.zeros(grid_points.shape[0], dtype=np.float)
-            
-        result = np.asfarray(cutils.iterate_data_weighted_2D(data, weights, 
-                                                            result, grid_num,
-                                                            obs_tot))
-
+        
+        # Call the Cython implementation
+        result = cutils.iterate_data_weighted_2D(data, weights, result, 
+                                                 grid_num, obs_tot)
+        result = np.asarray_chkfinite(result, dtype=np.float)
+        
         assert np.allclose(np.sum(result),  1)
     
         return result
@@ -362,15 +365,10 @@ if __name__ == "__main__":
     weights = weights / np.sum(weights)
     
     num_points = 12
-    #grid_points = autogrid(data_orig, boundary_abs=0.1, num_points=num_points, boundary_rel=0.05)
-    #grid_points = np.concatenate((np.linspace(-3, 3, num=num_points).reshape(-1,1),
-    #                            np.linspace(-3, 3, num=4).reshape(-1,1)), axis=1)
-    grid_points = cartesian([np.linspace(-3, 3, num=num_points), np.linspace(-3, 3, num=12)])
-    
-    
+    grid_points = cartesian([np.linspace(-7, 7, num=num_points), np.linspace(-7, 7, num=12)])
+
     result = linbin_2dim(data_orig, grid_points, weights=weights)
-    #print(grid_points.shape)
-    #print(result)
+
     
     import matplotlib.pyplot as plt
     
