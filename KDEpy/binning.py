@@ -227,8 +227,8 @@ if __name__ == "__main__":
         ----------
         data : array-like
             The data must be of shape (obs, dims).
-        grid_points : integer or array-like
-            If an integer, it specifices the number of grid points in each dim.
+        grid_points : array-like
+            Grid, where cartesian product is already performed.
         weights : array-like
             Must have shape (obs,).
             
@@ -237,50 +237,42 @@ if __name__ == "__main__":
         >>> 1 + 1
         2
         """
+        assert len(grid_points.shape) == 2
         
-        # Create a grid
-        #linspace = np.linspace(0, 2, num=6).reshape(-1, 1)
-        #grid = np.concatenate((linspace, 
-        #                       linspace), axis=1)
+        obs_tot, dims = grid_points.shape
+        # Compute the number of grid points for each dimension in the grid
+        grid_num = np.array(list(len(np.unique(grid_points[:, i])) for 
+                                 i in range(dims)))
         
         # Scale the data to the grid
         min_grid = np.min(grid_points, axis=0)
         max_grid = np.max(grid_points, axis=0)
-        num_intervals = (grid_points.shape[0] - 1)  # Number of intervals
+        num_intervals = (grid_num - 1)  # Number of intervals
         dx = (max_grid - min_grid) / num_intervals
-        data = (data_orig - min_grid) / dx
-            
-        # Get data from grid before cartesian product
-        obs, dims = grid_points.shape
-        # grid_points = cartesian(grid_points)
-        obs = len(np.unique(grid_points[:, 0]))
+        data = (data - min_grid) / dx
     
         # Create results
-        result = np.zeros(grid_points.shape[0])
+        result = np.zeros(grid_points.shape[0], dtype=np.float)
             
-        print('-------------')
         for observation, weight in zip(data, weights):
-            print('--------------------------------')
-            print(observation)
             
-            int_frac = [[(int(coordinate), 1 - (coordinate % 1)), 
-                         (int(coordinate) + 1,  (coordinate % 1))] for coordinate in observation]
-            #int_frac += [(int(coordinate) + 1, 1 - (coordinate % 1)) for coordinate in observation]
-            print(int_frac)
+            int_frac = (((int(coordinate), 1 - (coordinate % 1)), 
+                         (int(coordinate) + 1,  (coordinate % 1))) for coordinate in observation)
+
             for cart_prod in itertools.product(*int_frac):
-                print('--------------------')
-                print(cart_prod)
-                index = sum((i * obs**c) for c, (i, j) in enumerate(reversed(cart_prod)))
+                fractions = (frac for (integral, frac) in cart_prod)
                 
+                # In reversed order
+                integrals_rev = list(integral for (integral, frac) in reversed(cart_prod))
+                
+                #obs = grid_num[0]
+                index = sum((i * g**c) for ((c, i), g) in zip(enumerate(integrals_rev), grid_num))
                 value = functools.reduce(operator.mul, (j for (i,j) in cart_prod))
-                print(index)
-                
-                print(f'Placing {value} at index {index}, i.e. {grid_points[index % obs**dims,:]}')
-                result[index % obs**dims] += value * weight
-                
-            
-        print(sum(result), 1)
-        assert np.allclose(sum(result),  1)
+
+                # print(f'Placing {value} at index {index}, i.e. {grid_points[index % obs**dims,:]}')
+                result[index % obs_tot] += value * weight
+
+        assert np.allclose(np.sum(result),  1)
         
         return result
     
@@ -291,15 +283,21 @@ if __name__ == "__main__":
                           [1,   2],
                           [1.8, 1.2]])
                 
-    data_orig = np.array([[1,   2], [1, 3]])
-    n = 500
-    #data_orig = np.concatenate((np.random.randn(n).reshape(-1, 1)/6 + 1, 
-    #                       np.random.randn(n).reshape(-1, 1)/6 + 1), axis=1)
-    weights = np.random.randn(data_orig.shape[0])**2 + 100
+    #data_orig = np.array([[1,   2], [1, 3]])
+    n = 5000
+    data_orig = np.concatenate((np.random.randn(n).reshape(-1, 1)/6 + 1, 
+                           np.random.randn(n).reshape(-1, 1)/6 + 1), axis=1)
+    weights = np.random.randn(data_orig.shape[0])**2 + 1
     weights = weights / np.sum(weights)
     
-    num_points = 3
+    num_points = 8
     grid_points = autogrid(data_orig, boundary_abs=0.1, num_points=num_points, boundary_rel=0.05)
+    grid_points = cartesian(grid_points)
+    
+    linspace = np.linspace(0, 2, num=num_points).reshape(-1, 1)
+    grid_points = np.concatenate((linspace, 
+                           linspace), axis=1)
+    
     grid_points = cartesian(grid_points)
     
     result = linbin_Ndim(data_orig, grid_points, weights=weights)
@@ -307,7 +305,7 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
     
     plt.scatter(data_orig[:, 0], data_orig[:, 1], s=weights * 1000)
-    
+    print(result)
     d = result.reshape(num_points, num_points)
     plt.scatter(grid_points[:, 0], grid_points[:, 1], s = result * 1000, zorder = -1)
     
