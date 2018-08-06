@@ -98,7 +98,7 @@ def autogrid(data, boundary_abs=3, num_points=None, boundary_rel=0.05):
                                         maximum + outside_borders,
                                         num=num_points)  
 
-    return cartesian(grid_points)
+    return grid_points
     
 
 if __name__ == "__main__":

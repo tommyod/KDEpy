@@ -214,76 +214,105 @@ if __name__ == "__main__":
 #    result = np.asfarray(np.zeros(len(grid_points) + 1))
     ###########################################################
     
+    def linbin_Ndim(data, grid_points, weights=None):
+        """
+        N-dimensional linear binning.
+        
+        With :math:`N` data points, and :math:`n` grid points in each dimension
+        :math:`d`, the running time is :math:`O(N2^d)`. For each point the
+        algorithm finds the nearest points, of which there are two in each
+        dimension.
+        
+        Parameters
+        ----------
+        data : array-like
+            The data must be of shape (obs, dims).
+        grid_points : integer or array-like
+            If an integer, it specifices the number of grid points in each dim.
+        weights : array-like
+            Must have shape (obs,).
+            
+        Examples
+        --------
+        >>> 1 + 1
+        2
+        """
+        
+        # Create a grid
+        #linspace = np.linspace(0, 2, num=6).reshape(-1, 1)
+        #grid = np.concatenate((linspace, 
+        #                       linspace), axis=1)
+        
+        # Scale the data to the grid
+        min_grid = np.min(grid_points, axis=0)
+        max_grid = np.max(grid_points, axis=0)
+        num_intervals = (grid_points.shape[0] - 1)  # Number of intervals
+        dx = (max_grid - min_grid) / num_intervals
+        data = (data_orig - min_grid) / dx
+            
+        # Get data from grid before cartesian product
+        obs, dims = grid_points.shape
+        # grid_points = cartesian(grid_points)
+        obs = len(np.unique(grid_points[:, 0]))
+    
+        # Create results
+        result = np.zeros(grid_points.shape[0])
+            
+        print('-------------')
+        for observation, weight in zip(data, weights):
+            print('--------------------------------')
+            print(observation)
+            
+            int_frac = [[(int(coordinate), 1 - (coordinate % 1)), 
+                         (int(coordinate) + 1,  (coordinate % 1))] for coordinate in observation]
+            #int_frac += [(int(coordinate) + 1, 1 - (coordinate % 1)) for coordinate in observation]
+            print(int_frac)
+            for cart_prod in itertools.product(*int_frac):
+                print('--------------------')
+                print(cart_prod)
+                index = sum((i * obs**c) for c, (i, j) in enumerate(reversed(cart_prod)))
+                
+                value = functools.reduce(operator.mul, (j for (i,j) in cart_prod))
+                print(index)
+                
+                print(f'Placing {value} at index {index}, i.e. {grid_points[index % obs**dims,:]}')
+                result[index % obs**dims] += value * weight
+                
+            
+        print(sum(result), 1)
+        assert np.allclose(sum(result),  1)
+        
+        return result
+    
+    
+    
     # Create data
     data_orig = np.array([[0.6, 0.8],
-                     [1,   2],
-                     [1.8, 1.2]])
-    data_orig = np.concatenate((np.random.randn(25).reshape(-1, 1)/3 + 1, 
-                           np.random.randn(25).reshape(-1, 1)/6 + 1), axis=1)
+                          [1,   2],
+                          [1.8, 1.2]])
+                
+    data_orig = np.array([[1,   2], [1, 3]])
+    n = 500
+    #data_orig = np.concatenate((np.random.randn(n).reshape(-1, 1)/6 + 1, 
+    #                       np.random.randn(n).reshape(-1, 1)/6 + 1), axis=1)
+    weights = np.random.randn(data_orig.shape[0])**2 + 100
+    weights = weights / np.sum(weights)
     
-    grid = autogrid(data_orig, boundary_abs=1, num_points=16, boundary_rel=0.05)
+    num_points = 3
+    grid_points = autogrid(data_orig, boundary_abs=0.1, num_points=num_points, boundary_rel=0.05)
+    grid_points = cartesian(grid_points)
     
-    # Create a grid
-    linspace = np.linspace(0, 2, num=6).reshape(-1, 1)
-    grid = np.concatenate((linspace, 
-                           linspace), axis=1)
-    
-    # Scale the data to the grid
-    min_grid = np.min(grid, axis=0)
-    max_grid = np.max(grid, axis=0)
-    num_intervals = (grid.shape[0] - 1)  # Number of intervals
-    dx = (max_grid - min_grid) / num_intervals
-    data = (data_orig - min_grid) / dx
-        
-    #
-    obs, dims = grid.shape
-    grid = cartesian(grid)
-    
-    
-
-        
-    
-
-    # Create results
-    result = np.zeros(grid.shape[0])
-        
-    print('-------------')
-    for observation in data:
-        print('--------------------------------')
-        print(observation)
-        
-        int_frac = [[(int(coordinate), 1 - (coordinate % 1)), 
-                     (int(coordinate) + 1,  (coordinate % 1))] for coordinate in observation]
-        #int_frac += [(int(coordinate) + 1, 1 - (coordinate % 1)) for coordinate in observation]
-        print(int_frac)
-        for cart_prod in itertools.product(*int_frac):
-            print('--------------------')
-            print(cart_prod)
-            index = sum((i * obs**c) for c, (i, j) in enumerate(reversed(cart_prod)))
-            
-            value = functools.reduce(operator.mul, (j for (i,j) in cart_prod))
-            print(index)
-            
-            print(f'Placing {value} at index {index}, i.e. {grid[index % obs**dims,:]}')
-            result[index % obs**dims] += value
-            
-    for grid_point, value in zip(grid, result):
-        print(f'{grid_point} -> {value}')
-        
-    print(sum(result), data.shape[0])
-    assert np.allclose(sum(result),  data.shape[0])
-    
+    result = linbin_Ndim(data_orig, grid_points, weights=weights)
     
     import matplotlib.pyplot as plt
     
-    print(data)
-    plt.scatter(data_orig[:, 0], data_orig[:, 1])
+    plt.scatter(data_orig[:, 0], data_orig[:, 1], s=weights * 1000)
     
-    d = result.reshape(len(linspace), len(linspace))
-    plt.scatter(grid[:, 0], grid[:, 1], s = result**2 * 100, zorder = -1)
+    d = result.reshape(num_points, num_points)
+    plt.scatter(grid_points[:, 0], grid_points[:, 1], s = result * 1000, zorder = -1)
     
-    plt.xticks(linspace.ravel())
-    plt.yticks(linspace.ravel())
+    plt.xticks(np.unique(grid_points[:, 0]))
+    plt.yticks(np.unique(grid_points[:, 1]))
     plt.grid(True)
     plt.show()
 
