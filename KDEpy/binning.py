@@ -239,7 +239,18 @@ if __name__ == "__main__":
         """
         assert len(grid_points.shape) == 2
         
+        # Convert the data and grid points
+        data = np.asarray_chkfinite(data, dtype=np.float)
+        grid_points = np.asarray_chkfinite(grid_points, dtype=np.float)
+        if weights is not None:
+            weights = np.asarray_chkfinite(weights, dtype=np.float)
+            weights = weights / np.sum(weights)
+
+        if (weights is not None) and (data.shape[0] != len(weights)):
+            raise ValueError('Length of data must match length of weights.')
+        
         obs_tot, dims = grid_points.shape
+        
         # Compute the number of grid points for each dimension in the grid
         grid_num = np.array(list(len(np.unique(grid_points[:, i])) for 
                                  i in range(dims)))
@@ -254,25 +265,52 @@ if __name__ == "__main__":
         # Create results
         result = np.zeros(grid_points.shape[0], dtype=np.float)
             
-        for observation, weight in zip(data, weights):
+        if weights is not None:
+            grid_num = np.asarray_chkfinite(grid_num, dtype=np.float)
+            result = cutils.iterate_data_weighted_N(data, weights, result, grid_num, obs_tot)
+            result = np.asfarray(result)
+#            for observation, weight in zip(data, weights):
+#                
+#                int_frac = (((int(coordinate), 1 - (coordinate % 1)), 
+#                             (int(coordinate) + 1,  (coordinate % 1)))
+#                            for coordinate in observation)
+#    
+#                for cart_prod in itertools.product(*int_frac):
+#                    fractions = (frac for (integral, frac) in cart_prod)
+#                    
+#                    # In reversed order
+#                    integrals_rev = list(integral for (integral, frac) in reversed(cart_prod))
+#                    
+#                    index = sum((i * g**c) for ((c, i), g) in zip(enumerate(integrals_rev), grid_num))
+#                    
+#    
+#                    # print(f'Placing {value} at index {index}, i.e. {grid_points[index % obs**dims,:]}')
+#                    value = functools.reduce(operator.mul, fractions)
+#                    result[index % obs_tot] += value * weight
+                    
+        else:
+            for observation in data:
+                
+                int_frac = (((int(coordinate), 1 - (coordinate % 1)), 
+                             (int(coordinate) + 1,  (coordinate % 1)))
+                            for coordinate in observation)
+    
+                for cart_prod in itertools.product(*int_frac):
+                    fractions = (frac for (integral, frac) in cart_prod)
+                    
+                    # In reversed order
+                    integrals_rev = list(integral for (integral, frac) in reversed(cart_prod))
+                    
+                    index = sum((i * g**c) for ((c, i), g) in zip(enumerate(integrals_rev), grid_num))
+                    
+    
+                    # print(f'Placing {value} at index {index}, i.e. {grid_points[index % obs**dims,:]}')
+                    value = functools.reduce(operator.mul, fractions)
+                    result[index % obs_tot] += value
+
+            result = result / data.shape[0]
             
-            int_frac = (((int(coordinate), 1 - (coordinate % 1)), 
-                         (int(coordinate) + 1,  (coordinate % 1))) for coordinate in observation)
-
-            for cart_prod in itertools.product(*int_frac):
-                fractions = (frac for (integral, frac) in cart_prod)
-                
-                # In reversed order
-                integrals_rev = list(integral for (integral, frac) in reversed(cart_prod))
-                
-                #obs = grid_num[0]
-                index = sum((i * g**c) for ((c, i), g) in zip(enumerate(integrals_rev), grid_num))
-                value = functools.reduce(operator.mul, (j for (i,j) in cart_prod))
-
-                # print(f'Placing {value} at index {index}, i.e. {grid_points[index % obs**dims,:]}')
-                result[index % obs_tot] += value * weight
-
-        assert np.allclose(np.sum(result),  1)
+        #assert np.allclose(np.sum(result),  1)
         
         return result
     
@@ -284,29 +322,29 @@ if __name__ == "__main__":
                           [1.8, 1.2]])
                 
     #data_orig = np.array([[1,   2], [1, 3]])
-    n = 5000
-    data_orig = np.concatenate((np.random.randn(n).reshape(-1, 1)/6 + 1, 
-                           np.random.randn(n).reshape(-1, 1)/6 + 1), axis=1)
+    n = 100000
+    data_orig = np.concatenate((np.random.randn(n).reshape(-1, 1) , 
+                           np.random.randn(n).reshape(-1, 1)), axis=1)
+    #data_orig = np.random.randn(50).reshape(-1, 1)
     weights = np.random.randn(data_orig.shape[0])**2 + 1
     weights = weights / np.sum(weights)
     
-    num_points = 8
-    grid_points = autogrid(data_orig, boundary_abs=0.1, num_points=num_points, boundary_rel=0.05)
-    grid_points = cartesian(grid_points)
+    num_points = 6
+    #grid_points = autogrid(data_orig, boundary_abs=0.1, num_points=num_points, boundary_rel=0.05)
+    #grid_points = np.concatenate((np.linspace(-3, 3, num=num_points).reshape(-1,1),
+    #                            np.linspace(-3, 3, num=4).reshape(-1,1)), axis=1)
+    grid_points = cartesian([np.linspace(-3, 3, num=num_points), np.linspace(-3, 3, num=12)])
     
-    linspace = np.linspace(0, 2, num=num_points).reshape(-1, 1)
-    grid_points = np.concatenate((linspace, 
-                           linspace), axis=1)
-    
-    grid_points = cartesian(grid_points)
     
     result = linbin_Ndim(data_orig, grid_points, weights=weights)
+    #print(grid_points.shape)
+    #print(result)
     
     import matplotlib.pyplot as plt
     
-    plt.scatter(data_orig[:, 0], data_orig[:, 1], s=weights * 1000)
-    print(result)
-    d = result.reshape(num_points, num_points)
+    plt.scatter(data_orig[:, 0], data_orig[:, 1])#, s=weights * 1000)
+    #print(result)
+    d = result.reshape(num_points, 12)
     plt.scatter(grid_points[:, 0], grid_points[:, 1], s = result * 1000, zorder = -1)
     
     plt.xticks(np.unique(grid_points[:, 0]))

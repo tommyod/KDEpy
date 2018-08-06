@@ -7,42 +7,43 @@ Created on Sun Feb  4 10:52:17 2018
 """
 import numpy as np
 
-
 def cartesian(arrays):
     """
     Generate a cartesian product of input arrays.
-    Adapted from from: 
+    Adapted from: 
         https://github.com/scikit-learn/scikit-learn/blob/
         master/sklearn/utils/extmath.py#L489
         
     Parameters
     ----------
-    arrays : ndarry
-        An array of shape (obs, dims).
+    arrays : list of array-like
+        1-D arrays to form the cartesian product of.
     out : ndarray
         Array to place the cartesian product in.
-    
+        
     Returns
     -------
     out : ndarray
         2-D array of shape (M, len(arrays)) containing cartesian products
         formed of input arrays.
-    
+        
     Examples
     --------
-    >>> data = np.array([[0, 0, 0], [1, 1, 1]])
-    >>> cartesian(data)
-    array([[0, 0, 0],
-           [0, 0, 1],
-           [0, 1, 0],
-           [0, 1, 1],
-           [1, 0, 0],
-           [1, 0, 1],
-           [1, 1, 0],
-           [1, 1, 1]])
+    >>> cartesian(([1, 2, 3], [4, 5], [6, 7]))
+    array([[1, 4, 6],
+           [1, 4, 7],
+           [1, 5, 6],
+           [1, 5, 7],
+           [2, 4, 6],
+           [2, 4, 7],
+           [2, 5, 6],
+           [2, 5, 7],
+           [3, 4, 6],
+           [3, 4, 7],
+           [3, 5, 6],
+           [3, 5, 7]])
     """
-    obs, dims = arrays.shape
-    arrays = list(arrays[:, i] for i in range(dims))
+    arrays = [np.asarray(x) for x in arrays]
     shape = (len(x) for x in arrays)
     dtype = arrays[0].dtype
 
