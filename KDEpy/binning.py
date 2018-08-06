@@ -265,56 +265,88 @@ if __name__ == "__main__":
         # Create results
         result = np.zeros(grid_points.shape[0], dtype=np.float)
             
-        if weights is not None:
-            grid_num = np.asarray_chkfinite(grid_num, dtype=np.float)
-            result = cutils.iterate_data_weighted_N(data, weights, result, grid_num, obs_tot)
-            result = np.asfarray(result)
-#            for observation, weight in zip(data, weights):
-#                
-#                int_frac = (((int(coordinate), 1 - (coordinate % 1)), 
-#                             (int(coordinate) + 1,  (coordinate % 1)))
-#                            for coordinate in observation)
-#    
-#                for cart_prod in itertools.product(*int_frac):
-#                    fractions = (frac for (integral, frac) in cart_prod)
-#                    
-#                    # In reversed order
-#                    integrals_rev = list(integral for (integral, frac) in reversed(cart_prod))
-#                    
-#                    index = sum((i * g**c) for ((c, i), g) in zip(enumerate(integrals_rev), grid_num))
-#                    
-#    
-#                    # print(f'Placing {value} at index {index}, i.e. {grid_points[index % obs**dims,:]}')
-#                    value = functools.reduce(operator.mul, fractions)
-#                    result[index % obs_tot] += value * weight
-                    
-        else:
-            for observation in data:
-                
-                int_frac = (((int(coordinate), 1 - (coordinate % 1)), 
-                             (int(coordinate) + 1,  (coordinate % 1)))
-                            for coordinate in observation)
-    
-                for cart_prod in itertools.product(*int_frac):
-                    fractions = (frac for (integral, frac) in cart_prod)
-                    
-                    # In reversed order
-                    integrals_rev = list(integral for (integral, frac) in reversed(cart_prod))
-                    
-                    index = sum((i * g**c) for ((c, i), g) in zip(enumerate(integrals_rev), grid_num))
-                    
-    
-                    # print(f'Placing {value} at index {index}, i.e. {grid_points[index % obs**dims,:]}')
-                    value = functools.reduce(operator.mul, fractions)
-                    result[index % obs_tot] += value
-
-            result = result / data.shape[0]
+        for observation, weight in zip(data, weights):
             
-        #assert np.allclose(np.sum(result),  1)
+            int_frac = (((int(coordinate), 1 - (coordinate % 1)), 
+                         (int(coordinate) + 1,  (coordinate % 1)))
+                        for coordinate in observation)
+
+            for cart_prod in itertools.product(*int_frac):
+                fractions = (frac for (integral, frac) in cart_prod)
+                
+                # In reversed order
+                integrals_rev = list(integral for (integral, frac) in reversed(cart_prod))
+                
+                index = sum((i * g**c) for ((c, i), g) in zip(enumerate(integrals_rev), grid_num))
+                
+
+                # print(f'Placing {value} at index {index}, i.e. {grid_points[index % obs**dims,:]}')
+                value = functools.reduce(operator.mul, fractions)
+                result[index % obs_tot] += value * weight
+            
+        assert np.allclose(np.sum(result),  1)
         
         return result
     
+    def linbin_2dim(data, grid_points, weights=None):
+        """
+        N-dimensional linear binning.
+        
+        With :math:`N` data points, and :math:`n` grid points in each dimension
+        :math:`d`, the running time is :math:`O(N2^d)`. For each point the
+        algorithm finds the nearest points, of which there are two in each
+        dimension.
+        
+        Parameters
+        ----------
+        data : array-like
+            The data must be of shape (obs, dims).
+        grid_points : array-like
+            Grid, where cartesian product is already performed.
+        weights : array-like
+            Must have shape (obs,).
+            
+        Examples
+        --------
+        >>> 1 + 1
+        2
+        """
+        assert len(grid_points.shape) == 2
+        assert data.shape[1] == 2
+        
+        # Convert the data and grid points
+        data = np.asarray_chkfinite(data, dtype=np.float)
+        grid_points = np.asarray_chkfinite(grid_points, dtype=np.float)
+        if weights is not None:
+            weights = np.asarray_chkfinite(weights, dtype=np.float)
+            weights = weights / np.sum(weights)
+
+        if (weights is not None) and (data.shape[0] != len(weights)):
+            raise ValueError('Length of data must match length of weights.')
+        
+        obs_tot, dims = grid_points.shape
+        
+        # Compute the number of grid points for each dimension in the grid
+        grid_num = np.array(list(len(np.unique(grid_points[:, i])) for 
+                                 i in range(dims)))
+        
+        # Scale the data to the grid
+        min_grid = np.min(grid_points, axis=0)
+        max_grid = np.max(grid_points, axis=0)
+        num_intervals = (grid_num - 1)  # Number of intervals
+        dx = (max_grid - min_grid) / num_intervals
+        data = (data - min_grid) / dx
     
+        # Create results
+        result = np.zeros(grid_points.shape[0], dtype=np.float)
+            
+        result = np.asfarray(cutils.iterate_data_weighted_2D(data, weights, 
+                                                            result, grid_num,
+                                                            obs_tot))
+
+        assert np.allclose(np.sum(result),  1)
+    
+        return result
     
     # Create data
     data_orig = np.array([[0.6, 0.8],
@@ -326,17 +358,17 @@ if __name__ == "__main__":
     data_orig = np.concatenate((np.random.randn(n).reshape(-1, 1) , 
                            np.random.randn(n).reshape(-1, 1)), axis=1)
     #data_orig = np.random.randn(50).reshape(-1, 1)
-    weights = np.random.randn(data_orig.shape[0])**2 + 1
+    weights = np.random.randn(data_orig.shape[0])**2 + 100
     weights = weights / np.sum(weights)
     
-    num_points = 6
+    num_points = 12
     #grid_points = autogrid(data_orig, boundary_abs=0.1, num_points=num_points, boundary_rel=0.05)
     #grid_points = np.concatenate((np.linspace(-3, 3, num=num_points).reshape(-1,1),
     #                            np.linspace(-3, 3, num=4).reshape(-1,1)), axis=1)
     grid_points = cartesian([np.linspace(-3, 3, num=num_points), np.linspace(-3, 3, num=12)])
     
     
-    result = linbin_Ndim(data_orig, grid_points, weights=weights)
+    result = linbin_2dim(data_orig, grid_points, weights=weights)
     #print(grid_points.shape)
     #print(result)
     
