@@ -6,6 +6,7 @@ Created on Sun Feb  4 10:52:17 2018
 @author: tommy
 """
 import numpy as np
+import numbers
 
 def cartesian(arrays):
     """
@@ -78,28 +79,56 @@ def autogrid(data, boundary_abs=3, num_points=None, boundary_rel=0.05):
     boundary_rel: float
         How far out to go, relatively to max - min.
         
+    Returns
+    -------
+    grid : array-like
+        A grid of shape (obs, dims).
+        
     Examples
     --------
-    >>> 2 + 1
-    3
+    >>> autogrid(np.array([[0, 0]]), boundary_abs=1, num_points=3)
+    array([[-1., -1.],
+           [-1.,  0.],
+           [-1.,  1.],
+           [ 0., -1.],
+           [ 0.,  0.],
+           [ 0.,  1.],
+           [ 1., -1.],
+           [ 1.,  0.],
+           [ 1.,  1.]])
+    >>> autogrid(np.array([[0, 0]]), boundary_abs=0.5, num_points=(2, 3))
+    array([[-0.5, -0.5],
+           [-0.5,  0. ],
+           [-0.5,  0.5],
+           [ 0.5, -0.5],
+           [ 0.5,  0. ],
+           [ 0.5,  0.5]])
     """
     obs, dims = data.shape
     minimums, maximums = data.min(axis=0), data.max(axis=0)
     ranges = maximums - minimums
     
     if num_points is None:
-        num_points = int(np.power(1024, 1 / dims))
+        num_points = [int(np.power(1024, 1 / dims))] * dims
+    elif isinstance(num_points, (numbers.Number,)):
+        num_points = [num_points] * dims
+    elif isinstance(num_points, (list, tuple)):
+        pass
+    else:
+        msg = '`num_points` must be None, a number, or list/tuple for dims'
+        raise TypeError(msg)
         
-    grid_points = np.empty(shape=(num_points, dims))
+    list_of_grids = []
 
-    generator = enumerate(zip(minimums, maximums, ranges))
-    for i, (minimum, maximum, rang) in generator:
+    generator = enumerate(zip(minimums, maximums, ranges, num_points))
+    for i, (minimum, maximum, rang, points) in generator:
+        assert points >= 2
         outside_borders = max(boundary_rel * rang, boundary_abs)
-        grid_points[:, i] = np.linspace(minimum - outside_borders,
+        list_of_grids.append(np.linspace(minimum - outside_borders,
                                         maximum + outside_borders,
-                                        num=num_points)  
+                                        num=points))
 
-    return grid_points
+    return cartesian(list_of_grids)
     
 
 if __name__ == "__main__":

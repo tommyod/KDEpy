@@ -170,3 +170,55 @@ def iterate_data_weighted_2D(double[:, :] data, double[:] weights,
 #        result[index % obs_tot] += value * weight
 
     return result
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.cdivision(True)
+def iterate_data_2D(double[:, :] data, double[:] result, long[:] grid_num, 
+                             int obs_tot):
+    """
+    Iterate over data points and weights and assign linear weights to nearest grid points.
+    """
+    cdef int length_data, index, i, x_integral, y_integral
+    cdef double x, y, x_fractional, y_fractional, value
+    
+    data_length = data.shape[0]
+    for i in range(data_length):
+        x, y = data[i,0], data[i,1]
+        
+        x_integral = int(x)
+        x_fractional = (x % 1)
+        y_integral = int(y)
+        y_fractional = (y % 1)
+        
+        #  | ---------------------------------
+        #  |                   |              |
+        #  |-------------------X--------------|
+        #  |                   |              |
+        #  |                   |              |
+        #  |                   |              |
+        #  |                   |              |
+        #  | ---------------------------------
+
+        # Computations with few flops
+        xy = x_fractional * y_fractional
+        y_xy = y_fractional - xy
+        x_xy = x_fractional - xy
+        
+        # Bottom left
+        index = y_integral + x_integral * grid_num[1]
+        result[index % obs_tot] += (xy - x_fractional - y_fractional + 1)
+        
+        # Bottom right
+        index = y_integral + (x_integral + 1) * grid_num[1]
+        result[index % obs_tot] += x_xy
+        
+        # Top left
+        index = (y_integral + 1) + x_integral * grid_num[1]
+        result[index % obs_tot] += y_xy
+        
+        # Top right
+        index = (y_integral + 1) + (x_integral + 1) * grid_num[1]
+        result[index % obs_tot] += xy
+
+    return result

@@ -7,8 +7,9 @@ import pytest
 import numbers
 import numpy as np
 from KDEpy.BaseKDE import BaseKDE
-from KDEpy.binning import linbin_numpy
+from KDEpy.binning import linear_binning
 from scipy.signal import convolve
+from KDEpy.utils import cartesian
 
 
 class FFTKDE(BaseKDE):
@@ -91,24 +92,6 @@ class FFTKDE(BaseKDE):
         >>> kde = FFTKDE().fit(data, weights=weights)
         >>> x, y = kde()
         """
-        # TODO: Implement 2D FFTKDE
-        # Since the FFT is only used for 1D KDEs, we check that the user inputs
-        # are 1D if they are NumPy ndarrays
-        class_name = type(self).__name__
-        if isinstance(data, np.ndarray):
-            
-            if not ((len(data.shape) == 1) or (len(data.shape) == 2 and
-                                               data.shape[1] == 1)):
-                msg = 'The data for {} must be 1D'.format(class_name)
-                raise ValueError(msg)
-                
-        if isinstance(weights, np.ndarray):
-            if not ((len(weights.shape) == 1) or (len(weights.shape) == 2 and
-                                                  weights.shape[1] == 1)):
-                msg = 'The weights for {} must be 1D'.format(class_name)
-                raise ValueError(msg)
-                
-        # ------------- END code specific for FFTKDE --------------------------
         
         # Sets self.data
         super().fit(data)
@@ -121,7 +104,7 @@ class FFTKDE(BaseKDE):
                 weights = self._process_sequence(weights)
                 self.weights = np.asfarray(weights, dtype=np.float)
         else:
-            self.weights = np.ones_like(self.data, dtype=np.float)
+            self.weights = np.ones(self.data.shape[0], dtype=np.float)
             
         self.weights = self.weights / np.sum(self.weights)
             
@@ -155,13 +138,16 @@ class FFTKDE(BaseKDE):
         # This method sets self.grid points and verifies it
         super().evaluate(grid_points)
         
+        #print(self.grid_points.shape)
+        #print(self._user_supplied_grid)
+        
         # Return the array converted to a float type
         grid_points = np.asfarray(self.grid_points)
         
         # Verify that the grid is equidistant
-        diffs = np.diff(grid_points)
-        if not np.allclose(np.ones_like(diffs) * diffs[0], diffs):
-            raise ValueError('The grid must be equidistant, use linspace.')
+        #diffs = np.diff(grid_points)
+        #if not np.allclose(np.ones_like(diffs) * diffs[0], diffs):
+        #    raise ValueError('The grid must be equidistant, use linspace.')
         
         if callable(self.bw):
             bw = self.bw(self.data)
@@ -172,9 +158,20 @@ class FFTKDE(BaseKDE):
             
         self.bw = bw
         
+            # Compute the number of grid points for each dimension in the grid
+#        grid_num = np.array(list(len(np.unique(grid_points[:, i])) for 
+#                                 i in range(dims)))
+#        
+#        # Scale the data to the grid
+#        min_grid = np.min(grid_points, axis=0)
+#        max_grid = np.max(grid_points, axis=0)
+#        num_intervals = (grid_num - 1)  # Number of intervals
+#        dx = (max_grid - min_grid) / num_intervals
+#        data = (data - min_grid) / dx
+        
         # Step 1 - Obtaining the grid counts
         num_grid_points = len(grid_points)
-        data = linbin_numpy(self.data.ravel(), 
+        data = linear_binning(self.data, 
                             grid_points=grid_points, 
                             weights=self.weights.ravel())
         
@@ -183,6 +180,8 @@ class FFTKDE(BaseKDE):
         num_grid_points = len(grid_points)
         dx = ((self.grid_points.max() - self.grid_points.min()) / 
               (num_grid_points - 1))
+        
+
         
         # Find the real bandwidth, the support times the desired bw factor
         if self.kernel.finite_support:
@@ -196,9 +195,11 @@ class FFTKDE(BaseKDE):
         assert dx * L < real_bw
         
         # Evaluate the kernel once
-        kernel_eval_grid = np.linspace(-dx * L, dx * L, int(L * 2 + 1))
+        grids = [np.linspace(-dx * L, dx * L, int(L * 2 + 1))] 
+        kernel_eval_grid = cartesian(grids)
         kernel_weights = self.kernel(kernel_eval_grid, bw=self.bw).ravel()
         
+        #print(kernel_weights)
         # Step 3 - Performing the convolution
         evaluated = convolve(data, kernel_weights, mode='same').reshape(-1, 1)
         
@@ -209,4 +210,45 @@ if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
     pytest.main(args=['.', '--doctest-modules', '-v', '--capture=sys'])
 
+if False:
+    from KDEpy.utils import cartesian, autogrid
+    import itertools
+    import functools
+    import operator
     
+    # Create data
+    data_orig = np.array([[0.6, 0.8],
+                          [1,   2],
+                          [1.8, 1.2]])
+    
+    grid_points = 8
+    x, y = FFTKDE().fit(data_orig)(grid_points)
+    
+    print(x.shape)
+    print(y.shape)
+                
+    #data_orig = np.array([[1,   2], [1, 3]])
+    #n = 10000
+    #data_orig = np.concatenate((np.random.randn(n).reshape(-1, 1) , 
+    #                       np.random.randn(n).reshape(-1, 1)), axis=1)
+    #data_orig = np.random.randn(50).reshape(-1, 1)
+    #weights = np.random.randn(data_orig.shape[0])**2 + 100
+    #weights = weights / np.sum(weights)
+    
+    #num_points = 12
+    #grid_points = cartesian([np.linspace(-7, 7, num=num_points), np.linspace(-7, 7, num=12)])
+
+    #result = linbin_2dim(data_orig, grid_points, weights=None)
+
+    
+    import matplotlib.pyplot as plt
+    
+    plt.scatter(data_orig[:, 0], data_orig[:, 1])#, s=weights * 1000)
+    #print(result)
+    output = y.reshape(grid_points, grid_points)
+    plt.scatter(x[:, 0], x[:, 1], s = y * 1000, zorder = -1)
+    
+    plt.xticks(np.unique(x[:, 0]))
+    plt.yticks(np.unique(x[:, 1]))
+    plt.grid(True)
+    plt.show()

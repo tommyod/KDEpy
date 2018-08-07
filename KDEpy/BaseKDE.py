@@ -104,30 +104,24 @@ class BaseKDE(ABC):
         """
         if not hasattr(self, 'data'):
             raise ValueError('Must call fit before evaluating.')
-        
-        # If no information is supplied at all, call the autogrid method
-        if grid_points is None or isinstance(grid_points, numbers.Integral):
-            self._user_supplied_grid = False
             
-            if isinstance(self.bw, (np.ndarray, Sequence)):
-                bw = max(self.bw)
-            elif callable(self.bw):
-                bw = self.bw(self.data)
-            else:
-                bw = self.bw
-                
+        # -------------- Set up the bandwidth depending on inputs -------------
+        if isinstance(self.bw, (np.ndarray, Sequence)):
+            bw = max(self.bw)
+        elif callable(self.bw):
+            bw = self.bw(self.data)
+        else:
+            bw = self.bw
+            
+        # -------------- Set up the grid depending on input -------------------
+        
+        # If the grid None or an integer, use that in the autogrid method
+        types_for_autogrid = (numbers.Integral, tuple, list)
+        if grid_points is None or isinstance(grid_points, types_for_autogrid):
+            self._user_supplied_grid = False
             grid_points = autogrid(self.data, 
                                    self.kernel.practical_support(bw),
                                    grid_points)
-            
-        # If a number is specified, interpret it as the number of grid points
-        elif isinstance(grid_points, numbers.Number):
-            if not (isinstance(grid_points, numbers.Integral) and 
-                    grid_points > 0):
-                raise ValueError('grid_points must be positive integer.')
-            self._user_supplied_grid = False
-            grid_points = autogrid(self.data, num_points=grid_points)
-            
         else:
             self._user_supplied_grid = True
             grid_points = self._process_sequence(grid_points)
@@ -183,4 +177,4 @@ class BaseKDE(ABC):
 
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
-    pytest.main(args=[__file__, '--doctest-modules', '-v'])
+    pytest.main(args=['.', '--doctest-modules', '-v'])
