@@ -8,6 +8,7 @@ Created on Sun Feb  4 10:52:17 2018
 import numpy as np
 import numbers
 
+
 def cartesian(arrays):
     """
     Generate a cartesian product of input arrays.
@@ -125,8 +126,8 @@ def autogrid(data, boundary_abs=3, num_points=None, boundary_rel=0.05):
         assert points >= 2
         outside_borders = max(boundary_rel * rang, boundary_abs)
         list_of_grids.append(np.linspace(minimum - outside_borders,
-                                        maximum + outside_borders,
-                                        num=points))
+                                         maximum + outside_borders,
+                                         num=points))
 
     return cartesian(list_of_grids)
     

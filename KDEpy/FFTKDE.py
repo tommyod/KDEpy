@@ -64,7 +64,8 @@ class FFTKDE(BaseKDE):
       ``statsmodels.nonparametric.kde.KDEUnivariate``.
     """
     
-    def __init__(self, kernel='gaussian', bw=1):
+    def __init__(self, kernel='gaussian', bw=1, norm=2):
+        self.norm = norm
         super().__init__(kernel, bw)
     
     def fit(self, data, weights=None):
@@ -98,16 +99,15 @@ class FFTKDE(BaseKDE):
         
         # If weights were passed
         if weights is not None:
-            if not len(weights) == len(data):
+            if not len(weights) == self.data.shape[0]:
                 raise ValueError('Length of data and weights must match.')
             else:
-                weights = self._process_sequence(weights)
+                weights = self._process_sequence(weights).ravel()
                 self.weights = np.asfarray(weights, dtype=np.float)
+                self.weights = self.weights / np.sum(self.weights)
         else:
-            self.weights = np.ones(self.data.shape[0], dtype=np.float)
-            
-        self.weights = self.weights / np.sum(self.weights)
-            
+            self.weights = None
+
         return self
     
     def evaluate(self, grid_points=None):
@@ -116,9 +116,10 @@ class FFTKDE(BaseKDE):
         
         Parameters
         ----------
-        grid_points: array-like or None
-            A 1D grid (mesh) to evaluate on. If None, a grid will be 
-            automatically created.
+        grid_points: None, integer or tuple
+            If None, a grid will be created. An integer specifies the number of
+            equidistant grid points. A tuple specifies the number of grid
+            points in each dimension of the data.
             
         Returns
         -------
@@ -135,19 +136,11 @@ class FFTKDE(BaseKDE):
         >>> y = kde(grid_points=np.linspace(0, 10, num=2**10))
         """
         
-        # This method sets self.grid points and verifies it
+        # This method sets self.grid_points and verifies it
         super().evaluate(grid_points)
-        
-        #print(self.grid_points.shape)
-        #print(self._user_supplied_grid)
         
         # Return the array converted to a float type
         grid_points = np.asfarray(self.grid_points)
-        
-        # Verify that the grid is equidistant
-        #diffs = np.diff(grid_points)
-        #if not np.allclose(np.ones_like(diffs) * diffs[0], diffs):
-        #    raise ValueError('The grid must be equidistant, use linspace.')
         
         if callable(self.bw):
             bw = self.bw(self.data)
@@ -155,100 +148,47 @@ class FFTKDE(BaseKDE):
             bw = self.bw
         else:
             raise ValueError('The bw must be a callable or a number.')
-            
         self.bw = bw
         
-            # Compute the number of grid points for each dimension in the grid
-#        grid_num = np.array(list(len(np.unique(grid_points[:, i])) for 
-#                                 i in range(dims)))
-#        
-#        # Scale the data to the grid
-#        min_grid = np.min(grid_points, axis=0)
-#        max_grid = np.max(grid_points, axis=0)
-#        num_intervals = (grid_num - 1)  # Number of intervals
-#        dx = (max_grid - min_grid) / num_intervals
-#        data = (data - min_grid) / dx
-        
         # Step 1 - Obtaining the grid counts
-        num_grid_points = len(grid_points)
-        data = linear_binning(self.data, 
-                            grid_points=grid_points, 
-                            weights=self.weights.ravel())
+        data = linear_binning(self.data, grid_points=grid_points, 
+                              weights=self.weights)
         
         # Step 2 - Computing kernel weights
-        # Compute dx for the grid
-        num_grid_points = len(grid_points)
-        dx = ((self.grid_points.max() - self.grid_points.min()) / 
-              (num_grid_points - 1))
+        grid_obs, grid_dims = grid_points.shape
+        num_grid_points = np.array(list(len(np.unique(grid_points[:, i])) 
+                                        for i in range(grid_dims)))
         
-
+        min_grid = np.min(self.grid_points, axis=0)
+        max_grid = np.max(self.grid_points, axis=0)
+        num_intervals = (num_grid_points - 1)
+        dx = (max_grid - min_grid) / num_intervals
         
         # Find the real bandwidth, the support times the desired bw factor
         if self.kernel.finite_support:
             real_bw = self.kernel.support * self.bw
         else:
-            # TODO: Make this more robust with threshold
             real_bw = self.kernel.practical_support(self.bw)
             
         # Compute L, the number of dx'es to move out from 0 in kernel
-        L = min(np.floor(real_bw / dx), num_grid_points - 1)
-        assert dx * L < real_bw
+        L = np.minimum(np.floor(real_bw / dx), num_intervals)
+        assert (dx * L < real_bw).all()
         
         # Evaluate the kernel once
-        grids = [np.linspace(-dx * L, dx * L, int(L * 2 + 1))] 
-        kernel_eval_grid = cartesian(grids)
-        kernel_weights = self.kernel(kernel_eval_grid, bw=self.bw).ravel()
+        grids = [np.linspace(-dx * L, dx * L, int(L * 2 + 1)) for (dx, L)
+                 in zip(dx, L)] 
+        kernel_grid = cartesian(grids)
+        kernel_weights = self.kernel(kernel_grid, bw=self.bw, norm=self.norm)
         
-        #print(kernel_weights)
+        # Reshape in preparation to 
+        kernel_weights = kernel_weights.reshape(*[int(k * 2 + 1) for k in L])
+        data = data.reshape(*tuple(num_grid_points))
+
         # Step 3 - Performing the convolution
         evaluated = convolve(data, kernel_weights, mode='same').reshape(-1, 1)
-        
         return self._evalate_return_logic(evaluated, grid_points)
 
 
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
     pytest.main(args=['.', '--doctest-modules', '-v', '--capture=sys'])
-
-if False:
-    from KDEpy.utils import cartesian, autogrid
-    import itertools
-    import functools
-    import operator
-    
-    # Create data
-    data_orig = np.array([[0.6, 0.8],
-                          [1,   2],
-                          [1.8, 1.2]])
-    
-    grid_points = 8
-    x, y = FFTKDE().fit(data_orig)(grid_points)
-    
-    print(x.shape)
-    print(y.shape)
-                
-    #data_orig = np.array([[1,   2], [1, 3]])
-    #n = 10000
-    #data_orig = np.concatenate((np.random.randn(n).reshape(-1, 1) , 
-    #                       np.random.randn(n).reshape(-1, 1)), axis=1)
-    #data_orig = np.random.randn(50).reshape(-1, 1)
-    #weights = np.random.randn(data_orig.shape[0])**2 + 100
-    #weights = weights / np.sum(weights)
-    
-    #num_points = 12
-    #grid_points = cartesian([np.linspace(-7, 7, num=num_points), np.linspace(-7, 7, num=12)])
-
-    #result = linbin_2dim(data_orig, grid_points, weights=None)
-
-    
-    import matplotlib.pyplot as plt
-    
-    plt.scatter(data_orig[:, 0], data_orig[:, 1])#, s=weights * 1000)
-    #print(result)
-    output = y.reshape(grid_points, grid_points)
-    plt.scatter(x[:, 0], x[:, 1], s = y * 1000, zorder = -1)
-    
-    plt.xticks(np.unique(x[:, 0]))
-    plt.yticks(np.unique(x[:, 1]))
-    plt.grid(True)
-    plt.show()

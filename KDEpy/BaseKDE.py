@@ -156,20 +156,15 @@ class BaseKDE(ABC):
         """
         Return either evaluation points y, or tuple (x, y) based on inputs.
         """
+        # Adding epsilon to output helps contour plotting functions
+        evaluated = evaluated.ravel() + np.finfo(float).eps
         obs, dims = grid_points.shape
         if self._user_supplied_grid:
-            if dims == 1:
-                return evaluated.ravel()
-            elif dims == 2:
-                return evaluated
-            else:
-                return evaluated
+            return evaluated
         else:
             if dims == 1:
-                return grid_points.ravel(), evaluated.ravel()
-            elif dims == 2:
-                return grid_points, evaluated
-            return grid_points, evaluated 
+                return grid_points.ravel(), evaluated
+            return grid_points, evaluated
   
     def __call__(self, *args, **kwargs):
         return self.evaluate(*args, **kwargs)

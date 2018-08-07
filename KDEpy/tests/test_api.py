@@ -75,8 +75,41 @@ def test_api_types(kde, bw, kernel, type_func):
     y1 = model.fit(data, weights).evaluate(x)
     assert np.allclose(y, y1)
     
+
+@pytest.mark.parametrize("kde1, kde2, bw, kernel", 
+                         [(k[0], k[1], bw, ker) for (k, bw, ker) in 
+                          itertools.product(kde_pairs,
+                                            [0.5, 1],
+                                            kernels)])
+def test_api_models_kernels_bandwidths_2D(kde1, kde2, bw, kernel):
+    """
+    Test the API.
+    """
     
-def test_api_2D_data():
+    # TODO: Put weights into BaseKDE? If it is applicable in every sub-class.
+    data = np.array([[0, 0], [0, 1], [0, 0.5], [-1, 1]])
+    weights = [1, 2, 1, 0.8]
+    
+    points = 2**5
+    
+    # Chained expression
+    x1, y1 = kde1(kernel=kernel, bw=bw).fit(data, weights).evaluate(points)
+    
+    # Step by step, with previous grid
+    model = kde2(kernel=kernel, bw=bw)
+    model.fit(data, weights)
+    x2, y2 = model.evaluate(points)
+
+    # Mean error
+    err = np.sqrt(np.mean((y1 - y2) ** 2))
+    if kernel in ('box', 'logistic', 'sigmoid'):
+        assert True
+    else:
+        assert err < 0.0025
+    
+
+@pytest.mark.parametrize("estimator", kdes) 
+def test_api_2D_data(estimator):
     """
     Test working on 2D data.
     """
@@ -89,8 +122,6 @@ def test_api_2D_data():
     n = 16
     data = np.concatenate((np.random.randn(n).reshape(-1, 1), 
                            np.random.randn(n).reshape(-1, 1)), axis=1)
-
-    from KDEpy.NaiveKDE import NaiveKDE
     
     grid_points = 2**5  # Grid points in each dimension
     N = 16  # Number of contours
@@ -102,7 +133,7 @@ def test_api_2D_data():
         ax.set_title(f'Norm $p={norm}$')
         
         # Compute
-        kde = NaiveKDE(kernel='gaussian', norm=norm)
+        kde = estimator(kernel='gaussian', norm=norm)
         grid, points = kde.fit(data).evaluate(grid_points)
     
         # The grid is of shape (obs, dims), points are of shape (obs, 1)
@@ -121,5 +152,5 @@ def test_api_2D_data():
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
     pytest.main(args=['.', '--doctest-modules', '-v', '--capture=sys',
-                      '-k test_api_types'
+                      '-k test_api_models_kernels_bandwidths_2D'
                       ])

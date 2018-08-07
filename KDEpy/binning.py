@@ -5,6 +5,9 @@ Created on Sun Feb  4 10:52:17 2018
 
 @author: tommy
 """
+import itertools
+import functools
+import operator
 import pytest
 import numpy as np
 
@@ -203,7 +206,7 @@ def linbin_Ndim(data, grid_points, weights=None):
         # Compute integer part and fractional part for every x_i
         # Compute relation to previous grid point, and next grid point
         int_frac = (((int(coordinate), 1 - (coordinate % 1)), 
-                     (int(coordinate) + 1,  (coordinate % 1)))
+                     (int(coordinate) + 1, (coordinate % 1)))
                     for coordinate in observation)
 
         # Go through every cartesian product, i.e. every corner in the
@@ -221,9 +224,9 @@ def linbin_Ndim(data, grid_points, weights=None):
             value = functools.reduce(operator.mul, fractions)
             result[index % obs_tot] += value * weight
         
-    assert np.allclose(np.sum(result),  1)
-    
+    assert np.allclose(np.sum(result), 1)
     return result
+
 
 def linbin_2dim(data, grid_points, weights=None):
     """
@@ -290,7 +293,7 @@ def linbin_2dim(data, grid_points, weights=None):
         result = np.asarray_chkfinite(result, dtype=np.float)
         result = result / data_obs
 
-    assert np.allclose(np.sum(result),  1)
+    assert np.allclose(np.sum(result), 1)
     return result
 
 
@@ -346,46 +349,6 @@ def linear_binning(data, grid_points, weights=None):
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
     pytest.main(args=['.', '--doctest-modules', '-v', '--capture=sys'])
-    
-if False:
-    from KDEpy.utils import cartesian, autogrid
-    import itertools
-    import functools
-    import operator
-    
-
-    
-    # Create data
-    data_orig = np.array([[0.6, 0.8],
-                          [1,   2],
-                          [1.8, 1.2]])
-                
-    #data_orig = np.array([[1,   2], [1, 3]])
-    n = 10000
-    data_orig = np.concatenate((np.random.randn(n).reshape(-1, 1) , 
-                           np.random.randn(n).reshape(-1, 1)), axis=1)
-    #data_orig = np.random.randn(50).reshape(-1, 1)
-    weights = np.random.randn(data_orig.shape[0])**2 + 100
-    weights = weights / np.sum(weights)
-    
-    num_points = 12
-    grid_points = cartesian([np.linspace(-7, 7, num=num_points), np.linspace(-7, 7, num=12)])
-
-    result = linbin_2dim(data_orig, grid_points, weights=None)
-
-    
-    import matplotlib.pyplot as plt
-    
-    plt.scatter(data_orig[:, 0], data_orig[:, 1])#, s=weights * 1000)
-    #print(result)
-    d = result.reshape(num_points, 12)
-    plt.scatter(grid_points[:, 0], grid_points[:, 1], s = result * 1000, zorder = -1)
-    
-    plt.xticks(np.unique(grid_points[:, 0]))
-    plt.yticks(np.unique(grid_points[:, 1]))
-    plt.grid(True)
-    plt.show()
-
         
         
         
