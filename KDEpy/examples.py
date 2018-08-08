@@ -68,7 +68,7 @@ plt.tight_layout()
 
 # --------- Cool plot ---------
 
-plt.figure(figsize=(8*1.2, 3.75*1.2))
+plt.figure(figsize=(8*1.5, 3.75*1.5))
 np.random.seed(42)
 
 
