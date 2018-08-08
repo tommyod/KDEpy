@@ -70,11 +70,12 @@ plt.tight_layout()
 
 plt.figure(figsize=(8*1.5, 3.75*1.5))
 np.random.seed(42)
+FONTSIZE = 15
 
 
 plt.subplot(2, 3, 1)
 n = 15
-plt.title('Automatic bandwidth\n robust w.r.t multimodality')
+plt.title('Automatic bandwidth\n robust w.r.t multimodality', fontsize=FONTSIZE)
 data = np.concatenate((np.random.randn(n), np.random.randn(n) + 10))
 plt.scatter(data, np.zeros_like(data), marker='|', color='red', label='Data')
 x, y = FFTKDE(bw='ISJ').fit(data)()
@@ -84,7 +85,7 @@ plt.grid(True, ls='--', zorder=-15)
 
 
 plt.subplot(2, 3, 2)
-plt.title('9+ kernel functions')
+plt.title('9+ kernel functions', fontsize=FONTSIZE)
 for kernel in FFTKDE._available_kernels.keys():
     x, y = FFTKDE(kernel=kernel).fit([0])()
     plt.plot(x, y, label=kernel)
@@ -93,7 +94,7 @@ plt.grid(True, ls='--', zorder=-15)
 
 
 plt.subplot(2, 3, 3)
-plt.title('Fast 2D computations\nusing binning and FFT')
+plt.title('Fast 2D computations\nusing binning and FFT', fontsize=FONTSIZE)
 n = 16
 data1 = np.concatenate((np.random.randn(n).reshape(-1, 1), 
                        np.random.randn(n).reshape(-1, 1)), axis=1)
@@ -117,7 +118,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.colors import LightSource
 from matplotlib import cm
 ax = plt.subplot(2, 3, 4, projection='3d')
-plt.title('Kernels normalized in any\ndimension for $p\in\{1, 2, \infty\}$')
+plt.title('Kernels normalized in any\ndimension for $p\in\{1, 2, \infty\}$', fontsize=FONTSIZE)
 data = np.array([[0, 0]])
 grid_points = 2**6  # Grid points in each dimension
 x, z = FFTKDE(kernel='gaussian', bw=1, norm=2).fit(data)((grid_points, grid_points))
@@ -134,7 +135,7 @@ ax.set_zticks([])
 
 
 plt.subplot(2, 3, 5)
-plt.title('Individual data points\nmay be weighted')
+plt.title('Individual data points\nmay be weighted', fontsize=FONTSIZE)
 np.random.seed(123)
 n = 5
 data = np.random.randn(n)*2
@@ -156,7 +157,7 @@ st = time.perf_counter()
 x, y = FFTKDE(kernel='gaussian', bw=10).fit(data)(2**10)
 timed = (time.perf_counter() - st)*1000
 plt.plot(x, y)
-plt.title('One million points on\n1024 points' + f' grid in {int(round(timed,0))} ms')
+plt.title('One million points on\n1024 points' + f' grid in {int(round(timed,0))} ms', fontsize=FONTSIZE)
 data = np.random.choice(data, size=100,replace=False)
 plt.scatter(data, np.zeros_like(data), marker='|', color='red', label='Data', s=3)
 plt.yticks([]); plt.xticks([]);
