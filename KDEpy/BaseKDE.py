@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sun Feb  4 10:52:17 2018
-
-@author: tommy
+Module for the BaseKDE class.
 """
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
@@ -20,12 +18,13 @@ class BaseKDE(ABC):
     Abstract Base Class for every kernel density estimator.
     
     This class is never instantiated, it merely defines some common methods
-    which never subclass must implement. In summary, it facilitates:
+    which every subclass must implement. In summary, it facilitates:
         
         - The `_available_kernels` parameter
         - Correct handling of `kernel` and `bw` in __init__
         - Forces subclasses to implement `fit(data)`, converts `data` to 
-          correct shape (obs, dims)
+          correct shape (obs, dims) and converts `weights` to correct shape
+          (obs,)
         - Forces subclasses to implement `evaluate(grid_points)`, with handling
     """
     
@@ -47,23 +46,22 @@ class BaseKDE(ABC):
             The bandwidth, either a number, a string or an array-like.
         """
         
-        # Verify that the choice of a kernel is valid, and set the function
+        # Verify that the choice of kernel is valid, and set the function
         akernels = sorted(list(self._available_kernels.keys()))
         msg = f'Kernel must be a string or callable. Options: {akernels}'
         if isinstance(kernel, str):
             kernel = kernel.strip().lower()
-            
             if kernel not in akernels:
                 raise ValueError(msg)
-            
-            self.kernel = self._available_kernels[kernel]
+            else:
+                self.kernel = self._available_kernels[kernel]
         elif callable(kernel):
             self.kernel = kernel
         else:
             raise ValueError(msg)
         
-        # bw may either be a positive number, a string, or array-like such that
-        # each point in the data has a uniue bw
+        # The `bw` paramter may either be a positive number, a string, or 
+        # array-like such that each point in the data has a uniue bw
         if (isinstance(bw, numbers.Number) and bw > 0):
             self.bw = bw
         elif isinstance(bw, str):
@@ -78,11 +76,21 @@ class BaseKDE(ABC):
             raise ValueError(f'Bandwidth must be > 0, array-like or a string.')
             
     @abstractmethod
-    def fit(self, data):
+    def fit(self, data, weights=None):
         """
         Fit the kernel density estimator to the data.
+        This method converts the data to shape (obs, dims) and the weights
+        to (obs,).
+
+        Parameters
+        ----------
+        data : array-like or Sequence
+            May be array-like of shape (obs,), shape (obs, dims) or a
+            Python Sequence, e.g. a list or tuple.
+        weights : array-like, Sequence or None
+            May be array-like of shape (obs,), shape (obs, dims), a 
+            Python Sequence, e.g. a list or tuple, or None.
         """
-        
         # In the end, the data should be an ndarray of shape (obs, dims)
         data = self._process_sequence(data)
             
@@ -92,15 +100,24 @@ class BaseKDE(ABC):
         if not obs > 0:
             raise ValueError('Data must contain at least one data point.')
         assert dims > 0
-        self.data = np.asfarray(data)
+        self.data = data
+
+        if weights is not None:
+            self.weights = self._process_sequence(weights).ravel()
+            if not obs == len(self.weights):
+                raise ValueError('Number of data obs must match weights')
     
     @abstractmethod
     def evaluate(self, grid_points=None):
         """
-        Evaluate the kernel density estimator.
+        Evaluate the kernel density estimator on the grid points.
         
-        grid_points: positive integer (number of points), or a grid Sequence 
-                     or ndarray of shape (obs, dims)
+        Parameters
+        ----------
+        grid_points : integer, tuple or array-like
+            If an integer, the number of equidistant grid point in every
+            dimension. If a tuple, the number of grid points in each
+            dimension. If array-like, grid points of shape (obs, dims).
         """
         if not hasattr(self, 'data'):
             raise ValueError('Must call fit before evaluating.')
@@ -114,14 +131,12 @@ class BaseKDE(ABC):
             bw = self.bw
             
         # -------------- Set up the grid depending on input -------------------
-        
         # If the grid None or an integer, use that in the autogrid method
-        types_for_autogrid = (numbers.Integral, tuple, list)
+        types_for_autogrid = (numbers.Integral, tuple)
         if grid_points is None or isinstance(grid_points, types_for_autogrid):
             self._user_supplied_grid = False
-            grid_points = autogrid(self.data, 
-                                   self.kernel.practical_support(bw),
-                                   grid_points)
+            bw_grid = self.kernel.practical_support(bw)
+            grid_points = autogrid(self.data, bw_grid, grid_points)
         else:
             self._user_supplied_grid = True
             grid_points = self._process_sequence(grid_points)
@@ -129,15 +144,25 @@ class BaseKDE(ABC):
         obs, dims = grid_points.shape
         if not obs > 0:
             raise ValueError('Grid must contain at least one data point.') 
-            
         self.grid_points = grid_points
         
-        assert hasattr(self, '_user_supplied_grid')
-        
-    def _process_sequence(self, sequence_array_like):
+    @staticmethod
+    def _process_sequence(sequence_array_like):
         """
         Process a sequence of data input to ndarray of shape (obs, dims).
+
+        Parameters
+        ----------
+        sequence_array_like : Sequence or array-like
+            The input data.
+
+        Examples
+        --------
+        >>> res = BaseKDE._process_sequence([1, 2, 3]) 
+        >>> (res == np.array([[1], [2], [3]])).all()
+        True
         """
+        # Must convert to float to avoid possible interger overflow
         if isinstance(sequence_array_like, Sequence):
             out = np.asfarray(sequence_array_like).reshape(-1, 1)
         elif isinstance(sequence_array_like, np.ndarray):
@@ -150,7 +175,7 @@ class BaseKDE(ABC):
         else:
             raise TypeError('Must be of shape (obs, dims)')
             
-        return np.asarray_chkfinite(np.asfarray(out))
+        return np.asarray_chkfinite(out, dtype=np.float)
         
     def _evalate_return_logic(self, evaluated, grid_points):
         """

@@ -329,8 +329,8 @@ _kernel_functions = {'gaussian': gaussian,
                      'triweight': triweight,
                      'tricube': tricube,
                      'cosine': cosine,
-                     'logistic': logistic,
-                     'sigmoid': sigmoid
+                     # 'logistic': logistic,
+                     # 'sigmoid': sigmoid
                      }
 
 

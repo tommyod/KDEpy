@@ -4,12 +4,13 @@
 Functions for bandwidth selection.
 """
 import numpy as np
-
 from KDEpy.binning import linbin_numpy
 from KDEpy.utils import autogrid
 from scipy import fftpack
 from scipy.optimize import brentq
 
+# This notice is included since some of the functions are based on the
+# MATLAB code by Zdravko Botev
 _botev_notice = """Copyright (c) 2015, Zdravko Botev
 All rights reserved.
 
@@ -105,7 +106,7 @@ def _fixed_point(t, N, I_sq, a2):
 
 def _root(function, N, args):
     """
-    Root finding algorithm. Based on MatLab implementation by Botev et al.
+    Root finding algorithm. Based on MATLAB implementation by Botev et al.
     
     >>> # From the matlab code
     >>> ints = np.arange(1, 51)
@@ -142,9 +143,14 @@ def _root(function, N, args):
 
 def improved_sheather_jones(data):
     """
-    Improved Sheather Jones from the Botev et al.
-    
-    For more information, see:
+    The Improved Sheater Jones (ISJ) algorithm from the paper by Botev et al.
+    This algorithm computes the optimal bandwidth for a gaussian kernel,
+    and works very well for bimodal data (unlike other rules). The
+    disadvantage of this algorithm is longer computation time, and the fact
+    that this implementation does not always converge if very few data
+    points are supplied.
+
+    Understanding this algorithm is difficult, see:
     https://books.google.no/books?id=Trj9HQ7G8TUC&pg=PA328&lpg=PA328&dq=
     sheather+jones+why+use+dct&source=bl&ots=1ETdKd_6EF&sig=jZk4R515GB1xsn-
     VZVnjr-JfjSI&hl=en&sa=X&ved=2ahUKEwi1_czNncTcAhVGhqYKHaPiBtcQ6AEwA3oEC
@@ -180,16 +186,21 @@ def improved_sheather_jones(data):
     # Solve for the optimal (in the AMISE sense) t
     t_star = _root(_fixed_point, N, args=(N, I_sq, a2))
 
+    # The remainder of the algorithm computes the actual density
+    # estimate, but this function is only used to compute the 
+    # bandwidth, since the bandwidth may be used for other kernels
+    # apart from the Gaussian kernel
+
     # Smooth the initial data using the computed optimal t  
     # Multiplication in frequency domain is convolution   
-    integers = np.arange(n, dtype=np.float)
-    a_t = a * np.exp(-integers**2 * np.pi ** 2 * t_star / 2)
+    # integers = np.arange(n, dtype=np.float)
+    # a_t = a * np.exp(-integers**2 * np.pi ** 2 * t_star / 2)
 
     # Diving by 2 done because of the implementation of fftpack.idct
-    density = fftpack.idct(a_t) / (2 * R)
+    # density = fftpack.idct(a_t) / (2 * R)
     
     # Due to overflow, some values might be smaller than zero, correct it
-    density[density < 0] = 0.
+    # density[density < 0] = 0.
     bandwidth = np.sqrt(t_star) * R
     return bandwidth
 

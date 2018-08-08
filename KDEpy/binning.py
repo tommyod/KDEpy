@@ -1,15 +1,32 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sun Feb  4 10:52:17 2018
+Module for functions related to linear binning. These functions employ
+linear binning to weighted data. This is typically a preprocessing step
+before convolving with a kernel in the FFTKDE, but may also be used to
+reduce the effective number of data points in any algorithm.
 
-@author: tommy
+The idea behind linear binning is the following: (1) go through every
+data point and (2) assign weight to the 2^dims nearest grid points.
+In `dims` dimensions, there are 2 points on the grid to consider in
+each direction, so a total of 2^dims grid points to assign weights to
+for every data point. The weights are determined by the proportion of
+the volume of this hypercube that is enclosed by the data point.
+
+A ------------------------------------ B
+|                          |           |
+|                          |           |
+|                          X-----------|
+|                                      |
+|                                      |
+|                                      |
+|                                      |
+C ------------------------------------ C
 """
+import numpy as np
 import itertools
 import functools
 import operator
-import pytest
-import numpy as np
 
 try:
     import cutils
@@ -107,14 +124,13 @@ def linbin_numpy(data, grid_points, weights=None):
     # Transform the data
     min_grid = np.min(grid_points)
     max_grid = np.max(grid_points)
-    num_intervals = len(grid_points) - 1  # Number of intervals
+    num_intervals = len(grid_points) - 1  
     dx = (max_grid - min_grid) / num_intervals
     transformed_data = (data - min_grid) / dx
 
     # Compute the integral and fractional part of the data
     # The integral part is used for lookups, the fractional part is used
     # to weight the data
-    num_intervals = len(grid_points) - 1  # Number of intervals
     fractional, integral = np.modf(transformed_data)
     integral = integral.astype(np.int)
 
@@ -152,12 +168,14 @@ def linbin_numpy(data, grid_points, weights=None):
 def linbin_Ndim(data, grid_points, weights=None):
     """
     N-dimensional linear binning. This is a slow, pure-Python function.
+    Although it is slow, it works and may be used as a starting point for
+    developing faster Cython implementations.
     
     With :math:`N` data points, and :math:`n` grid points in each dimension
     :math:`d`, the running time is :math:`O(N2^d)`. For each point the
     algorithm finds the nearest points, of which there are two in each
     dimension.
-    
+   
     Parameters
     ----------
     data : array-like
@@ -178,6 +196,7 @@ def linbin_Ndim(data, grid_points, weights=None):
     if weights is not None:
         weights = np.asarray_chkfinite(weights, dtype=np.float)
     else:
+        # This is not efficient, but this function should just be correct
         weights = np.ones_like(data.shape[0])
     weights = weights / np.sum(weights)
 
@@ -187,8 +206,8 @@ def linbin_Ndim(data, grid_points, weights=None):
     obs_tot, dims = grid_points.shape
     
     # Compute the number of grid points for each dimension in the grid
-    grid_num = np.array(list(len(np.unique(grid_points[:, i])) for 
-                             i in range(dims)))
+    grid_num = (grid_points[:, i] for i in range(dims))
+    grid_num = np.array(list(len(np.unique(g)) for g in grid_num))
     
     # Scale the data to the grid
     min_grid = np.min(grid_points, axis=0)
@@ -217,7 +236,7 @@ def linbin_Ndim(data, grid_points, weights=None):
             integrals_rev = list(integral for (integral, frac) in 
                                  reversed(cart_prod))
             
-            # Find the index in the resulting array, compured by 
+            # Find the index in the resulting array, compured by
             # sum integra_valuel * grid_num**i 
             index = sum((i * g**c) for ((c, i), g) in 
                         zip(enumerate(integrals_rev), grid_num))
@@ -270,13 +289,13 @@ def linbin_2dim(data, grid_points, weights=None):
     obs_tot, dims = grid_points.shape
     
     # Compute the number of grid points for each dimension in the grid
-    grid_num = np.array(list(len(np.unique(grid_points[:, i])) for 
-                             i in range(dims)))
+    grid_num = (grid_points[:, i] for i in range(dims))
+    grid_num = np.array(list(len(np.unique(g)) for g in grid_num))
     
     # Scale the data to the grid
     min_grid = np.min(grid_points, axis=0)
     max_grid = np.max(grid_points, axis=0)
-    num_intervals = (grid_num - 1)  # Number of intervals
+    num_intervals = (grid_num - 1)
     dx = (max_grid - min_grid) / num_intervals
     data = (data - min_grid) / dx
 
@@ -347,10 +366,6 @@ def linear_binning(data, grid_points, weights=None):
 
 
 if __name__ == "__main__":
+    import pytest
     # --durations=10  <- May be used to show potentially slow tests
     pytest.main(args=['.', '--doctest-modules', '-v', '--capture=sys'])
-        
-        
-        
-        
-    
