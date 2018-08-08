@@ -75,7 +75,7 @@ FONTSIZE = 15
 
 plt.subplot(2, 3, 1)
 n = 15
-plt.title('Automatic bandwidth\n robust w.r.t multimodality', fontsize=FONTSIZE)
+plt.title('Automatic bandwidth,\nrobust w.r.t multimodality', fontsize=FONTSIZE)
 data = np.concatenate((np.random.randn(n), np.random.randn(n) + 10))
 plt.scatter(data, np.zeros_like(data), marker='|', color='red', label='Data')
 x, y = FFTKDE(bw='ISJ').fit(data)()
@@ -106,7 +106,6 @@ grid_points = 2**7  # Grid points in each dimension
 N = 8  # Number of contours
 x, z = FFTKDE(bw=1).fit(data)((grid_points, grid_points))
 x, y = np.unique(x[:, 0]), np.unique(x[:, 1])
-print(x.shape, y.shape, z.shape)
 z = z.reshape(grid_points, grid_points).T
 plt.contour(x, y, z, N, linewidths=0.8, colors='k')
 plt.contourf(x, y, z, N, cmap="PuBu")
@@ -154,10 +153,10 @@ plt.grid(True, ls='--', zorder=-15)
 plt.subplot(2, 3, 6)
 data = np.random.gamma(10, 100, size=(10**6))
 st = time.perf_counter()
-x, y = FFTKDE(kernel='gaussian', bw=10).fit(data)(2**10)
+x, y = FFTKDE(kernel='gaussian', bw=100).fit(data)(2**10)
 timed = (time.perf_counter() - st)*1000
 plt.plot(x, y)
-plt.title('One million points on\n1024 points' + f' grid in {int(round(timed,0))} ms', fontsize=FONTSIZE)
+plt.title('One million points on\n1024 grid' + f' points in {int(round(timed,0))} ms', fontsize=FONTSIZE)
 data = np.random.choice(data, size=100,replace=False)
 plt.scatter(data, np.zeros_like(data), marker='|', color='red', label='Data', s=3)
 plt.yticks([]); plt.xticks([]);
