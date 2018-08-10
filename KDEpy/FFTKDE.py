@@ -67,6 +67,7 @@ class FFTKDE(BaseKDE):
     def __init__(self, kernel='gaussian', bw=1, norm=2):
         self.norm = norm
         super().__init__(kernel, bw)
+        assert isinstance(self.norm, numbers.Number) and self.norm > 0
     
     def fit(self, data, weights=None):
         """
@@ -95,19 +96,7 @@ class FFTKDE(BaseKDE):
         """
         
         # Sets self.data
-        super().fit(data)
-        
-        # If weights were passed
-        if weights is not None:
-            if not len(weights) == self.data.shape[0]:
-                raise ValueError('Length of data and weights must match.')
-            else:
-                weights = self._process_sequence(weights).ravel()
-                self.weights = np.asfarray(weights, dtype=np.float)
-                self.weights = self.weights / np.sum(self.weights)
-        else:
-            self.weights = None
-
+        super().fit(data, weights)
         return self
     
     def evaluate(self, grid_points=None):
@@ -139,9 +128,6 @@ class FFTKDE(BaseKDE):
         # This method sets self.grid_points and verifies it
         super().evaluate(grid_points)
         
-        # Return the array converted to a float type
-        grid_points = np.asfarray(self.grid_points)
-        
         if callable(self.bw):
             bw = self.bw(self.data)
         elif isinstance(self.bw, numbers.Number) and self.bw > 0:
@@ -151,13 +137,12 @@ class FFTKDE(BaseKDE):
         self.bw = bw
         
         # Step 1 - Obtaining the grid counts
-        data = linear_binning(self.data, grid_points=grid_points, 
+        data = linear_binning(self.data, grid_points=self.grid_points, 
                               weights=self.weights)
         
         # Step 2 - Computing kernel weights
-        grid_obs, grid_dims = grid_points.shape
-        num_grid_points = np.array(list(len(np.unique(grid_points[:, i])) 
-                                        for i in range(grid_dims)))
+        num_grid_points = np.array(list(len(np.unique(self.grid_points[:, i])) 
+                                        for i in range(self.grid_points.shape[1])))
         
         min_grid = np.min(self.grid_points, axis=0)
         max_grid = np.max(self.grid_points, axis=0)
@@ -186,7 +171,7 @@ class FFTKDE(BaseKDE):
 
         # Step 3 - Performing the convolution
         evaluated = convolve(data, kernel_weights, mode='same').reshape(-1, 1)
-        return self._evalate_return_logic(evaluated, grid_points)
+        return self._evalate_return_logic(evaluated, self.grid_points)
 
 
 if __name__ == "__main__":

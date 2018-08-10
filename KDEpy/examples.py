@@ -156,7 +156,7 @@ st = time.perf_counter()
 x, y = FFTKDE(kernel='gaussian', bw=100).fit(data)(2**10)
 timed = (time.perf_counter() - st)*1000
 plt.plot(x, y)
-plt.title('One million points on\n1024 grid' + f' points in {int(round(timed,0))} ms', fontsize=FONTSIZE)
+plt.title('One million observations on\n1024 grid' + f' points in {int(round(timed,0))} ms', fontsize=FONTSIZE)
 data = np.random.choice(data, size=100,replace=False)
 plt.scatter(data, np.zeros_like(data), marker='|', color='red', label='Data', s=3)
 plt.yticks([]); plt.xticks([]);

@@ -91,18 +91,7 @@ class TreeKDE(BaseKDE):
         >>> x, y = kde()
         """
         # Sets self.data
-        super().fit(data)
-        
-        # If weights were passed
-        if weights is not None:
-            if not len(weights) == self.data.shape[0]:
-                raise ValueError('Length of data and weights must match.')
-            else:
-                weights = np.asarray_chkfinite(weights, dtype=np.float)
-                self.weights = weights.ravel() / np.sum(weights)
-        else:
-            self.weights = weights
-    
+        super().fit(data, weights)
         return self
     
     def evaluate(self, grid_points=None, eps=10e-4):
@@ -137,11 +126,7 @@ class TreeKDE(BaseKDE):
         # This method sets self.grid points and verifies it
         super().evaluate(grid_points)
         
-        # Return the array converted to a float type
-        grid_points = np.asfarray(self.grid_points)
-        grid_obs, grid_dims = grid_points.shape
-        # Create zeros on the grid points
-        evaluated = np.zeros(grid_obs)
+        evaluated = np.zeros(self.grid_points.shape[0])
         
         # For every data point, compute the kernel and add to the grid
         obs, dims = self.data.shape
@@ -152,7 +137,6 @@ class TreeKDE(BaseKDE):
             bw = np.asfarray(np.ones(obs) * bw(self.data))
         else:
             bw = np.asarray_chkfinite(bw, dtype=np.float)
-        maximal_bw = np.max(self.bw)
 
         # Initialize the tree structure for fast lookups of neighbors
         tree = cKDTree(self.data)
@@ -165,19 +149,16 @@ class TreeKDE(BaseKDE):
             
         # Since we iterate through grid points, we need the maximum bw to
         # ensure that we get data points that are close enough
-        for i, grid_point in enumerate(grid_points):
+        for i, grid_point in enumerate(self.grid_points):
 
             # Query for data points that are close to this grid point
-            indices = tree.query_ball_point(x=grid_point, 
-                                            r=kernel_radius,  # * maximal_bw, 
-                                            p=self.norm, 
-                                            # TODO: Is this epsilon value ok?
-                                            eps=eps * np.sqrt(obs))
+            # TODO: Is this epsilon value sensible?
+            indices = tree.query_ball_point(x=grid_point,r=kernel_radius,
+                                            p=self.norm, eps=eps * obs**0.5)
 
             # Use broadcasting to find x-values (distances)
-            x_values = grid_point - self.data[indices]
-            kernel_estimates = self.kernel(x_values, bw=bw[indices], 
-                                           norm=self.norm)
+            x = grid_point - self.data[indices]
+            kernel_estimates = self.kernel(x, bw=bw[indices], norm=self.norm)
             
             if self.weights is not None:
                 weights_subset = self.weights[indices]
@@ -190,7 +171,7 @@ class TreeKDE(BaseKDE):
             else:
                 evaluated[i] += np.sum(kernel_estimates) / obs
 
-        return self._evalate_return_logic(evaluated, grid_points)
+        return self._evalate_return_logic(evaluated, self.grid_points)
 
 
 if __name__ == "__main__":

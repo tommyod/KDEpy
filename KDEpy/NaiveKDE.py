@@ -7,6 +7,7 @@ Created on Sun Feb  4 10:52:17 2018
 """
 import pytest
 import numbers
+import itertools
 import numpy as np
 from KDEpy.BaseKDE import BaseKDE
 
@@ -81,20 +82,7 @@ class NaiveKDE(BaseKDE):
         >>> x, y = kde()
         """
         # Sets self.data
-        super().fit(data)
-        
-        # If weights were passed
-        if weights is not None:
-            if not len(weights) == len(data):
-                raise ValueError('Length of data and weights must match.')
-            else:
-                weights = self._process_sequence(weights)
-                self.weights = np.asfarray(weights)
-        else:
-            self.weights = np.ones(self.data.shape[0])
-            
-        self.weights = self.weights / np.sum(self.weights)
-            
+        super().fit(data, weights)
         return self
     
     def evaluate(self, grid_points=None):
@@ -123,12 +111,9 @@ class NaiveKDE(BaseKDE):
         """
         # This method sets self.grid points and verifies it
         super().evaluate(grid_points)
-        
-        # Return the array converted to a float type
-        grid_points = np.asfarray(self.grid_points)
-        grid_obs, grid_dims = grid_points.shape
+
         # Create zeros on the grid points
-        evaluated = np.zeros(grid_obs)
+        evaluated = np.zeros(self.grid_points.shape[0])
         
         # For every data point, compute the kernel and add to the grid
         bw = self.bw
@@ -137,19 +122,23 @@ class NaiveKDE(BaseKDE):
         elif callable(bw):
             bw = np.asfarray(np.ones(self.data.shape[0]) * bw(self.data))
 
-        # TODO: Implementation w.r.t grid points for faster evaluation
-        for weight, data_point, bw in zip(self.weights, self.data, bw):
-            evaluated += weight * self.kernel(grid_points - data_point, 
-                                              bw=bw, norm=self.norm)
+        # TODO: Implementation w.r.t grid points for faster evaluation  
+        weights = (itertools.repeat(1 / self.data.shape[0]) if self.weights 
+                   is None else self.weights)
             
-        return self._evalate_return_logic(evaluated, grid_points)
+        for weight, data_point, bw in zip(weights, self.data, bw):
+            x = self.grid_points - data_point
+            evaluated += weight * self.kernel(x, bw=bw, norm=self.norm)
+
+        return self._evalate_return_logic(evaluated, self.grid_points)
 
 
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
     pytest.main(args=['.', '--doctest-modules', '-v'])
+    
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     
     import matplotlib.pyplot as plt
     
@@ -173,7 +162,7 @@ if __name__ == '__main__':
     y = kde.evaluate(x)
     plt.plot(x, y)
     plt.scatter(data, np.zeros_like(data))
-    
+      
     plt.subplot(1, 2, 2)
     kde = NaiveKDE(kernel=kernel, bw=bw)
     kde.fit(data)

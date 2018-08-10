@@ -75,6 +75,11 @@ class BaseKDE(ABC):
         else:
             raise ValueError(f'Bandwidth must be > 0, array-like or a string.')
             
+        # Test quickly that the method has done what is was supposed to do
+        assert callable(self.kernel)
+        assert (isinstance(self.bw, (np.ndarray, Sequence, numbers.Number)) or 
+                callable(self.bw))
+            
     @abstractmethod
     def fit(self, data, weights=None):
         """
@@ -91,21 +96,32 @@ class BaseKDE(ABC):
             May be array-like of shape (obs,), shape (obs, dims), a 
             Python Sequence, e.g. a list or tuple, or None.
         """
+        
+        # -------------- Set up the data depending on input -------------------
         # In the end, the data should be an ndarray of shape (obs, dims)
         data = self._process_sequence(data)
             
-        assert len(data.shape) == 2
         obs, dims = data.shape
 
         if not obs > 0:
             raise ValueError('Data must contain at least one data point.')
         assert dims > 0
         self.data = data
-
+        
+        # -------------- Set up the weights depending on input ----------------
         if weights is not None:
             self.weights = self._process_sequence(weights).ravel()
+            self.weights = self.weights / np.sum(self.weights)
             if not obs == len(self.weights):
                 raise ValueError('Number of data obs must match weights')
+        else:
+            self.weights = weights
+                
+        # Test quickly that the method has done what is was supposed to do
+        assert len(self.data.shape) == 2
+        if self.weights is not None:
+            assert len(self.weights.shape) == 1
+            assert self.data.shape[0] == len(self.weights)
     
     @abstractmethod
     def evaluate(self, grid_points=None):
@@ -129,6 +145,7 @@ class BaseKDE(ABC):
             bw = self.bw(self.data)
         else:
             bw = self.bw
+        self.bw = bw
             
         # -------------- Set up the grid depending on input -------------------
         # If the grid None or an integer, use that in the autogrid method
@@ -145,6 +162,12 @@ class BaseKDE(ABC):
         if not obs > 0:
             raise ValueError('Grid must contain at least one data point.') 
         self.grid_points = grid_points
+    
+        # Test quickly that the method has done what is was supposed to do
+        assert isinstance(self.bw, numbers.Number)
+        assert self.bw > 0
+        assert len(self.grid_points.shape) == 2
+        
         
     @staticmethod
     def _process_sequence(sequence_array_like):
@@ -174,7 +197,6 @@ class BaseKDE(ABC):
                 raise ValueError('Must be of shape (obs, dims)')
         else:
             raise TypeError('Must be of shape (obs, dims)')
-            
         return np.asarray_chkfinite(out, dtype=np.float)
         
     def _evalate_return_logic(self, evaluated, grid_points):
