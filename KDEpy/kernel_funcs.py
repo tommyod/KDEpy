@@ -261,7 +261,12 @@ class Kernel(collections.abc.Callable):
         else:
             def f(x):
                 return self.evaluate(x, bw=bw) - atol
-            return brentq(f, a=0, b=10 * bw, full_output=False)
+            try:
+                return brentq(f, a=0, b=10 * bw, full_output=False)
+            except ValueError:
+                msg = 'Unable to solve for support numerically. Use a ' + \
+                      'kernel with finite support or scale data to smaller bw.'
+                raise ValueError(msg)
     
     def evaluate(self, x, bw=1, norm=2):
         """

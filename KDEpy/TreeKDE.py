@@ -153,7 +153,7 @@ class TreeKDE(BaseKDE):
 
             # Query for data points that are close to this grid point
             # TODO: Is this epsilon value sensible?
-            indices = tree.query_ball_point(x=grid_point,r=kernel_radius,
+            indices = tree.query_ball_point(x=grid_point, r=kernel_radius,
                                             p=self.norm, eps=eps * obs**0.5)
 
             # Use broadcasting to find x-values (distances)

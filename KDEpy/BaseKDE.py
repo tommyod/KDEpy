@@ -167,8 +167,7 @@ class BaseKDE(ABC):
         assert isinstance(self.bw, numbers.Number)
         assert self.bw > 0
         assert len(self.grid_points.shape) == 2
-        
-        
+           
     @staticmethod
     def _process_sequence(sequence_array_like):
         """

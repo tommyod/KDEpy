@@ -141,8 +141,9 @@ class FFTKDE(BaseKDE):
                               weights=self.weights)
         
         # Step 2 - Computing kernel weights
+        g_shape = self.grid_points.shape[1]
         num_grid_points = np.array(list(len(np.unique(self.grid_points[:, i])) 
-                                        for i in range(self.grid_points.shape[1])))
+                                        for i in range(g_shape)))
         
         min_grid = np.min(self.grid_points, axis=0)
         max_grid = np.max(self.grid_points, axis=0)
