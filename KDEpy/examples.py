@@ -1,74 +1,23 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Usage examples.
+This file 
 """
 
 # For Travis CI
 import matplotlib
 matplotlib.use('Agg')
 
-# --------- Minimal working example ---------
 import time
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
-
-plt.figure(figsize=(6, 3))
-##############################
 from KDEpy import NaiveKDE, TreeKDE, FFTKDE
-np.random.seed(42)
-data = norm(loc=0, scale=1).rvs(2**3)
-x, y = TreeKDE(kernel='gaussian', bw='silverman').fit(data).evaluate()
-plt.plot(x, y, label='KDE estimate')
-##############################
-plt.plot(x, norm(loc=0, scale=1).pdf(x), label='True distribution')
-plt.scatter(data, np.zeros_like(data), marker='|', color='red', label='Data')
 
-plt.legend(loc='best')
-plt.tight_layout()
-plt.savefig(r'../example.png')
-
-
-
-# --------- Minimal working example ---------
-plt.figure(figsize=(6, 3))
-##############################
-
-data = norm(loc=0, scale=1).rvs(2**6)
-for bw in [0.1, 'silverman', 1.5]:
-    x, y = FFTKDE(kernel='triweight', bw=bw).fit(data).evaluate()
-    plt.plot(x, y, label=f'KDE estimate, bw={bw}')
-
-##############################
-# plt.plot(x, norm(loc=0, scale=1).pdf(x), label='True distribution')
-plt.scatter(data, np.zeros_like(data), marker='|', color='red', label='Data')
-
-plt.legend(loc='best')
-plt.tight_layout()
-plt.savefig(r'../example2.png')
-
-# --------- Every function used ---------
-
-plt.figure(figsize=(6, 3))
-
-np.random.seed(42)
-data = norm(loc=0, scale=1).rvs(2**3)
-
-for kde in [NaiveKDE, TreeKDE, FFTKDE]:
-    x, y = kde(kernel='gaussian', bw='silverman').fit(data).evaluate()
-    plt.plot(x, y, label=kde.__name__ + ' estimate')
-
-plt.plot(x, norm(loc=0, scale=1).pdf(x), label='True distribution')
-plt.scatter(data, np.zeros_like(data), marker='|', color='red', label='Data')
-
-plt.legend(loc='best')
-plt.tight_layout() 
-
-
-# --------- Cool plot ---------
-
-plt.figure(figsize=(8*1.5, 3.75*1.5))
+# -----------------------------------------------------------------------------
+# ------ ADVERTISEMENT PLOT: Create the plot that is shown in the README ------
+# -----------------------------------------------------------------------------
+plt.figure(figsize=(12, 5.5))
 np.random.seed(42)
 FONTSIZE = 15
 
@@ -96,11 +45,11 @@ plt.grid(True, ls='--', zorder=-15)
 plt.subplot(2, 3, 3)
 plt.title('Fast 2D computations\nusing binning and FFT', fontsize=FONTSIZE)
 n = 16
-data1 = np.concatenate((np.random.randn(n).reshape(-1, 1), 
-                       np.random.randn(n).reshape(-1, 1)), axis=1)
-data2 = np.concatenate((np.random.randn(n).reshape(-1, 1) + 1, 
-                       np.random.randn(n).reshape(-1, 1) + 4), axis=1)
+gen_random = lambda n: np.random.randn(n).reshape(-1, 1)
+data1 = np.concatenate((gen_random(n), gen_random(n)), axis=1)
+data2 = np.concatenate((gen_random(n) + 1, gen_random(n) + 4), axis=1)
 data = np.concatenate((data1, data2))
+
 
 grid_points = 2**7  # Grid points in each dimension
 N = 8  # Number of contours
@@ -162,9 +111,65 @@ plt.scatter(data, np.zeros_like(data), marker='|', color='red', label='Data', s=
 plt.yticks([]); plt.xticks([]);
 plt.grid(True, ls='--', zorder=-15)
 
+
 plt.tight_layout()
 plt.savefig(r'../example3.png')
-plt.savefig(r'../example3.pdf')
+
+# -----------------------------------------------------------------------------
+# ------ MINIMAL WORKING EXAMPLE: Showing a simle way to create a plot --------
+# -----------------------------------------------------------------------------
+
+plt.figure(figsize=(6, 3))
+##############################
+np.random.seed(42)
+data = norm(loc=0, scale=1).rvs(2**3)
+x, y = TreeKDE(kernel='gaussian', bw='silverman').fit(data).evaluate()
+plt.plot(x, y, label='KDE estimate')
+##############################
+plt.plot(x, norm(loc=0, scale=1).pdf(x), label='True distribution')
+plt.scatter(data, np.zeros_like(data), marker='|', color='red', label='Data')
+
+plt.legend(loc='best')
+plt.tight_layout()
+plt.savefig(r'../example.png')
+
+
+# -----------------------------------------------------------------------------
+# ------ COMPARING BANDWIDTHS: Different bandwidths on the same data set ------
+# -----------------------------------------------------------------------------
+plt.figure(figsize=(6, 3))
+##############################
+
+data = norm(loc=0, scale=1).rvs(2**6)
+for bw in [0.1, 'silverman', 1.5]:
+    x, y = FFTKDE(kernel='triweight', bw=bw).fit(data).evaluate()
+    plt.plot(x, y, label=f'KDE estimate, bw={bw}')
+
+##############################
+plt.scatter(data, np.zeros_like(data), marker='|', color='red', label='Data')
+
+plt.legend(loc='best')
+plt.tight_layout()
+plt.savefig(r'../example2.png')
+
+# -----------------------------------------------------------------------------
+# ------ EVERY ESTIMATOR: Comparing the different algorithms ------------------
+# -----------------------------------------------------------------------------
+
+plt.figure(figsize=(6, 3))
+
+np.random.seed(42)
+data = norm(loc=0, scale=1).rvs(2**3)
+
+for kde in [NaiveKDE, TreeKDE, FFTKDE]:
+    x, y = kde(kernel='gaussian', bw='silverman').fit(data).evaluate()
+    plt.plot(x, y + np.random.randn()/100, label=kde.__name__ + ' estimate')
+
+plt.plot(x, norm(loc=0, scale=1).pdf(x), label='True distribution')
+plt.scatter(data, np.zeros_like(data), marker='|', color='red', label='Data')
+
+plt.legend(loc='best')
+plt.tight_layout() 
 
 
 
