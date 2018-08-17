@@ -119,6 +119,10 @@ def autogrid(data, boundary_abs=3, num_points=None, boundary_rel=0.05):
         msg = '`num_points` must be None, a number, or list/tuple for dims'
         raise TypeError(msg)
         
+    if not len(num_points) == dims:
+        raise ValueError('Number of points must be sequence matching dims.')
+    
+        
     list_of_grids = []
 
     generator = enumerate(zip(minimums, maximums, ranges, num_points))

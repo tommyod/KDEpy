@@ -111,7 +111,7 @@ def iterate_data_weighted_2D(double[:, :] data, double[:] weights,
     
     data_length = data.shape[0]
     for i in range(data_length):
-        x, y = data[i,0], data[i,1]
+        x, y = data[i, 0], data[i, 1]
         weight = weights[i]
         
         x_integral = int(x)
@@ -134,19 +134,19 @@ def iterate_data_weighted_2D(double[:, :] data, double[:] weights,
         x_xy = x_fractional - xy
         
         # Bottom left
-        index = y_integral + x_integral * grid_num[1]
+        index = y_integral + x_integral * grid_num[0]
         result[index % obs_tot] += (xy - x_fractional - y_fractional + 1) * weight
         
         # Bottom right
-        index = y_integral + (x_integral + 1) * grid_num[1]
+        index = y_integral + (x_integral + 1) * grid_num[0]
         result[index % obs_tot] += x_xy * weight
         
         # Top left
-        index = (y_integral + 1) + x_integral * grid_num[1]
+        index = (y_integral + 1) + x_integral * grid_num[0]
         result[index % obs_tot] += y_xy * weight
         
         # Top right
-        index = (y_integral + 1) + (x_integral + 1) * grid_num[1]
+        index = (y_integral + 1) + (x_integral + 1) * grid_num[0]
         result[index % obs_tot] += xy * weight
         
 #        # Bottom left
@@ -184,7 +184,7 @@ def iterate_data_2D(double[:, :] data, double[:] result, long[:] grid_num,
     
     data_length = data.shape[0]
     for i in range(data_length):
-        x, y = data[i,0], data[i,1]
+        x, y = data[i, 0], data[i, 1]
         
         x_integral = int(x)
         x_fractional = (x % 1)
@@ -206,19 +206,129 @@ def iterate_data_2D(double[:, :] data, double[:] result, long[:] grid_num,
         x_xy = x_fractional - xy
         
         # Bottom left
-        index = y_integral + x_integral * grid_num[1]
+        index = y_integral + x_integral * grid_num[0]
         result[index % obs_tot] += (xy - x_fractional - y_fractional + 1)
         
         # Bottom right
-        index = y_integral + (x_integral + 1) * grid_num[1]
+        index = y_integral + (x_integral + 1) * grid_num[0]
         result[index % obs_tot] += x_xy
         
         # Top left
-        index = (y_integral + 1) + x_integral * grid_num[1]
+        index = (y_integral + 1) + x_integral * grid_num[0]
         result[index % obs_tot] += y_xy
         
         # Top right
-        index = (y_integral + 1) + (x_integral + 1) * grid_num[1]
+        index = (y_integral + 1) + (x_integral + 1) * grid_num[0]
         result[index % obs_tot] += xy
+
+    return result
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.cdivision(True)
+def iterate_data_weighted_3D(double[:, :] data, double[:] weights, 
+                             double[:] result, long[:] grid_num, 
+                             int obs_tot):
+    """
+    Iterate over data points and weights and assign linear weights to nearest grid points.
+    """
+    cdef int length_data, index, i, x_integral, y_integral
+    cdef double x, y, z, weight, x_fractional, y_fractional, value
+    
+    data_length = data.shape[0]
+    for i in range(data_length):
+        x, y, z = data[i, 0], data[i, 1], data[i, 2]
+        weight = weights[i]
+        
+        x_int = int(x)
+        x_fractional = (x % 1)
+        y_int = int(y)
+        y_fractional = (y % 1)
+        z_int = int(z)
+        z_fractional = (z % 1)
+        
+        x, y, z = x_fractional, y_fractional, z_fractional
+        
+        # xyz (center)
+        index = z_int + y_int * grid_num[1] + x_int * grid_num[0]**2
+        result[index % obs_tot] += (x - 1) * (y - 1) * (z - 1) * weight
+        
+        index = z_int + y_int * grid_num[1] + (x_int + 1) * grid_num[0]**2
+        result[index % obs_tot] += x * (y - 1) * (z - 1) * weight
+        
+        index = z_int + (y_int + 1) * grid_num[1] + x_int * grid_num[0]**2
+        result[index % obs_tot] += (x - 1) * y * (z - 1) * weight
+        
+        index = z_int + (y_int + 1) * grid_num[1] + (x_int + 1) * grid_num[0]**2
+        result[index % obs_tot] += x * y * (z - 1) * weight
+        
+        
+        index = z_int + 1 + y_int * grid_num[1] + x_int * grid_num[0]**2
+        result[index % obs_tot] += (x - 1) * (y - 1) * z * weight
+        
+        index = z_int + 1 + y_int * grid_num[1] + (x_int + 1) * grid_num[0]**2
+        result[index % obs_tot] += x * (y - 1) * z * weight
+        
+        index = z_int + 1 + (y_int + 1) * grid_num[1] + x_int * grid_num[0]**2
+        result[index % obs_tot] += (x - 1) * y * z * weight
+        
+        index = z_int + 1 + (y_int + 1) * grid_num[1] + (x_int + 1) * grid_num[0]**2
+        result[index % obs_tot] += x * y * z * weight
+
+
+    return result
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.cdivision(True)
+def iterate_data_3D(double[:, :] data, double[:] result, long[:] grid_num, 
+                    int obs_tot):
+    """
+    Iterate over data points and weights and assign linear weights to nearest grid points.
+    """
+    cdef int length_data, index, i, x_integral, y_integral
+    cdef double x, y, z, x_fractional, y_fractional, value
+    
+    data_length = data.shape[0]
+    for i in range(data_length):
+        x, y, z = data[i, 0], data[i, 1], data[i, 2]
+        
+        x_int = int(x)
+        x_fractional = (x % 1)
+        y_int = int(y)
+        y_fractional = (y % 1)
+        z_int = int(z)
+        z_fractional = (z % 1)
+        
+        x, y, z = x_fractional, y_fractional, z_fractional
+        
+        # xyz (center)
+        index = z_int + y_int * grid_num[1] + x_int * grid_num[0]**2
+        result[index % obs_tot] += (1 - x) * (1 - y) * (1 - z) 
+        
+        index = z_int + y_int * grid_num[1] + (x_int + 1) * grid_num[0]**2
+        result[index % obs_tot] += x * (1 - y) * (1 - z) 
+        
+        index = z_int + (y_int + 1) * grid_num[1] + x_int * grid_num[0]**2
+        result[index % obs_tot] += (1 - x) * y * (1 - z) 
+        
+        index = z_int + (y_int + 1) * grid_num[1] + (x_int + 1) * grid_num[0]**2
+        result[index % obs_tot] += x * y * (1 - z) 
+        
+        
+        index = z_int + 1 + y_int * grid_num[1] + x_int * grid_num[0]**2
+        result[index % obs_tot] += (1 - x) * (1 - y) * z 
+        
+        index = z_int + 1 + y_int * grid_num[1] + (x_int + 1) * grid_num[0]**2
+        result[index % obs_tot] += x * (1 - y) * z 
+        
+        index = z_int + 1 + (y_int + 1) * grid_num[1] + x_int * grid_num[0]**2
+        result[index % obs_tot] += (1 - x) * y * z 
+        
+        index = z_int + 1 + (y_int + 1) * grid_num[1] + (x_int + 1) * grid_num[0]**2
+        result[index % obs_tot] += x * y * z 
+
 
     return result
