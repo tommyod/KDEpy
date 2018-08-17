@@ -157,8 +157,8 @@ class FFTKDE(BaseKDE):
             real_bw = self.kernel.practical_support(self.bw)
             
         # Compute L, the number of dx'es to move out from 0 in kernel
-        L = np.minimum(np.floor(real_bw / dx), num_intervals)
-        assert (dx * L < real_bw).all()
+        L = np.minimum(np.floor(real_bw / dx), num_intervals + 1)
+        assert (dx * L <= real_bw).all()
         
         # Evaluate the kernel once
         grids = [np.linspace(-dx * L, dx * L, int(L * 2 + 1)) for (dx, L)

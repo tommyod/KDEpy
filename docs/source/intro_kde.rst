@@ -1,97 +1,132 @@
-
-What is kernel density estimation?
-==================================
-
-Testing
--------
-
+Introduction
+============
 
 .. currentmodule:: KDEpy.kde
 
-:class:`KDE` will take in its ``fit`` method arrays X, y
-and will store the coefficients :math:`w` of the linear model in its
-``coef_`` member.
+- what is it
+- why use it
+- histograms
+- centered histograms
+- the KDE
+- choices
+- computation and implementations
 
-Histograms
-----------
-
-By centering histograms bins, the data controls the estimate.
-
-.. plot::
-   :include-source:
-
-   from KDEpy import *
-   from scipy import stats
-
-   # Generate a distribution and some data
-   dist = stats.norm(loc=0, scale=1)
-   data = dist.rvs(32)
-
-   # Compute kernel density estimate on a grid
-   plt.figure(figsize=(7, 3))
-
-   x, y = NaiveKDE(kernel='box', bw='silverman').fit(data).evaluate()
-   plt.plot(x, y, label='KDE estimate')
-   plt.scatter(data, np.zeros_like(data), marker='x', label='Data', color='k')
-   plt.plot(x, dist.pdf(x), ls='--', label='True distribution')
-   plt.grid(True, ls='--', zorder=-15); plt.legend(); plt.show()
+A Kernel Density Estimator (KDE) may be thought of as an extension to the familiar histogram.
+The purpose of the KDE is to estimate an unknown probability density function given points drawn from it.
+A natural first thought is to use a histogram -- it's well known, simple to understand and works reasonably well.
 
 
-Fixed width kernels
--------------------
+The histogram
+-------------
+
+To see how the histogram performs, we'll generate some data from a normal distribution and plot it alongside the histogram.
+As seen below, the histogram does a fairly poor job.
+The location of the bins and the number of bins both seem arbitrary, and the estimated distribution is discontinuous.
 
 .. plot::
-   :include-source:
+  :include-source:
 
-   from KDEpy import *
-   from scipy import stats
+  from scipy import stats
 
-   # Generate a distribution and some data
-   dist = stats.norm(loc=0, scale=1)
-   data = dist.rvs(16)
+  # Generate a distribution and some data
+  dist = stats.norm(loc=0, scale=1)
+  data = dist.rvs(2**4)
 
-   plt.figure(figsize=(7, 3))
+  plt.hist(data, bins='auto', density=True, edgecolor='k', zorder=10)
+  plt.scatter(data, np.zeros_like(data), marker='x', color='red', zorder=15)
+  x = np.linspace(-3, 3)
+  plt.plot(x, dist.pdf(x), ls='--', color='red', zorder=20)
+  plt.grid(True, ls='--', zorder=-15);
 
-   # Kernel density estimate with too small bandwidth
-   x, y = NaiveKDE(bw=0.1).fit(data).evaluate()
-   plt.plot(x, y, label='KDE estimate')
+Centering the histogram
+-----------------------
 
-   # Kernel density estimate with too large bandwidth
-   x, y = NaiveKDE(bw=2).fit(data).evaluate()
-   plt.plot(x, y, label='KDE estimate')
+In an effort to reduce the arbitrary placement of the histogram bins, we center a "box" on each data point and sum those boxes to obtain a distribution.
+This is a kernel density estimate, with a `rectangular function <https://en.wikipedia.org/wiki/Rectangular_function>`_ as the kernel.
+The method is more data driven and less arbitrary than the histogram, but two problems still remain -- the result is discontinuous, and the choice of the *bandwidth* (the width of the rectangular kernel function) must be chosen carefully.
 
-   plt.plot(x, dist.pdf(x), ls='--', label='True distribution')
-   plt.scatter(data, np.zeros_like(data), marker='x', label='Data', color='k')
-   plt.grid(True, ls='--', zorder=-15); plt.legend(); plt.show()
+.. plot::
+  :include-source:
+
+  from scipy import stats
+  from KDEpy import TreeKDE
+
+  dist = stats.norm(loc=0, scale=1)
+  data = dist.rvs(2**4)
+
+  x, y = TreeKDE(kernel='box', bw=1).fit(data).evaluate()
+  plt.plot(x, y, zorder=10)
+  plt.scatter(data, np.zeros_like(data), marker='x', color='red', zorder=15)
+  plt.plot(x, dist.pdf(x), ls='--', color='red', zorder=20)
+  plt.grid(True, ls='--', zorder=-15);
 
 
-Variable width kernels
+Choosing a smooth kernel
+------------------------
+
+To alleviate the problem of discontinuity, we substitute the rectangular function used above for a `gaussian function <https://en.wikipedia.org/wiki/Gaussian_function>`_.
+The gaussian is smooth, and so the result of our estimate will also be smooth.
+
+.. plot::
+  :include-source:
+
+  from scipy import stats
+  from KDEpy import TreeKDE
+
+  dist = stats.norm(loc=0, scale=1)
+  data = dist.rvs(2**4)
+
+  x, y = TreeKDE(kernel='gaussian', bw=1).fit(data).evaluate()
+  plt.plot(x, y, zorder=10)
+  plt.scatter(data, np.zeros_like(data), marker='x', color='red', zorder=15)
+  plt.plot(x, dist.pdf(x), ls='--', color='red', zorder=20)
+  plt.grid(True, ls='--', zorder=-15);
+
+
+Selecting a good bandwidth
+--------------------------
+
+.. plot::
+  :include-source:
+
+  from scipy import stats
+  from KDEpy import TreeKDE
+
+  dist = stats.norm(loc=0, scale=1)
+  data = dist.rvs(2**4)
+
+  x, y = TreeKDE(kernel='gaussian', bw='silverman').fit(data).evaluate()
+  plt.plot(x, y, zorder=10)
+  plt.scatter(data, np.zeros_like(data), marker='x', color='red', zorder=15)
+  plt.plot(x, dist.pdf(x), ls='--', color='red', zorder=20)
+  plt.grid(True, ls='--', zorder=-15);
+
+
+
+Methods of computation
 ----------------------
 
 .. plot::
-   :include-source:
+  :include-source:
 
-   from KDEpy import *
-   from scipy import stats
+  from scipy import stats
+  from KDEpy import TreeKDE, FFTKDE
 
-   # Generate a distribution and some data
-   dist = stats.lognorm(s=1)
-   data = dist.rvs(160)
+  dist = stats.norm(loc=0, scale=1)
+  data = dist.rvs(2**4)
 
-   plt.figure(figsize=(7, 3))
+  x, y = TreeKDE(kernel='gaussian', bw='silverman').fit(data)()
+  plt.plot(x, y, zorder=10, lw=5, label='TreeKDE')
 
-   # Kernel density estimate with too small bandwidth
-   x, y = NaiveKDE(bw=data).fit(data).evaluate()
-   plt.plot(x, y, label='KDE estimate')
+  y = FFTKDE(kernel='gaussian', bw='silverman').fit(data).evaluate(x)
+  plt.plot(x, y, zorder=10, lw=2, label='FFTKDE')
 
-   plt.plot(x, dist.pdf(x), ls='--', label='True distribution')
-   plt.scatter(data, np.zeros_like(data), marker='x', label='Data', color='k')
-   plt.grid(True, ls='--', zorder=-15); plt.legend(); plt.show()
+  plt.scatter(data, np.zeros_like(data), marker='x', color='red', zorder=15)
+  plt.plot(x, dist.pdf(x), ls='--', color='red', zorder=20)
+  plt.grid(True, ls='--', zorder=-15); plt.legend();
 
 
-.. topic:: References
+Extensions to the problem
+-------------------------
 
-    * "Notes on Regularized Least Squares", Rifkin & Lippert (`technical report
-      <http://cbcl.mit.edu/projects/cbcl/publications/ps/MIT-CSAIL-TR-2007-025.pdf>`_,
-      `course slides
-      <http://www.mit.edu/~9.520/spring07/Classes/rlsslides.pdf>`_).
+sdf

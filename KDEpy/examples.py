@@ -9,10 +9,12 @@ import matplotlib
 matplotlib.use('Agg')
 
 import time
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
 from KDEpy import NaiveKDE, TreeKDE, FFTKDE
+here = os.path.abspath(os.path.dirname(__file__))
 
 # -----------------------------------------------------------------------------
 # ------ ADVERTISEMENT PLOT: Create the plot that is shown in the README ------
@@ -113,7 +115,7 @@ plt.grid(True, ls='--', zorder=-15)
 
 
 plt.tight_layout()
-plt.savefig(r'../example3.png')
+plt.savefig(os.path.join(here, r'../example3.png'))
 
 # -----------------------------------------------------------------------------
 # ------ MINIMAL WORKING EXAMPLE: Showing a simle way to create a plot --------
@@ -131,7 +133,7 @@ plt.scatter(data, np.zeros_like(data), marker='|', color='red', label='Data')
 
 plt.legend(loc='best')
 plt.tight_layout()
-plt.savefig(r'../example.png')
+plt.savefig(os.path.join(here, r'../example.png'))
 
 
 # -----------------------------------------------------------------------------
@@ -150,7 +152,7 @@ plt.scatter(data, np.zeros_like(data), marker='|', color='red', label='Data')
 
 plt.legend(loc='best')
 plt.tight_layout()
-plt.savefig(r'../example2.png')
+plt.savefig(os.path.join(here, r'../example2.png'))
 
 # -----------------------------------------------------------------------------
 # ------ EVERY ESTIMATOR: Comparing the different algorithms ------------------

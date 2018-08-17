@@ -116,6 +116,7 @@ html_theme_options = {
         "Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji"\
         ,"Segoe UI Symbol"',
     'font_size': '15px',
+    'code_font_size': '13px',
     'head_font_family': '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,\
         "Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji"\
         ,"Segoe UI Symbol"',

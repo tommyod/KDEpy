@@ -147,10 +147,47 @@ def test_api_2D_data(estimator):
 
     plt.tight_layout()
     plt.close()
+    
+    
+@pytest.mark.parametrize("estimator", kdes) 
+def test_api_2D_data_which_is_1D(estimator):
+    """
+    Test that 2D data along a line is the same as 1D data.
+    """
+    
+    np.random.seed(123)
+    random_data = np.random.randn(50).reshape(-1, 1)
+    zeros = np.zeros_like(random_data)
+    data_2D = np.concatenate((random_data, zeros), axis=1)
+    
+    x2, y2 = NaiveKDE().fit(data_2D).evaluate((1024, 3))
+    y2 = y2.reshape((1024, 3))
+    x, y = NaiveKDE().fit(random_data).evaluate(1024)
+    
+    # Proportions
+    prop = y2[:, 3 // 2].ravel() / y
+    
+    # At zero, epsilon is added and eps / eps = 1, remove these values
+    prop = prop[~np.isclose(prop, 1)]
+    
+    # Every other value should be equal - i.e they should be proportional
+    # To see why they are equal, consider points (0, 0), (1, 0) and (2, 0).
+    # Depending on the norm the normalization will make the heigh smaller
+    assert np.all(np.isclose(prop, prop[0]))
+    
+    # Again the other way around too
+    data_2D = np.concatenate((zeros, random_data), axis=1)
+    x2, y2 = NaiveKDE().fit(data_2D).evaluate((3, 1024))
+    y2 = y2.reshape((3, 1024))
+    x, y = NaiveKDE().fit(random_data).evaluate(1024)
+    prop = y2[3 // 2, :].ravel() / y
+    prop = prop[~np.isclose(prop, 1)]
+    assert np.all(np.isclose(prop, prop[0]))
 
 
 if __name__ == "__main__":
-    # --durations=10  <- May be used to show potentially slow tests
-    pytest.main(args=['.', '--doctest-modules', '-v', '--capture=sys',
-                      '-k test_api_models_kernels_bandwidths_2D'
-                      ])
+    if True:
+        # --durations=10  <- May be used to show potentially slow tests
+        pytest.main(args=['.', '--doctest-modules', '-v', '--capture=sys',
+                          '-k 2D'
+                          ])
