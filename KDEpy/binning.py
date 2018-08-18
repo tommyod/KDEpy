@@ -123,10 +123,10 @@ def linbin_numpy(data, grid_points, weights=None):
     >>> linbin_numpy(data, np.arange(1, 7), weights=None)
     array([0.   , 0.375, 0.375, 0.25 , 0.   , 0.   ])
     """
-    assert len(data.shape) == 1
     # Convert the data and grid points
     data = np.asarray_chkfinite(data, dtype=np.float)
     grid_points = np.asarray_chkfinite(grid_points, dtype=np.float)
+    assert len(data.shape) == 1
 
     # Verify that the grid is equidistant
     diffs = np.diff(grid_points)
