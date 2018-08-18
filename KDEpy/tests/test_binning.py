@@ -3,10 +3,12 @@
 """
 Tests for binning functions.
 """
-import numpy as np
-
-from KDEpy.binning import (linbin_numpy)
 import pytest
+import numpy as np
+from KDEpy.utils import autogrid
+from KDEpy.binning import (linbin_numpy, linear_binning, linbin_Ndim)
+
+
 
 
 def naivebinning(data, grid_points, weights=None):
@@ -93,12 +95,23 @@ class TestBinningFunctions():
             
             y = func(data, grid, weights=weights)
             assert np.allclose(y, ans)
+            
+    @pytest.mark.parametrize("dims", [1, 2, 3])  
+    def test_cython_binning(self, dims):
+        
+        num_points = 10
+        data = np.random.randn(dims * num_points).reshape(num_points, dims) / 7
+        weights = np.random.randn(num_points)
+        grid_points = autogrid(np.array([[0] * dims]), num_points=(3,) * dims)
+        result = linear_binning(data, grid_points, weights=weights)
+        result_slow = linbin_Ndim(data, grid_points, weights=weights)
+        assert np.allclose(result, result_slow)
+    
+
+        
  
     
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
-    pytest.main(args=['.', '--doctest-modules', '-v', '--durations=15'])
-    data = np.array([2, 2.5, 3, 4])
-    a = naivebinning(data, np.arange(1, 5), weights=None)
-    
-    print(a)
+    pytest.main(args=['.', '--doctest-modules', '-v', 
+                      '-k binning', '--durations=15'])

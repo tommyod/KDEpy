@@ -13,20 +13,20 @@ each direction, so a total of 2^dims grid points to assign weights to
 for every data point. The weights are determined by the proportion of
 the volume of this hypercube that is enclosed by the data point.
 
-A ------------------------------------ B
-|                          |           |
-|                          |           |
-|                          X-----------|
-|                                      |
-|                                      |
-|                                      |
-|                                      |
-C ------------------------------------ C
+A ------------------------------ B
+|                    |           |
+|                    |           |
+|                    X-----------|
+|                                |
+|                                |
+|                                |
+C ------------------------------ C
 """
 import numpy as np
 import itertools
 import functools
 import operator
+from KDEpy.utils import cartesian
 
 try:
     import cutils
@@ -248,9 +248,9 @@ def linbin_Ndim(data, grid_points, weights=None):
     return result
 
 
-def linbin_2dim(data, grid_points, weights=None):
+def linbin_23dim(data, grid_points, weights=None):
     """
-    2-dimensional linear binning.
+    2 and 3-dimensional linear binning.
     
     With :math:`N` data points, and :math:`n` grid points in each dimension
     :math:`d`, the running time is :math:`O(N2^d)`. For each point the
@@ -275,7 +275,7 @@ def linbin_2dim(data, grid_points, weights=None):
     """
     data_obs, data_dims = data.shape
     assert len(grid_points.shape) == 2
-    assert data_dims == 2
+    assert data_dims in (2, 3)
     
     # Convert the data and grid points
     data = np.asarray_chkfinite(data, dtype=np.float)
@@ -305,11 +305,20 @@ def linbin_2dim(data, grid_points, weights=None):
     
     # Call the Cython implementation
     if weights is not None:
-        result = cutils.iterate_data_weighted_2D(data, weights, result, 
-                                                 grid_num, obs_tot)
+        if data_dims == 2:
+            result = cutils.iterate_data_weighted_2D(data, weights, result, 
+                                                     grid_num, obs_tot)
+        elif data_dims == 3:
+            result = cutils.iterate_data_weighted_3D(data, weights, result, 
+                                                     grid_num, obs_tot)
+
         result = np.asarray_chkfinite(result, dtype=np.float)
     else:
-        result = cutils.iterate_data_2D(data, result, grid_num, obs_tot)
+        if data_dims == 2:
+            result = cutils.iterate_data_2D(data, result, grid_num, obs_tot)
+        elif data_dims == 3:
+            result = cutils.iterate_data_3D(data, result, grid_num, obs_tot)
+        
         result = np.asarray_chkfinite(result, dtype=np.float)
         result = result / data_obs
 
@@ -317,9 +326,9 @@ def linbin_2dim(data, grid_points, weights=None):
     return result
 
 
-def linbin_3dim(data, grid_points, weights=None):
+def linbin_Ndim_test(data, grid_points, weights=None):
     """
-    3-dimensional linear binning.
+    2 and 3-dimensional linear binning.
     
     With :math:`N` data points, and :math:`n` grid points in each dimension
     :math:`d`, the running time is :math:`O(N2^d)`. For each point the
@@ -344,7 +353,6 @@ def linbin_3dim(data, grid_points, weights=None):
     """
     data_obs, data_dims = data.shape
     assert len(grid_points.shape) == 2
-    assert data_dims == 3
     
     # Convert the data and grid points
     data = np.asarray_chkfinite(data, dtype=np.float)
@@ -371,14 +379,16 @@ def linbin_3dim(data, grid_points, weights=None):
 
     # Create results
     result = np.zeros(grid_points.shape[0], dtype=np.float)
+    binary_flgs = cartesian(([0,1], ) * dims)
     
     # Call the Cython implementation
     if weights is not None:
-        result = cutils.iterate_data_weighted_3D(data, weights, result, 
-                                                 grid_num, obs_tot)
+        result = cutils.iterate_data_ND_weighted(data, weights, result, 
+                                                     grid_num, obs_tot, binary_flgs)
+
         result = np.asarray_chkfinite(result, dtype=np.float)
     else:
-        result = cutils.iterate_data_3D(data, result, grid_num, obs_tot)
+        result = cutils.iterate_data_ND(data, result, grid_num, obs_tot, binary_flgs)
         result = np.asarray_chkfinite(result, dtype=np.float)
         result = result / data_obs
 
@@ -430,41 +440,59 @@ def linear_binning(data, grid_points, weights=None):
             return linbin_cython(data.ravel(), grid_points, weights=weights)   
         else:
             return linbin_numpy(data.ravel(), grid_points, weights=weights)
-    elif dims == 2:
-        return linbin_2dim(data, grid_points, weights=weights)
-    elif dims == 3:
-        return linbin_3dim(data, grid_points, weights=weights)
     else:
-        #if weights is None:
-        #    weights = np.ones(obs) / obs
         return linbin_Ndim(data, grid_points, weights=weights)
+#    elif dims == 2:
+#        return linbin_23dim(data, grid_points, weights=weights)
+#    elif dims == 3:
+#        return linbin_23dim(data, grid_points, weights=weights)
+#    else:
+#        return linbin_Ndim(data, grid_points, weights=weights)
 
 
 if __name__ == "__main__":
     import pytest
     # --durations=10  <- May be used to show potentially slow tests
-    # pytest.main(args=['.', '--doctest-modules', '-v', '--capture=sys'])
+    pytest.main(args=['.', '--doctest-modules', '-v', '--capture=sys'])
     
-    
-    from KDEpy.utils import autogrid
-    data = np.array([[-0.3,0,0.2]])
-    data = np.random.randn(3).reshape(1, 3)
-    
-    
-    grid_points = autogrid(np.array([[0,0,0]]), num_points=(3, 3, 3))
-    
-    d = linear_binning(data, grid_points, weights=None)
-    
-    print(d)
-    
-    for p, d in zip(grid_points, d):
-        print(p, '\t', d)
+    def main():
+        import time
+        from KDEpy.utils import autogrid
+        data = np.array([[0,0, 1.5]])
+        n = 20
+        data = np.random.randn(3 * n).reshape(n, 3) / 7
+        weights = np.random.randn(n)**2 + 10
         
-    print('------------')
-    d2 = linbin_Ndim(data, grid_points, weights=None)
-    
-    for p, d2 in zip(grid_points, d2):
-        print(p, '\t', d2)
-    
-    #grid = autogrid(np.array([[0, 0, 0]]), num_points=(3, 3, 3))
-    assert np.allclose(d, d2)
+        
+        grid_points = autogrid(np.array([[0,0,0]]), num_points=(3, 3, 3))
+        
+        d = linear_binning(data, grid_points, weights=None)
+            
+        print('------------')
+        t1 = time.perf_counter()
+        d2 = linbin_23dim(data, grid_points, weights=weights)
+        t1 = time.perf_counter() - t1
+        for p, j in zip(grid_points, d2):
+            print(p, '\t', j)
+        
+        #grid = autogrid(np.array([[0, 0, 0]]), num_points=(3, 3, 3))
+        #assert np.allclose(d, d2)
+        
+        
+        print('--------------------------------------')
+        #data = np.array([[0,1,1.5]])
+        #data = np.random.randn(3).reshape(1, 3)
+        
+        t2 = time.perf_counter()
+        d = linbin_Ndim_test(data, grid_points, weights=weights)
+        t2 = time.perf_counter() - t2
+        
+        
+        for p, i, j in zip(grid_points, d2, d):
+            print(p, '\t', i, j)
+            
+        assert np.allclose(d, d2)
+        print(t1)
+        print(t2)
+        
+    main()
