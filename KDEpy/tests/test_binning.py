@@ -11,7 +11,6 @@ import itertools
 import random
 
 
-
 def naivebinning(data, grid_points, weights=None):
     """
     DO NOT USE.
@@ -116,7 +115,6 @@ class TestBinningFunctions():
         else:
             weights = None
             
-            
         if eq_grid:
             num_points = (16,) * dims
         else:
@@ -138,18 +136,17 @@ class TestBinningFunctions():
         eps = 10e-6
         for subtest in range(25):
             data = np.random.randint(-2, 2, size=(1, dims)) - eps
-            grid_points = autogrid(np.array([[0] * dims]), num_points=(7,) * dims)
+            grid_points = autogrid(np.array([[0] * dims]), 
+                                   num_points=(7,) * dims)
             answer = linear_binning(data, grid_points)
             
             for grid_point, a in zip(grid_points, answer):
                 diff = np.sum((grid_point - data.ravel())**2)
                 if diff < eps:
                     assert np.allclose(a, (1 - eps)**dims)
-    
-
-        
  
     
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
-    pytest.main(args=['.', '--doctest-modules', '-v', '-k correctness', '--durations=15'])
+    pytest.main(args=['.', '--doctest-modules', '-v', 
+                      '-k correctness', '--durations=15'])

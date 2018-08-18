@@ -218,11 +218,4 @@ class BaseKDE(ABC):
 
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
-    # pytest.main(args=['.', '--doctest-modules', '-v'])
-    
-    import matplotlib.pyplot as plt
-    data = np.random.randn(2**6)
-    
-
-    
-    plt.hist(data, bins='auto', density=True, edgecolor='k')
+    pytest.main(args=['.', '--doctest-modules', '-v'])

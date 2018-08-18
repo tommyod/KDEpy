@@ -1,8 +1,19 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Jul 16 20:30:38 2018
+Fast cython functions for linear binning.
 
-@author: Tommy
+Notes
+-----
+(1) Instead of computing the integral and fractional part of a number as
+    integral = int(data_point)
+    fractional = data_point % 1
+using the following code is x4 times faster:
+    integral = int(data_point)
+    fractional = data_point - integral
+    
+(2) It is extremely important to type EVERYTHING with cdef or in the function
+signature. If even one variable is not properly typed, much of the speed gain
+is gone.
 """
 
 cimport cython
@@ -20,19 +31,27 @@ cimport cython
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.cdivision(True)
-def iterate_data_weighted(double[:] transformed_data, double[:] weights, double[:] result):
+def iterate_data_1D_weighted(double[:] transformed_data, double[:] weights, double[:] result):
     """
-    Iterate over data points and weights and assign linear weights to nearest 
-    grid points. This Cython implementation is for 1D data.
+    1D fast binning with weights. Faster than N-dimensional cython function
+    because it unrolls the loops.
+    
+    Parameters
+    ----------
+    transformed_data : the transformed (scaled w.r.t grid) data
+    weights : the weights
+    result : array to put the results of the computation in
     """
-    cdef int length_data, length_result, integral
+    cdef int obs, integral
     cdef double data_point, weight, fractional, frac_times_weight
-    length_data = transformed_data.shape[0]
-    length_result = transformed_data.shape[0]
+    
+    obs = transformed_data.shape[0]
 
-    for i in range(length_data):
-        data_point, weight = transformed_data[i], weights[i]
-        integral, fractional = int(data_point), (data_point) % 1
+    for i in range(obs):
+        data_point = transformed_data[i]
+        weight = weights[i]
+        integral = int(data_point)
+        fractional = data_point - integral
         frac_times_weight = fractional * weight  # Compute product once
         result[integral + 1] += frac_times_weight
         result[integral] += weight - frac_times_weight
@@ -43,21 +62,124 @@ def iterate_data_weighted(double[:] transformed_data, double[:] weights, double[
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.cdivision(True)
-def iterate_data(double[:] transformed_data, double[:] result):
+def iterate_data_1D(double[:] transformed_data, double[:] result):
     """
-    Iterate over data points and assign linear weights to nearest grid points.
-    This Cython implementation is for 1D data.
+    1D fast binning weights. Faster than N-dimensional cython function
+    because it unrolls the loops.
+    
+    Parameters
+    ----------
+    transformed_data : the transformed (scaled w.r.t grid) data
+    result : array to put the results of the computation in
     """
-    cdef int length_data, length_result, integral
+    cdef int obs, integral
     cdef double data_point, weight, fractional
-    length_data = transformed_data.shape[0]
-    length_result = transformed_data.shape[0]
-
-    for i in range(length_data):
+    obs = transformed_data.shape[0]
+    for i in range(obs):
         data_point = transformed_data[i]
-        integral, fractional = int(data_point), (data_point) % 1
-        result[integral] += (1 - fractional)
+        integral = int(data_point)
+        fractional = data_point - integral
+        result[integral] += 1 - fractional
         result[integral + 1] += fractional
+
+    return result
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.cdivision(True)
+def iterate_data_2D_weighted(double[:, :] data, double[:] weights, 
+                             double[:] result, long[:] grid_num, int obs_tot):
+    """
+    2D fast binning with weights. Faster than N-dimensional cython function
+    because it unrolls the loops.
+    
+    Parameters
+    ----------
+    data : the transformed (scaled w.r.t grid) data
+    weights : the weights
+    result : array to put the results of the computation in
+    grid_num : number of grid points in each dimension
+    obs_tot : total number of observations (grid points)
+    """
+    cdef int obs, index, i, x_integral, y_integral, grid_num1
+    cdef double x, y, weight, x_fractional, y_fractional, value, xy, y_xy, x_xy
+    
+    obs = data.shape[0]
+    for i in range(obs):
+        
+        x = data[i, 0]
+        y = data[i, 1]
+        weight = weights[i]
+        
+        x_integral = int(x)
+        x_fractional = x - x_integral
+        y_integral = int(y)
+        y_fractional = y - y_integral
+
+        # Computations with few flops
+        xy = x_fractional * y_fractional
+        y_xy = y_fractional - xy
+        x_xy = x_fractional - xy
+        grid_num1 = grid_num[1]
+        # Bottom left
+        index = y_integral + x_integral * grid_num1
+        result[index % obs_tot] += (xy - x_fractional - y_fractional + 1) * weight
+        
+        # Bottom right
+        index = y_integral + (x_integral + 1) * grid_num1
+        result[index % obs_tot] += x_xy * weight
+        
+        # Top left
+        index = (y_integral + 1) + x_integral * grid_num1
+        result[index % obs_tot] += y_xy * weight
+        
+        # Top right
+        index = (y_integral + 1) + (x_integral + 1) * grid_num1
+        result[index % obs_tot] += xy * weight
+        
+    return result
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.cdivision(True)
+def iterate_data_2D(double[:, :] data, double[:] result, long[:] grid_num, 
+                    int obs_tot):
+    """
+    2D fast binning. Faster than N-dimensional cython function because it 
+    unrolls the loops. See `iterate_data_2D_weighted` for commented code.
+    
+    Parameters
+    ----------
+    data : the transformed (scaled w.r.t grid) data
+    weights : the weights
+    result : array to put the results of the computation in
+    grid_num : number of grid points in each dimension
+    obs_tot : total number of observations (grid points)
+    """
+    cdef int obs, index, i, x_integral, y_integral, grid_num1
+    cdef double x, y, x_fractional, y_fractional, value, xy, y_xy, x_xy
+    
+    obs = data.shape[0]
+    for i in range(obs):
+        x = data[i, 0]
+        y = data[i, 1]
+        x_integral = int(x)
+        x_fractional = x - x_integral
+        y_integral = int(y)
+        y_fractional = y - y_integral
+        xy = x_fractional * y_fractional
+        y_xy = y_fractional - xy
+        x_xy = x_fractional - xy
+        grid_num1 = grid_num[1] 
+        index = y_integral + x_integral * grid_num1
+        result[index % obs_tot] += (xy - x_fractional - y_fractional + 1)
+        index = y_integral + (x_integral + 1) * grid_num1
+        result[index % obs_tot] += x_xy
+        index = (y_integral + 1) + x_integral * grid_num1
+        result[index % obs_tot] += y_xy
+        index = (y_integral + 1) + (x_integral + 1) * grid_num1
+        result[index % obs_tot] += xy
 
     return result
 
@@ -72,14 +194,23 @@ def iterate_data_ND(double[:, :] data, double[:] result, long[:] grid_num,
     
     The idea behind this N-dimensional generalization is to pre-compute binary 
     numbers up to 2**dims. E.g. (0,0,0), (0,0,1), (0,1,0), (0,1,1), .. for 3 
-    dimensions. Each tuple represent a corner in N-space. Let t_j be the tuple 
-    binary value at index j, then the index computation may be expressed as
+    dimensions. Each tuple represent a corner in N-space. Let t_k be the tuple 
+    binary value at index k, then the index computation and the value at the
+    grid point may be expressed as:
+        
+        index = sum_i^n (x_i prod_j=i+1^n g_j)
+                where x_i := (int(x_i) + 0^t_k) 
+        
+        value = prod_i^n (1 - (x_i % 1))^t_k * (x_i % 1)^(t_k - 1)
     
-    index = SUM_{i=0} (int(x[n - j]) + 0**j) * grid_num[n - j]**j
-    
-    The first factor is either (x + 0) or (x + 1), depending on j.
-    
-    
+    Parameters
+    ----------
+    data : the transformed (scaled w.r.t grid) data
+    result : array to put the results of the computation in
+    grid_num : number of grid points in each dimension
+    obs_tot : total number of observations (grid points)
+    binary_flgs : array of shape (dims, 2**dims), counting in binary
+                 this is used to to go every corner point efficiently
     """
     cdef int obs, result_index, i, dims, corners, j, flg, corner, integer_xi
     cdef double corner_value, fraction
