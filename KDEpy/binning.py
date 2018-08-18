@@ -165,7 +165,7 @@ def linbin_numpy(data, grid_points, weights=None):
     return result[:-1]
 
 
-def linbin_Ndim(data, grid_points, weights=None):
+def linbin_Ndim_python(data, grid_points, weights=None):
     """
     N-dimensional linear binning. This is a slow, pure-Python function.
     Although it is slow, it works and may be used as a starting point for
@@ -223,6 +223,8 @@ def linbin_Ndim(data, grid_points, weights=None):
     # Go through every data point
     for observation, weight in zip(data, weights):
         
+        #print('Observation:', observation)
+        
         # Compute integer part and fractional part for every x_i
         # Compute relation to previous grid point, and next grid point
         int_frac = (((int(coordinate), 1 - (coordinate % 1)), 
@@ -234,99 +236,23 @@ def linbin_Ndim(data, grid_points, weights=None):
         for cart_prod in itertools.product(*int_frac):
             
             fractions = (frac for (integral, frac) in cart_prod)
-            integrals_rev = list(integral for (integral, frac) in 
-                                 reversed(cart_prod))
-            
+            integrals = list(integral for (integral, frac) in cart_prod) 
             # Find the index in the resulting array, compured by
-            # sum integra_valuel * grid_num**i 
-            index = sum((i * g**c) for ((c, i), g) in 
-                        zip(enumerate(integrals_rev), grid_num))
+            # x_1 * (g_2 * g_3 * g_4) + x_2 * (g_3 * g_4) + x_3 * (g_4) + x_4
+            
+            index = integrals[0]
+            for j in range(1, dims):
+                index = grid_num[j] * index + integrals[j]
+            
+            
             value = functools.reduce(operator.mul, fractions)
+            #print(index, grid_points[index], value)
             result[index % obs_tot] += value * weight
         
     assert np.allclose(np.sum(result), 1)
     return result
 
-
-def linbin_23dim(data, grid_points, weights=None):
-    """
-    2 and 3-dimensional linear binning.
-    
-    With :math:`N` data points, and :math:`n` grid points in each dimension
-    :math:`d`, the running time is :math:`O(N2^d)`. For each point the
-    algorithm finds the nearest points, of which there are two in each
-    dimension.
-    
-    Approximately 200 times faster than pure python implementation.
-    
-    Parameters
-    ----------
-    data : array-like
-        The data must be of shape (obs, dims).
-    grid_points : array-like
-        Grid, where cartesian product is already performed.
-    weights : array-like
-        Must have shape (obs,).
-        
-    Examples
-    --------
-    >>> 1 + 1
-    2
-    """
-    data_obs, data_dims = data.shape
-    assert len(grid_points.shape) == 2
-    assert data_dims in (2, 3)
-    
-    # Convert the data and grid points
-    data = np.asarray_chkfinite(data, dtype=np.float)
-    grid_points = np.asarray_chkfinite(grid_points, dtype=np.float)
-    if weights is not None:
-        weights = np.asarray_chkfinite(weights, dtype=np.float)
-        weights = weights / np.sum(weights)
-
-    if (weights is not None) and (data.shape[0] != len(weights)):
-        raise ValueError('Length of data must match length of weights.')
-    
-    obs_tot, dims = grid_points.shape
-    
-    # Compute the number of grid points for each dimension in the grid
-    grid_num = (grid_points[:, i] for i in range(dims))
-    grid_num = np.array(list(len(np.unique(g)) for g in grid_num))
-    
-    # Scale the data to the grid
-    min_grid = np.min(grid_points, axis=0)
-    max_grid = np.max(grid_points, axis=0)
-    num_intervals = (grid_num - 1)
-    dx = (max_grid - min_grid) / num_intervals
-    data = (data - min_grid) / dx
-
-    # Create results
-    result = np.zeros(grid_points.shape[0], dtype=np.float)
-    
-    # Call the Cython implementation
-    if weights is not None:
-        if data_dims == 2:
-            result = cutils.iterate_data_weighted_2D(data, weights, result, 
-                                                     grid_num, obs_tot)
-        elif data_dims == 3:
-            result = cutils.iterate_data_weighted_3D(data, weights, result, 
-                                                     grid_num, obs_tot)
-
-        result = np.asarray_chkfinite(result, dtype=np.float)
-    else:
-        if data_dims == 2:
-            result = cutils.iterate_data_2D(data, result, grid_num, obs_tot)
-        elif data_dims == 3:
-            result = cutils.iterate_data_3D(data, result, grid_num, obs_tot)
-        
-        result = np.asarray_chkfinite(result, dtype=np.float)
-        result = result / data_obs
-
-    assert np.allclose(np.sum(result), 1)
-    return result
-
-
-def linbin_Ndim_test(data, grid_points, weights=None):
+def linbin_Ndim(data, grid_points, weights=None):
     """
     2 and 3-dimensional linear binning.
     
@@ -442,57 +368,59 @@ def linear_binning(data, grid_points, weights=None):
             return linbin_numpy(data.ravel(), grid_points, weights=weights)
     else:
         return linbin_Ndim(data, grid_points, weights=weights)
-#    elif dims == 2:
-#        return linbin_23dim(data, grid_points, weights=weights)
-#    elif dims == 3:
-#        return linbin_23dim(data, grid_points, weights=weights)
-#    else:
-#        return linbin_Ndim(data, grid_points, weights=weights)
 
 
 if __name__ == "__main__":
     import pytest
     # --durations=10  <- May be used to show potentially slow tests
-    pytest.main(args=['.', '--doctest-modules', '-v', '--capture=sys'])
+    # pytest.main(args=['.', '--doctest-modules', '-v', '--capture=sys'])
+    from KDEpy.utils import autogrid
+    
+    def main2():
+        
+        dims = 3
+        n = 1
+        eps = 0.00000001
+        data = np.random.randn(dims * n).reshape(n, dims) / 7
+        data = np.array([[-1.5 - eps, 3 - eps, -2 - eps]]) # 1.5, 3, 1
+        weights = np.random.randn(n)**2 + 10
+        grid_points = autogrid(np.array([[0] * dims]), num_points=(5, 3, 7))
+        
+        print(grid_points)
+        ans_python = linbin_Ndim_python(data, grid_points, weights)
+        
     
     def main():
         import time
-        from KDEpy.utils import autogrid
-        data = np.array([[0,0, 1.5]])
-        n = 20
-        data = np.random.randn(3 * n).reshape(n, 3) / 7
+        
+        
+        dims = 4                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+        n = 10000
+        eps = 0.001
+        data = np.random.randn(dims * n).reshape(n, dims) / 7
+        #data = np.array([[-1.5 - eps, 3 - eps, -2 - eps]]) # 1.5, 3, 1
         weights = np.random.randn(n)**2 + 10
+        #weights = None
+        grid_points = autogrid(np.array([[0] * dims]), num_points=(4, 8, 5, 7))
+        #print(grid_points)
         
-        
-        grid_points = autogrid(np.array([[0,0,0]]), num_points=(3, 3, 3))
-        
-        d = linear_binning(data, grid_points, weights=None)
-            
-        print('------------')
         t1 = time.perf_counter()
-        d2 = linbin_23dim(data, grid_points, weights=weights)
+        ans_python = linbin_Ndim_python(data, grid_points, weights=weights)
         t1 = time.perf_counter() - t1
-        for p, j in zip(grid_points, d2):
-            print(p, '\t', j)
-        
-        #grid = autogrid(np.array([[0, 0, 0]]), num_points=(3, 3, 3))
-        #assert np.allclose(d, d2)
-        
-        
-        print('--------------------------------------')
-        #data = np.array([[0,1,1.5]])
-        #data = np.random.randn(3).reshape(1, 3)
         
         t2 = time.perf_counter()
-        d = linbin_Ndim_test(data, grid_points, weights=weights)
+        ans_cython = linear_binning(data, grid_points, weights=weights)
         t2 = time.perf_counter() - t2
         
+        #for i, j, k in zip(grid_points, ans_cython, ans_python):
+        #    print(str(list(i)).ljust(20), j, k, sep='\t')
         
-        for p, i, j in zip(grid_points, d2, d):
-            print(p, '\t', i, j)
-            
-        assert np.allclose(d, d2)
+        
+        
         print(t1)
         print(t2)
+        print(t1 / t2)
+        print('ok')
+        assert np.allclose(ans_cython, ans_python)
         
     main()

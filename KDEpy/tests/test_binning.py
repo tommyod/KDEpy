@@ -6,8 +6,9 @@ Tests for binning functions.
 import pytest
 import numpy as np
 from KDEpy.utils import autogrid
-from KDEpy.binning import (linbin_numpy, linear_binning, linbin_Ndim)
-
+from KDEpy.binning import (linbin_numpy, linear_binning, linbin_Ndim_python)
+import itertools
+import random
 
 
 
@@ -96,16 +97,54 @@ class TestBinningFunctions():
             y = func(data, grid, weights=weights)
             assert np.allclose(y, ans)
             
-    @pytest.mark.parametrize("dims", [1, 2, 3])  
-    def test_cython_binning(self, dims):
+    @pytest.mark.parametrize("dims, use_weights, eq_grid", 
+                             itertools.product([1, 2, 3, 4], 
+                                               [True, False],
+                                               [True, False]))  
+    def test_cython_binning(self, dims, use_weights, eq_grid):
+        """
+        Test the fast N-dimensional binning up against the naive
+        Python implementation - using weights, no weights, equal grid values
+        in each direction and unequal ones.
+        """
         
-        num_points = 10
+        num_points = 1000
         data = np.random.randn(dims * num_points).reshape(num_points, dims) / 7
-        weights = np.random.randn(num_points)
-        grid_points = autogrid(np.array([[0] * dims]), num_points=(3,) * dims)
+        
+        if use_weights:
+            weights = np.random.randn(num_points)
+        else:
+            weights = None
+            
+            
+        if eq_grid:
+            num_points = (16,) * dims
+        else:
+            num_points = tuple([random.randint(8, 16) for i in range(dims)])
+            
+        grid_points = autogrid(np.array([[0] * dims]), num_points=num_points)
         result = linear_binning(data, grid_points, weights=weights)
-        result_slow = linbin_Ndim(data, grid_points, weights=weights)
+        result_slow = linbin_Ndim_python(data, grid_points, weights=weights)
+        
         assert np.allclose(result, result_slow)
+        
+    @pytest.mark.parametrize("dims", [1, 2, 3, 4])
+    def test_binning_correctness_single_point(self, dims):
+        """
+        Permute a single grid poind make sure that same point is weighted
+        highly.
+        """
+        
+        eps = 10e-6
+        for subtest in range(25):
+            data = np.random.randint(-2, 2, size=(1, dims)) - eps
+            grid_points = autogrid(np.array([[0] * dims]), num_points=(7,) * dims)
+            answer = linear_binning(data, grid_points)
+            
+            for grid_point, a in zip(grid_points, answer):
+                diff = np.sum((grid_point - data.ravel())**2)
+                if diff < eps:
+                    assert np.allclose(a, (1 - eps)**dims)
     
 
         
@@ -113,5 +152,4 @@ class TestBinningFunctions():
     
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
-    pytest.main(args=['.', '--doctest-modules', '-v', 
-                      '-k binning', '--durations=15'])
+    pytest.main(args=['.', '--doctest-modules', '-v', '-k correctness', '--durations=15'])
