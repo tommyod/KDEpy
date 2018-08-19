@@ -1,3 +1,9 @@
 .prompt {
     display: none;
 }
+
+/* Avoid annoying underline when hovering over images. */
+a.reference:hover {
+    text-decoration: none;
+    border-bottom: none;
+}

@@ -26,7 +26,7 @@ KDEpy is available through `PyPI <https://pypi.org/project/KDEpy/>`_, and may be
 Example
 -----------------------
 
-Here's an example showing the usage of :class:`~KDEpy.FFTKDE.FFTKDE`.
+Here's an example showing the usage of :class:`~KDEpy.FFTKDE.FFTKDE`, the fastest algorithm implemented.
 Notice how the *kernel* and *bandwidth* are set, and how *weights* may be passed.
 The other classes share this common API, and are used the same way.
 
@@ -39,13 +39,14 @@ The other classes share this common API, and are used the same way.
    # Generate a distribution and 2**6 data points
    dist = norm(loc=0, scale=1)
    data = dist.rvs(2**6)
+   weights = np.arange(len(data)) + 1
 
    # Compute kernel density estimate on a grid using Silverman's rule for bw
-   x, y1 = FFTKDE(bw='silverman').fit(data)()
+   x, y1 = FFTKDE().fit(data)()
 
    # Compute a weighted estimate on the same grid, using verbose API
-   estimator = FFTKDE(kernel='biweight', bw=0.8)
-   y2 = estimator.fit(data, weights=np.arange(len(data)) + 1).evaluate(x)
+   estimator = FFTKDE(kernel='biweight', bw='silverman')
+   y2 = estimator.fit(data, weights=weights).evaluate(x)
 
    plt.plot(x, y1, label='KDE estimate with defaults')
    plt.plot(x, y2, label='KDE estimate with verbose API')
@@ -53,14 +54,14 @@ The other classes share this common API, and are used the same way.
    plt.grid(True, ls='--', zorder=-15); plt.legend()
 
 
-Navigation
-----------
+Table of contents
+-----------------
 
 .. toctree::
    :maxdepth: 1
 
    index.rst
-   introduction.ipynb
+   introduction.ipynb 
    bandwidth.rst
    examples.rst
    literature.rst

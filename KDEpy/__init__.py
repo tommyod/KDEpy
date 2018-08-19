@@ -4,9 +4,9 @@
 
 from KDEpy.NaiveKDE import NaiveKDE
 from KDEpy.TreeKDE import TreeKDE
-from KDEpy.FFTKDE import FFTKDE   
-    
-__version__ = '0.3'
+from KDEpy.FFTKDE import FFTKDE
+
+__version__ = '0.4'
 __author__ = 'tommyod'
 
 TreeKDE = TreeKDE
