@@ -9,7 +9,7 @@ This Python package implements various kernel density esimators (KDE).
 The long-term goal is to support state-of-the-art KDE algorithms, and eventually have the most complete implementation in the scientific Python universe.
 As of now, three algorithms are implemented through the same API: [`NaiveKDE`](https://kdepy.readthedocs.io/en/latest/API.html#naivekde), [`TreeKDE`](https://kdepy.readthedocs.io/en/latest/API.html#treekde) and [`FFTKDE`](https://kdepy.readthedocs.io/en/latest/API.html#fftkde).
 
-![Plot](./example3.png)
+![Plot](./docs/source/_static/img/showcase.png)
 
 *The code generating the above graph is found in [KDEpy/examples.py](https://github.com/tommyod/KDEpy/blob/master/KDEpy/examples.py).*
 
@@ -34,7 +34,7 @@ estimator = NaiveKDE(kernel='gaussian', bw='silverman')
 x, y = estimator.fit(data, weights=None).evaluate()
 plt.plot(x, y, label='KDE estimate')
 ```
-![Plot](./example.png)
+![Plot](./docs/source/_static/img/mwe.png)
 
 The package consists of three algorithms. Here's a brief explanation:
 - [`NaiveKDE`](https://kdepy.readthedocs.io/en/latest/API.html#naivekde) - A naive computation. Supports N-dimensional data, variable bandwidth, weighted data and many kernel functions. Very slow on large data sets.

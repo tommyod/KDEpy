@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-This file 
+This file
 """
 
 # For Travis CI
@@ -15,6 +15,8 @@ import matplotlib.pyplot as plt
 from scipy.stats import norm
 from KDEpy import NaiveKDE, TreeKDE, FFTKDE
 here = os.path.abspath(os.path.dirname(__file__))
+save_path = os.path.join(here, r'../docs/source/_static/img/')
+
 
 # -----------------------------------------------------------------------------
 # ------ ADVERTISEMENT PLOT: Create the plot that is shown in the README ------
@@ -41,7 +43,7 @@ for kernel in FFTKDE._available_kernels.keys():
     x, y = FFTKDE(kernel=kernel).fit([0])()
     plt.plot(x, y, label=kernel)
 plt.yticks([]); plt.xticks([]);
-plt.grid(True, ls='--', zorder=-15)  
+plt.grid(True, ls='--', zorder=-15)
 
 
 plt.subplot(2, 3, 3)
@@ -98,7 +100,7 @@ for d, w in zip(data, weights):
     y = TreeKDE(kernel=kernel).fit([d], weights=[w])(x) *  w / np.sum(weights)
     plt.plot(x, y, '--k', zorder=-15, alpha=0.75)
 plt.yticks([]); plt.xticks([]);
-plt.grid(True, ls='--', zorder=-15) 
+plt.grid(True, ls='--', zorder=-15)
 
 
 plt.subplot(2, 3, 6)
@@ -115,7 +117,7 @@ plt.grid(True, ls='--', zorder=-15)
 
 
 plt.tight_layout()
-plt.savefig(os.path.join(here, r'../example3.png'))
+plt.savefig(os.path.join(save_path, r'showcase.png'))
 
 # -----------------------------------------------------------------------------
 # ------ MINIMAL WORKING EXAMPLE: Showing a simle way to create a plot --------
@@ -133,7 +135,7 @@ plt.scatter(data, np.zeros_like(data), marker='|', color='red', label='Data')
 
 plt.legend(loc='best')
 plt.tight_layout()
-plt.savefig(os.path.join(here, r'../example.png'))
+plt.savefig(os.path.join(save_path, r'mwe.png'))
 
 
 # -----------------------------------------------------------------------------
@@ -152,7 +154,7 @@ plt.scatter(data, np.zeros_like(data), marker='|', color='red', label='Data')
 
 plt.legend(loc='best')
 plt.tight_layout()
-plt.savefig(os.path.join(here, r'../example2.png'))
+# plt.savefig(os.path.join(save_path, r'example2.png'))
 
 # -----------------------------------------------------------------------------
 # ------ EVERY ESTIMATOR: Comparing the different algorithms ------------------
@@ -171,7 +173,4 @@ plt.plot(x, norm(loc=0, scale=1).pdf(x), label='True distribution')
 plt.scatter(data, np.zeros_like(data), marker='|', color='red', label='Data')
 
 plt.legend(loc='best')
-plt.tight_layout() 
-
-
-
+plt.tight_layout()
