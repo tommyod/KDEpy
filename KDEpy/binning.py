@@ -405,35 +405,9 @@ def linear_binning(data, grid_points, weights=None):
 if __name__ == "__main__":
     import pytest
     # --durations=10  <- May be used to show potentially slow tests
-    # pytest.main(args=['.', '--doctest-modules', '-v', '--capture=sys'])
+    pytest.main(args=['.', '--doctest-modules', '-v', '--capture=sys'])
     # pytest.main(args=[__file__, '--doctest-modules', '-v', '--capture=sys'])
-    
-    import time
-    import statistics
-    from KDEpy.utils import autogrid
-    
-    n = 10**2
-    
-    data = np.random.randn(n).reshape(-1, 1)
-    weights = np.random.randn(n)**2 + 1
-    grid = autogrid(np.array([[0]]), boundary_abs=7, 
-                    num_points=2**10, boundary_rel=0.05)
-    
-    st = time.perf_counter()
-    binned = None # linbin_Ndim_python(data, grid, weights)
-    t1 = time.perf_counter() - st
-    
-    print('linbin_Ndim_python', t1)
-    
-    def main(data, grid, weights):
-        st = time.perf_counter()
-        binned = linear_binning(data, grid, weights)
-        t2 = time.perf_counter() - st
-        return t2
-    
-    times = [main(data, grid, weights) for i in range(50)]
-    #print(statistics.mean(times), statistics.stdev(times))
-    print(statistics.mean(times), statistics.stdev(times))
+
     
     
     

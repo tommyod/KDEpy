@@ -4,38 +4,11 @@
 Functions for bandwidth selection.
 """
 import numpy as np
-from KDEpy.binning import linbin_numpy
+import scipy
+from KDEpy.binning import linear_binning
 from KDEpy.utils import autogrid
 from scipy import fftpack
 from scipy.optimize import brentq
-
-# This notice is included since some of the functions are based on the
-# MATLAB code by Zdravko Botev
-_botev_notice = """Copyright (c) 2015, Zdravko Botev
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-* Redistributions of source code must retain the above copyright notice, this
-  list of conditions and the following disclaimer.
-
-* Redistributions in binary form must reproduce the above copyright notice,
-  this list of conditions and the following disclaimer in the documentation
-  and/or other materials provided with the distribution
-* Neither the name of The University of New South Wales nor the names of its
-  contributors may be used to endorse or promote products derived from this
-  software without specific prior written permission.
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."""
 
 
 def _fixed_point(t, N, I_sq, a2):
@@ -65,11 +38,16 @@ def _fixed_point(t, N, I_sq, a2):
     >>> # another
     >>> ans = _fixed_point(0.07,25,np.arange(1, 11),np.arange(1, 11))
     >>> assert np.allclose(ans, 0.069100181315957)
+    
+    References
+    ----------
+     - Implementation by Daniel B. Smith, PhD, found at
+       https://github.com/Daniel-B-Smith/KDE-for-SciPy/blob/master/kde.py
     """
     
     # This is important, as the powers might overflow if not done
-    I_sq = np.asfarray(I_sq)
-    a2 = np.asfarray(a2)
+    I_sq = np.asfarray(I_sq, dtype=scipy.float128)
+    a2 = np.asfarray(a2, dtype=scipy.float128)
     
     # ell = 7 corresponds to the 5 steps recommended in the paper
     ell = 7
@@ -87,7 +65,7 @@ def _fixed_point(t, N, I_sq, a2):
         
         # Step one: estimate t_s from |f^(s+1)|^2
         odd_numbers_prod = np.product(np.arange(1, 2 * s + 1, 2, 
-                                                dtype=np.float))
+                                                dtype=scipy.float128))
         K0 = odd_numbers_prod / np.sqrt(2 * np.pi)
         const = (1 + (1 / 2) ** (s + 1 / 2)) / 3
         time = np.power((2 * const * K0 / (N * f)), 
@@ -173,14 +151,14 @@ def improved_sheather_jones(data):
 
     # Use linear binning to bin the data on an equidistant grid, this is a
     # prerequisite for using the FFT (evenly spaced samples)
-    initial_data = linbin_numpy(data, xmesh)
+    initial_data = linear_binning(data.reshape(-1, 1), xmesh)
     assert np.allclose(initial_data.sum(), 1)
     
     # Compute the type 2 Discrete Cosine Transform (DCT) of the data
     a = fftpack.dct(initial_data)
     
     # Compute the bandwidth
-    I_sq = np.power(np.arange(1, n, dtype=np.float), 2)
+    I_sq = np.power(np.arange(1, n, dtype=scipy.float128), 2)
     a2 = a[1:]**2 / 4
 
     # Solve for the optimal (in the AMISE sense) t
