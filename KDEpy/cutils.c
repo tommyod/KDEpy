@@ -562,6 +562,7 @@ static CYTHON_INLINE float __PYX_NAN() {
 #define __PYX_HAVE__cutils
 #define __PYX_HAVE_API__cutils
 /* Early includes */
+#include <math.h>
 #include "pythread.h"
 #include <string.h>
 #include <stdlib.h>
@@ -1587,6 +1588,8 @@ static PyObject *__pyx_memoryviewslice_assign_item_from_object(struct __pyx_memo
 
 /* Module declarations from 'cython' */
 
+/* Module declarations from 'libc.math' */
+
 /* Module declarations from 'cutils' */
 static PyTypeObject *__pyx_array_type = 0;
 static PyTypeObject *__pyx_MemviewEnum_type = 0;
@@ -2004,7 +2007,7 @@ static PyObject *__pyx_codeobj__33;
 static PyObject *__pyx_codeobj__40;
 /* Late includes */
 
-/* "cutils.pyx":34
+/* "cutils.pyx":35
  * @cython.wraparound(False)
  * @cython.cdivision(True)
  * def iterate_data_1D_weighted(double[:] transformed_data, double[:] weights, double[:] result):             # <<<<<<<<<<<<<<
@@ -2048,17 +2051,17 @@ static PyObject *__pyx_pw_6cutils_1iterate_data_1D_weighted(PyObject *__pyx_self
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_weights)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("iterate_data_1D_weighted", 1, 3, 3, 1); __PYX_ERR(0, 34, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("iterate_data_1D_weighted", 1, 3, 3, 1); __PYX_ERR(0, 35, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_result)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("iterate_data_1D_weighted", 1, 3, 3, 2); __PYX_ERR(0, 34, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("iterate_data_1D_weighted", 1, 3, 3, 2); __PYX_ERR(0, 35, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "iterate_data_1D_weighted") < 0)) __PYX_ERR(0, 34, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "iterate_data_1D_weighted") < 0)) __PYX_ERR(0, 35, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -2067,13 +2070,13 @@ static PyObject *__pyx_pw_6cutils_1iterate_data_1D_weighted(PyObject *__pyx_self
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
       values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
     }
-    __pyx_v_transformed_data = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_transformed_data.memview)) __PYX_ERR(0, 34, __pyx_L3_error)
-    __pyx_v_weights = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_weights.memview)) __PYX_ERR(0, 34, __pyx_L3_error)
-    __pyx_v_result = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_result.memview)) __PYX_ERR(0, 34, __pyx_L3_error)
+    __pyx_v_transformed_data = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_transformed_data.memview)) __PYX_ERR(0, 35, __pyx_L3_error)
+    __pyx_v_weights = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_weights.memview)) __PYX_ERR(0, 35, __pyx_L3_error)
+    __pyx_v_result = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_result.memview)) __PYX_ERR(0, 35, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("iterate_data_1D_weighted", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 34, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("iterate_data_1D_weighted", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 35, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("cutils.iterate_data_1D_weighted", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -2106,7 +2109,7 @@ static PyObject *__pyx_pf_6cutils_iterate_data_1D_weighted(CYTHON_UNUSED PyObjec
   PyObject *__pyx_t_8 = NULL;
   __Pyx_RefNannySetupContext("iterate_data_1D_weighted", 0);
 
-  /* "cutils.pyx":48
+  /* "cutils.pyx":49
  *     cdef double data_point, weight, fractional, frac_times_weight
  * 
  *     obs = transformed_data.shape[0]             # <<<<<<<<<<<<<<
@@ -2115,7 +2118,7 @@ static PyObject *__pyx_pf_6cutils_iterate_data_1D_weighted(CYTHON_UNUSED PyObjec
  */
   __pyx_v_obs = (__pyx_v_transformed_data.shape[0]);
 
-  /* "cutils.pyx":50
+  /* "cutils.pyx":51
  *     obs = transformed_data.shape[0]
  * 
  *     for i in range(obs):             # <<<<<<<<<<<<<<
@@ -2127,46 +2130,46 @@ static PyObject *__pyx_pf_6cutils_iterate_data_1D_weighted(CYTHON_UNUSED PyObjec
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "cutils.pyx":51
+    /* "cutils.pyx":52
  * 
  *     for i in range(obs):
  *         data_point = transformed_data[i]             # <<<<<<<<<<<<<<
  *         weight = weights[i]
- *         integral = int(data_point)
+ *         # Using <int> as shown below is faster than int( . )
  */
     __pyx_t_4 = __pyx_v_i;
     __pyx_v_data_point = (*((double *) ( /* dim=0 */ (__pyx_v_transformed_data.data + __pyx_t_4 * __pyx_v_transformed_data.strides[0]) )));
 
-    /* "cutils.pyx":52
+    /* "cutils.pyx":53
  *     for i in range(obs):
  *         data_point = transformed_data[i]
  *         weight = weights[i]             # <<<<<<<<<<<<<<
- *         integral = int(data_point)
- *         fractional = data_point - integral
+ *         # Using <int> as shown below is faster than int( . )
+ *         # integral = int(data_point)
  */
     __pyx_t_5 = __pyx_v_i;
     __pyx_v_weight = (*((double *) ( /* dim=0 */ (__pyx_v_weights.data + __pyx_t_5 * __pyx_v_weights.strides[0]) )));
 
-    /* "cutils.pyx":53
- *         data_point = transformed_data[i]
- *         weight = weights[i]
- *         integral = int(data_point)             # <<<<<<<<<<<<<<
+    /* "cutils.pyx":56
+ *         # Using <int> as shown below is faster than int( . )
+ *         # integral = int(data_point)
+ *         integral = <int> floor(data_point)             # <<<<<<<<<<<<<<
  *         fractional = data_point - integral
  *         frac_times_weight = fractional * weight  # Compute product once
  */
-    __pyx_v_integral = ((int)__pyx_v_data_point);
+    __pyx_v_integral = ((int)floor(__pyx_v_data_point));
 
-    /* "cutils.pyx":54
- *         weight = weights[i]
- *         integral = int(data_point)
+    /* "cutils.pyx":57
+ *         # integral = int(data_point)
+ *         integral = <int> floor(data_point)
  *         fractional = data_point - integral             # <<<<<<<<<<<<<<
  *         frac_times_weight = fractional * weight  # Compute product once
  *         result[integral + 1] += frac_times_weight
  */
     __pyx_v_fractional = (__pyx_v_data_point - __pyx_v_integral);
 
-    /* "cutils.pyx":55
- *         integral = int(data_point)
+    /* "cutils.pyx":58
+ *         integral = <int> floor(data_point)
  *         fractional = data_point - integral
  *         frac_times_weight = fractional * weight  # Compute product once             # <<<<<<<<<<<<<<
  *         result[integral + 1] += frac_times_weight
@@ -2174,7 +2177,7 @@ static PyObject *__pyx_pf_6cutils_iterate_data_1D_weighted(CYTHON_UNUSED PyObjec
  */
     __pyx_v_frac_times_weight = (__pyx_v_fractional * __pyx_v_weight);
 
-    /* "cutils.pyx":56
+    /* "cutils.pyx":59
  *         fractional = data_point - integral
  *         frac_times_weight = fractional * weight  # Compute product once
  *         result[integral + 1] += frac_times_weight             # <<<<<<<<<<<<<<
@@ -2184,7 +2187,7 @@ static PyObject *__pyx_pf_6cutils_iterate_data_1D_weighted(CYTHON_UNUSED PyObjec
     __pyx_t_6 = (__pyx_v_integral + 1);
     *((double *) ( /* dim=0 */ (__pyx_v_result.data + __pyx_t_6 * __pyx_v_result.strides[0]) )) += __pyx_v_frac_times_weight;
 
-    /* "cutils.pyx":57
+    /* "cutils.pyx":60
  *         frac_times_weight = fractional * weight  # Compute product once
  *         result[integral + 1] += frac_times_weight
  *         result[integral] += weight - frac_times_weight             # <<<<<<<<<<<<<<
@@ -2195,7 +2198,7 @@ static PyObject *__pyx_pf_6cutils_iterate_data_1D_weighted(CYTHON_UNUSED PyObjec
     *((double *) ( /* dim=0 */ (__pyx_v_result.data + __pyx_t_7 * __pyx_v_result.strides[0]) )) += (__pyx_v_weight - __pyx_v_frac_times_weight);
   }
 
-  /* "cutils.pyx":59
+  /* "cutils.pyx":62
  *         result[integral] += weight - frac_times_weight
  * 
  *     return result             # <<<<<<<<<<<<<<
@@ -2203,13 +2206,13 @@ static PyObject *__pyx_pf_6cutils_iterate_data_1D_weighted(CYTHON_UNUSED PyObjec
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_8 = __pyx_memoryview_fromslice(__pyx_v_result, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 59, __pyx_L1_error)
+  __pyx_t_8 = __pyx_memoryview_fromslice(__pyx_v_result, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 62, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   __pyx_r = __pyx_t_8;
   __pyx_t_8 = 0;
   goto __pyx_L0;
 
-  /* "cutils.pyx":34
+  /* "cutils.pyx":35
  * @cython.wraparound(False)
  * @cython.cdivision(True)
  * def iterate_data_1D_weighted(double[:] transformed_data, double[:] weights, double[:] result):             # <<<<<<<<<<<<<<
@@ -2231,7 +2234,7 @@ static PyObject *__pyx_pf_6cutils_iterate_data_1D_weighted(CYTHON_UNUSED PyObjec
   return __pyx_r;
 }
 
-/* "cutils.pyx":65
+/* "cutils.pyx":68
  * @cython.wraparound(False)
  * @cython.cdivision(True)
  * def iterate_data_1D(double[:] transformed_data, double[:] result):             # <<<<<<<<<<<<<<
@@ -2272,11 +2275,11 @@ static PyObject *__pyx_pw_6cutils_3iterate_data_1D(PyObject *__pyx_self, PyObjec
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_result)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("iterate_data_1D", 1, 2, 2, 1); __PYX_ERR(0, 65, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("iterate_data_1D", 1, 2, 2, 1); __PYX_ERR(0, 68, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "iterate_data_1D") < 0)) __PYX_ERR(0, 65, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "iterate_data_1D") < 0)) __PYX_ERR(0, 68, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -2284,12 +2287,12 @@ static PyObject *__pyx_pw_6cutils_3iterate_data_1D(PyObject *__pyx_self, PyObjec
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
-    __pyx_v_transformed_data = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_transformed_data.memview)) __PYX_ERR(0, 65, __pyx_L3_error)
-    __pyx_v_result = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_result.memview)) __PYX_ERR(0, 65, __pyx_L3_error)
+    __pyx_v_transformed_data = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_transformed_data.memview)) __PYX_ERR(0, 68, __pyx_L3_error)
+    __pyx_v_result = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_result.memview)) __PYX_ERR(0, 68, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("iterate_data_1D", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 65, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("iterate_data_1D", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 68, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("cutils.iterate_data_1D", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -2319,7 +2322,7 @@ static PyObject *__pyx_pf_6cutils_2iterate_data_1D(CYTHON_UNUSED PyObject *__pyx
   PyObject *__pyx_t_7 = NULL;
   __Pyx_RefNannySetupContext("iterate_data_1D", 0);
 
-  /* "cutils.pyx":77
+  /* "cutils.pyx":80
  *     cdef int obs, integral
  *     cdef double data_point, weight, fractional
  *     obs = transformed_data.shape[0]             # <<<<<<<<<<<<<<
@@ -2328,48 +2331,48 @@ static PyObject *__pyx_pf_6cutils_2iterate_data_1D(CYTHON_UNUSED PyObject *__pyx
  */
   __pyx_v_obs = (__pyx_v_transformed_data.shape[0]);
 
-  /* "cutils.pyx":78
+  /* "cutils.pyx":81
  *     cdef double data_point, weight, fractional
  *     obs = transformed_data.shape[0]
  *     for i in range(obs):             # <<<<<<<<<<<<<<
  *         data_point = transformed_data[i]
- *         integral = int(data_point)
+ *         integral = <int> floor(data_point)
  */
   __pyx_t_1 = __pyx_v_obs;
   __pyx_t_2 = __pyx_t_1;
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "cutils.pyx":79
+    /* "cutils.pyx":82
  *     obs = transformed_data.shape[0]
  *     for i in range(obs):
  *         data_point = transformed_data[i]             # <<<<<<<<<<<<<<
- *         integral = int(data_point)
+ *         integral = <int> floor(data_point)
  *         fractional = data_point - integral
  */
     __pyx_t_4 = __pyx_v_i;
     __pyx_v_data_point = (*((double *) ( /* dim=0 */ (__pyx_v_transformed_data.data + __pyx_t_4 * __pyx_v_transformed_data.strides[0]) )));
 
-    /* "cutils.pyx":80
+    /* "cutils.pyx":83
  *     for i in range(obs):
  *         data_point = transformed_data[i]
- *         integral = int(data_point)             # <<<<<<<<<<<<<<
+ *         integral = <int> floor(data_point)             # <<<<<<<<<<<<<<
  *         fractional = data_point - integral
  *         result[integral] += 1 - fractional
  */
-    __pyx_v_integral = ((int)__pyx_v_data_point);
+    __pyx_v_integral = ((int)floor(__pyx_v_data_point));
 
-    /* "cutils.pyx":81
+    /* "cutils.pyx":84
  *         data_point = transformed_data[i]
- *         integral = int(data_point)
+ *         integral = <int> floor(data_point)
  *         fractional = data_point - integral             # <<<<<<<<<<<<<<
  *         result[integral] += 1 - fractional
  *         result[integral + 1] += fractional
  */
     __pyx_v_fractional = (__pyx_v_data_point - __pyx_v_integral);
 
-    /* "cutils.pyx":82
- *         integral = int(data_point)
+    /* "cutils.pyx":85
+ *         integral = <int> floor(data_point)
  *         fractional = data_point - integral
  *         result[integral] += 1 - fractional             # <<<<<<<<<<<<<<
  *         result[integral + 1] += fractional
@@ -2378,7 +2381,7 @@ static PyObject *__pyx_pf_6cutils_2iterate_data_1D(CYTHON_UNUSED PyObject *__pyx
     __pyx_t_5 = __pyx_v_integral;
     *((double *) ( /* dim=0 */ (__pyx_v_result.data + __pyx_t_5 * __pyx_v_result.strides[0]) )) += (1.0 - __pyx_v_fractional);
 
-    /* "cutils.pyx":83
+    /* "cutils.pyx":86
  *         fractional = data_point - integral
  *         result[integral] += 1 - fractional
  *         result[integral + 1] += fractional             # <<<<<<<<<<<<<<
@@ -2389,7 +2392,7 @@ static PyObject *__pyx_pf_6cutils_2iterate_data_1D(CYTHON_UNUSED PyObject *__pyx
     *((double *) ( /* dim=0 */ (__pyx_v_result.data + __pyx_t_6 * __pyx_v_result.strides[0]) )) += __pyx_v_fractional;
   }
 
-  /* "cutils.pyx":85
+  /* "cutils.pyx":88
  *         result[integral + 1] += fractional
  * 
  *     return result             # <<<<<<<<<<<<<<
@@ -2397,13 +2400,13 @@ static PyObject *__pyx_pf_6cutils_2iterate_data_1D(CYTHON_UNUSED PyObject *__pyx
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_7 = __pyx_memoryview_fromslice(__pyx_v_result, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 85, __pyx_L1_error)
+  __pyx_t_7 = __pyx_memoryview_fromslice(__pyx_v_result, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 88, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __pyx_r = __pyx_t_7;
   __pyx_t_7 = 0;
   goto __pyx_L0;
 
-  /* "cutils.pyx":65
+  /* "cutils.pyx":68
  * @cython.wraparound(False)
  * @cython.cdivision(True)
  * def iterate_data_1D(double[:] transformed_data, double[:] result):             # <<<<<<<<<<<<<<
@@ -2424,7 +2427,7 @@ static PyObject *__pyx_pf_6cutils_2iterate_data_1D(CYTHON_UNUSED PyObject *__pyx
   return __pyx_r;
 }
 
-/* "cutils.pyx":91
+/* "cutils.pyx":94
  * @cython.wraparound(False)
  * @cython.cdivision(True)
  * def iterate_data_2D_weighted(double[:, :] data, double[:] weights,             # <<<<<<<<<<<<<<
@@ -2474,29 +2477,29 @@ static PyObject *__pyx_pw_6cutils_5iterate_data_2D_weighted(PyObject *__pyx_self
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_weights)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("iterate_data_2D_weighted", 1, 5, 5, 1); __PYX_ERR(0, 91, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("iterate_data_2D_weighted", 1, 5, 5, 1); __PYX_ERR(0, 94, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_result)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("iterate_data_2D_weighted", 1, 5, 5, 2); __PYX_ERR(0, 91, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("iterate_data_2D_weighted", 1, 5, 5, 2); __PYX_ERR(0, 94, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_grid_num)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("iterate_data_2D_weighted", 1, 5, 5, 3); __PYX_ERR(0, 91, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("iterate_data_2D_weighted", 1, 5, 5, 3); __PYX_ERR(0, 94, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obs_tot)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("iterate_data_2D_weighted", 1, 5, 5, 4); __PYX_ERR(0, 91, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("iterate_data_2D_weighted", 1, 5, 5, 4); __PYX_ERR(0, 94, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "iterate_data_2D_weighted") < 0)) __PYX_ERR(0, 91, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "iterate_data_2D_weighted") < 0)) __PYX_ERR(0, 94, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 5) {
       goto __pyx_L5_argtuple_error;
@@ -2507,15 +2510,15 @@ static PyObject *__pyx_pw_6cutils_5iterate_data_2D_weighted(PyObject *__pyx_self
       values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
       values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
     }
-    __pyx_v_data = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_data.memview)) __PYX_ERR(0, 91, __pyx_L3_error)
-    __pyx_v_weights = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_weights.memview)) __PYX_ERR(0, 91, __pyx_L3_error)
-    __pyx_v_result = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_result.memview)) __PYX_ERR(0, 92, __pyx_L3_error)
-    __pyx_v_grid_num = __Pyx_PyObject_to_MemoryviewSlice_ds_long(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_grid_num.memview)) __PYX_ERR(0, 92, __pyx_L3_error)
-    __pyx_v_obs_tot = __Pyx_PyInt_As_int(values[4]); if (unlikely((__pyx_v_obs_tot == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 92, __pyx_L3_error)
+    __pyx_v_data = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_data.memview)) __PYX_ERR(0, 94, __pyx_L3_error)
+    __pyx_v_weights = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_weights.memview)) __PYX_ERR(0, 94, __pyx_L3_error)
+    __pyx_v_result = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_result.memview)) __PYX_ERR(0, 95, __pyx_L3_error)
+    __pyx_v_grid_num = __Pyx_PyObject_to_MemoryviewSlice_ds_long(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_grid_num.memview)) __PYX_ERR(0, 95, __pyx_L3_error)
+    __pyx_v_obs_tot = __Pyx_PyInt_As_int(values[4]); if (unlikely((__pyx_v_obs_tot == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 95, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("iterate_data_2D_weighted", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 91, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("iterate_data_2D_weighted", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 94, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("cutils.iterate_data_2D_weighted", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -2561,7 +2564,7 @@ static PyObject *__pyx_pf_6cutils_4iterate_data_2D_weighted(CYTHON_UNUSED PyObje
   PyObject *__pyx_t_14 = NULL;
   __Pyx_RefNannySetupContext("iterate_data_2D_weighted", 0);
 
-  /* "cutils.pyx":108
+  /* "cutils.pyx":111
  *     cdef double x, y, weight, x_fractional, y_fractional, value, xy, y_xy, x_xy
  * 
  *     obs = data.shape[0]             # <<<<<<<<<<<<<<
@@ -2570,7 +2573,7 @@ static PyObject *__pyx_pf_6cutils_4iterate_data_2D_weighted(CYTHON_UNUSED PyObje
  */
   __pyx_v_obs = (__pyx_v_data.shape[0]);
 
-  /* "cutils.pyx":109
+  /* "cutils.pyx":112
  * 
  *     obs = data.shape[0]
  *     for i in range(obs):             # <<<<<<<<<<<<<<
@@ -2582,7 +2585,7 @@ static PyObject *__pyx_pf_6cutils_4iterate_data_2D_weighted(CYTHON_UNUSED PyObje
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "cutils.pyx":111
+    /* "cutils.pyx":114
  *     for i in range(obs):
  * 
  *         x = data[i, 0]             # <<<<<<<<<<<<<<
@@ -2593,7 +2596,7 @@ static PyObject *__pyx_pf_6cutils_4iterate_data_2D_weighted(CYTHON_UNUSED PyObje
     __pyx_t_5 = 0;
     __pyx_v_x = (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_data.data + __pyx_t_4 * __pyx_v_data.strides[0]) ) + __pyx_t_5 * __pyx_v_data.strides[1]) )));
 
-    /* "cutils.pyx":112
+    /* "cutils.pyx":115
  * 
  *         x = data[i, 0]
  *         y = data[i, 1]             # <<<<<<<<<<<<<<
@@ -2604,53 +2607,53 @@ static PyObject *__pyx_pf_6cutils_4iterate_data_2D_weighted(CYTHON_UNUSED PyObje
     __pyx_t_7 = 1;
     __pyx_v_y = (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_data.data + __pyx_t_6 * __pyx_v_data.strides[0]) ) + __pyx_t_7 * __pyx_v_data.strides[1]) )));
 
-    /* "cutils.pyx":113
+    /* "cutils.pyx":116
  *         x = data[i, 0]
  *         y = data[i, 1]
  *         weight = weights[i]             # <<<<<<<<<<<<<<
  * 
- *         x_integral = int(x)
+ *         x_integral = <int> floor(x)
  */
     __pyx_t_8 = __pyx_v_i;
     __pyx_v_weight = (*((double *) ( /* dim=0 */ (__pyx_v_weights.data + __pyx_t_8 * __pyx_v_weights.strides[0]) )));
 
-    /* "cutils.pyx":115
+    /* "cutils.pyx":118
  *         weight = weights[i]
  * 
- *         x_integral = int(x)             # <<<<<<<<<<<<<<
+ *         x_integral = <int> floor(x)             # <<<<<<<<<<<<<<
  *         x_fractional = x - x_integral
- *         y_integral = int(y)
+ *         y_integral = <int> floor(y)
  */
-    __pyx_v_x_integral = ((int)__pyx_v_x);
+    __pyx_v_x_integral = ((int)floor(__pyx_v_x));
 
-    /* "cutils.pyx":116
+    /* "cutils.pyx":119
  * 
- *         x_integral = int(x)
+ *         x_integral = <int> floor(x)
  *         x_fractional = x - x_integral             # <<<<<<<<<<<<<<
- *         y_integral = int(y)
+ *         y_integral = <int> floor(y)
  *         y_fractional = y - y_integral
  */
     __pyx_v_x_fractional = (__pyx_v_x - __pyx_v_x_integral);
 
-    /* "cutils.pyx":117
- *         x_integral = int(x)
+    /* "cutils.pyx":120
+ *         x_integral = <int> floor(x)
  *         x_fractional = x - x_integral
- *         y_integral = int(y)             # <<<<<<<<<<<<<<
+ *         y_integral = <int> floor(y)             # <<<<<<<<<<<<<<
  *         y_fractional = y - y_integral
  * 
  */
-    __pyx_v_y_integral = ((int)__pyx_v_y);
+    __pyx_v_y_integral = ((int)floor(__pyx_v_y));
 
-    /* "cutils.pyx":118
+    /* "cutils.pyx":121
  *         x_fractional = x - x_integral
- *         y_integral = int(y)
+ *         y_integral = <int> floor(y)
  *         y_fractional = y - y_integral             # <<<<<<<<<<<<<<
  * 
  *         # Computations with few flops
  */
     __pyx_v_y_fractional = (__pyx_v_y - __pyx_v_y_integral);
 
-    /* "cutils.pyx":121
+    /* "cutils.pyx":124
  * 
  *         # Computations with few flops
  *         xy = x_fractional * y_fractional             # <<<<<<<<<<<<<<
@@ -2659,7 +2662,7 @@ static PyObject *__pyx_pf_6cutils_4iterate_data_2D_weighted(CYTHON_UNUSED PyObje
  */
     __pyx_v_xy = (__pyx_v_x_fractional * __pyx_v_y_fractional);
 
-    /* "cutils.pyx":122
+    /* "cutils.pyx":125
  *         # Computations with few flops
  *         xy = x_fractional * y_fractional
  *         y_xy = y_fractional - xy             # <<<<<<<<<<<<<<
@@ -2668,7 +2671,7 @@ static PyObject *__pyx_pf_6cutils_4iterate_data_2D_weighted(CYTHON_UNUSED PyObje
  */
     __pyx_v_y_xy = (__pyx_v_y_fractional - __pyx_v_xy);
 
-    /* "cutils.pyx":123
+    /* "cutils.pyx":126
  *         xy = x_fractional * y_fractional
  *         y_xy = y_fractional - xy
  *         x_xy = x_fractional - xy             # <<<<<<<<<<<<<<
@@ -2677,7 +2680,7 @@ static PyObject *__pyx_pf_6cutils_4iterate_data_2D_weighted(CYTHON_UNUSED PyObje
  */
     __pyx_v_x_xy = (__pyx_v_x_fractional - __pyx_v_xy);
 
-    /* "cutils.pyx":124
+    /* "cutils.pyx":127
  *         y_xy = y_fractional - xy
  *         x_xy = x_fractional - xy
  *         grid_num1 = grid_num[1]             # <<<<<<<<<<<<<<
@@ -2687,7 +2690,7 @@ static PyObject *__pyx_pf_6cutils_4iterate_data_2D_weighted(CYTHON_UNUSED PyObje
     __pyx_t_9 = 1;
     __pyx_v_grid_num1 = (*((long *) ( /* dim=0 */ (__pyx_v_grid_num.data + __pyx_t_9 * __pyx_v_grid_num.strides[0]) )));
 
-    /* "cutils.pyx":126
+    /* "cutils.pyx":129
  *         grid_num1 = grid_num[1]
  *         # Bottom left
  *         index = y_integral + x_integral * grid_num1             # <<<<<<<<<<<<<<
@@ -2696,7 +2699,7 @@ static PyObject *__pyx_pf_6cutils_4iterate_data_2D_weighted(CYTHON_UNUSED PyObje
  */
     __pyx_v_index = (__pyx_v_y_integral + (__pyx_v_x_integral * __pyx_v_grid_num1));
 
-    /* "cutils.pyx":127
+    /* "cutils.pyx":130
  *         # Bottom left
  *         index = y_integral + x_integral * grid_num1
  *         result[index % obs_tot] += (xy - x_fractional - y_fractional + 1) * weight             # <<<<<<<<<<<<<<
@@ -2706,7 +2709,7 @@ static PyObject *__pyx_pf_6cutils_4iterate_data_2D_weighted(CYTHON_UNUSED PyObje
     __pyx_t_10 = (__pyx_v_index % __pyx_v_obs_tot);
     *((double *) ( /* dim=0 */ (__pyx_v_result.data + __pyx_t_10 * __pyx_v_result.strides[0]) )) += ((((__pyx_v_xy - __pyx_v_x_fractional) - __pyx_v_y_fractional) + 1.0) * __pyx_v_weight);
 
-    /* "cutils.pyx":130
+    /* "cutils.pyx":133
  * 
  *         # Bottom right
  *         index = y_integral + (x_integral + 1) * grid_num1             # <<<<<<<<<<<<<<
@@ -2715,7 +2718,7 @@ static PyObject *__pyx_pf_6cutils_4iterate_data_2D_weighted(CYTHON_UNUSED PyObje
  */
     __pyx_v_index = (__pyx_v_y_integral + ((__pyx_v_x_integral + 1) * __pyx_v_grid_num1));
 
-    /* "cutils.pyx":131
+    /* "cutils.pyx":134
  *         # Bottom right
  *         index = y_integral + (x_integral + 1) * grid_num1
  *         result[index % obs_tot] += x_xy * weight             # <<<<<<<<<<<<<<
@@ -2725,7 +2728,7 @@ static PyObject *__pyx_pf_6cutils_4iterate_data_2D_weighted(CYTHON_UNUSED PyObje
     __pyx_t_11 = (__pyx_v_index % __pyx_v_obs_tot);
     *((double *) ( /* dim=0 */ (__pyx_v_result.data + __pyx_t_11 * __pyx_v_result.strides[0]) )) += (__pyx_v_x_xy * __pyx_v_weight);
 
-    /* "cutils.pyx":134
+    /* "cutils.pyx":137
  * 
  *         # Top left
  *         index = (y_integral + 1) + x_integral * grid_num1             # <<<<<<<<<<<<<<
@@ -2734,7 +2737,7 @@ static PyObject *__pyx_pf_6cutils_4iterate_data_2D_weighted(CYTHON_UNUSED PyObje
  */
     __pyx_v_index = ((__pyx_v_y_integral + 1) + (__pyx_v_x_integral * __pyx_v_grid_num1));
 
-    /* "cutils.pyx":135
+    /* "cutils.pyx":138
  *         # Top left
  *         index = (y_integral + 1) + x_integral * grid_num1
  *         result[index % obs_tot] += y_xy * weight             # <<<<<<<<<<<<<<
@@ -2744,7 +2747,7 @@ static PyObject *__pyx_pf_6cutils_4iterate_data_2D_weighted(CYTHON_UNUSED PyObje
     __pyx_t_12 = (__pyx_v_index % __pyx_v_obs_tot);
     *((double *) ( /* dim=0 */ (__pyx_v_result.data + __pyx_t_12 * __pyx_v_result.strides[0]) )) += (__pyx_v_y_xy * __pyx_v_weight);
 
-    /* "cutils.pyx":138
+    /* "cutils.pyx":141
  * 
  *         # Top right
  *         index = (y_integral + 1) + (x_integral + 1) * grid_num1             # <<<<<<<<<<<<<<
@@ -2753,7 +2756,7 @@ static PyObject *__pyx_pf_6cutils_4iterate_data_2D_weighted(CYTHON_UNUSED PyObje
  */
     __pyx_v_index = ((__pyx_v_y_integral + 1) + ((__pyx_v_x_integral + 1) * __pyx_v_grid_num1));
 
-    /* "cutils.pyx":139
+    /* "cutils.pyx":142
  *         # Top right
  *         index = (y_integral + 1) + (x_integral + 1) * grid_num1
  *         result[index % obs_tot] += xy * weight             # <<<<<<<<<<<<<<
@@ -2764,7 +2767,7 @@ static PyObject *__pyx_pf_6cutils_4iterate_data_2D_weighted(CYTHON_UNUSED PyObje
     *((double *) ( /* dim=0 */ (__pyx_v_result.data + __pyx_t_13 * __pyx_v_result.strides[0]) )) += (__pyx_v_xy * __pyx_v_weight);
   }
 
-  /* "cutils.pyx":141
+  /* "cutils.pyx":144
  *         result[index % obs_tot] += xy * weight
  * 
  *     return result             # <<<<<<<<<<<<<<
@@ -2772,13 +2775,13 @@ static PyObject *__pyx_pf_6cutils_4iterate_data_2D_weighted(CYTHON_UNUSED PyObje
  * @cython.boundscheck(False)
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_14 = __pyx_memoryview_fromslice(__pyx_v_result, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_t_14 = __pyx_memoryview_fromslice(__pyx_v_result, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 144, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_14);
   __pyx_r = __pyx_t_14;
   __pyx_t_14 = 0;
   goto __pyx_L0;
 
-  /* "cutils.pyx":91
+  /* "cutils.pyx":94
  * @cython.wraparound(False)
  * @cython.cdivision(True)
  * def iterate_data_2D_weighted(double[:, :] data, double[:] weights,             # <<<<<<<<<<<<<<
@@ -2801,7 +2804,7 @@ static PyObject *__pyx_pf_6cutils_4iterate_data_2D_weighted(CYTHON_UNUSED PyObje
   return __pyx_r;
 }
 
-/* "cutils.pyx":146
+/* "cutils.pyx":149
  * @cython.wraparound(False)
  * @cython.cdivision(True)
  * def iterate_data_2D(double[:, :] data, double[:] result, long[:] grid_num,             # <<<<<<<<<<<<<<
@@ -2848,23 +2851,23 @@ static PyObject *__pyx_pw_6cutils_7iterate_data_2D(PyObject *__pyx_self, PyObjec
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_result)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("iterate_data_2D", 1, 4, 4, 1); __PYX_ERR(0, 146, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("iterate_data_2D", 1, 4, 4, 1); __PYX_ERR(0, 149, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_grid_num)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("iterate_data_2D", 1, 4, 4, 2); __PYX_ERR(0, 146, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("iterate_data_2D", 1, 4, 4, 2); __PYX_ERR(0, 149, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obs_tot)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("iterate_data_2D", 1, 4, 4, 3); __PYX_ERR(0, 146, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("iterate_data_2D", 1, 4, 4, 3); __PYX_ERR(0, 149, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "iterate_data_2D") < 0)) __PYX_ERR(0, 146, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "iterate_data_2D") < 0)) __PYX_ERR(0, 149, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -2874,14 +2877,14 @@ static PyObject *__pyx_pw_6cutils_7iterate_data_2D(PyObject *__pyx_self, PyObjec
       values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
       values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
     }
-    __pyx_v_data = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_data.memview)) __PYX_ERR(0, 146, __pyx_L3_error)
-    __pyx_v_result = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_result.memview)) __PYX_ERR(0, 146, __pyx_L3_error)
-    __pyx_v_grid_num = __Pyx_PyObject_to_MemoryviewSlice_ds_long(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_grid_num.memview)) __PYX_ERR(0, 146, __pyx_L3_error)
-    __pyx_v_obs_tot = __Pyx_PyInt_As_int(values[3]); if (unlikely((__pyx_v_obs_tot == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 147, __pyx_L3_error)
+    __pyx_v_data = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_data.memview)) __PYX_ERR(0, 149, __pyx_L3_error)
+    __pyx_v_result = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_result.memview)) __PYX_ERR(0, 149, __pyx_L3_error)
+    __pyx_v_grid_num = __Pyx_PyObject_to_MemoryviewSlice_ds_long(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_grid_num.memview)) __PYX_ERR(0, 149, __pyx_L3_error)
+    __pyx_v_obs_tot = __Pyx_PyInt_As_int(values[3]); if (unlikely((__pyx_v_obs_tot == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 150, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("iterate_data_2D", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 146, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("iterate_data_2D", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 149, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("cutils.iterate_data_2D", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -2925,7 +2928,7 @@ static PyObject *__pyx_pf_6cutils_6iterate_data_2D(CYTHON_UNUSED PyObject *__pyx
   PyObject *__pyx_t_13 = NULL;
   __Pyx_RefNannySetupContext("iterate_data_2D", 0);
 
-  /* "cutils.pyx":163
+  /* "cutils.pyx":166
  *     cdef double x, y, x_fractional, y_fractional, value, xy, y_xy, x_xy
  * 
  *     obs = data.shape[0]             # <<<<<<<<<<<<<<
@@ -2934,7 +2937,7 @@ static PyObject *__pyx_pf_6cutils_6iterate_data_2D(CYTHON_UNUSED PyObject *__pyx
  */
   __pyx_v_obs = (__pyx_v_data.shape[0]);
 
-  /* "cutils.pyx":164
+  /* "cutils.pyx":167
  * 
  *     obs = data.shape[0]
  *     for i in range(obs):             # <<<<<<<<<<<<<<
@@ -2946,66 +2949,66 @@ static PyObject *__pyx_pf_6cutils_6iterate_data_2D(CYTHON_UNUSED PyObject *__pyx
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "cutils.pyx":165
+    /* "cutils.pyx":168
  *     obs = data.shape[0]
  *     for i in range(obs):
  *         x = data[i, 0]             # <<<<<<<<<<<<<<
  *         y = data[i, 1]
- *         x_integral = int(x)
+ *         x_integral = <int> floor(x)
  */
     __pyx_t_4 = __pyx_v_i;
     __pyx_t_5 = 0;
     __pyx_v_x = (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_data.data + __pyx_t_4 * __pyx_v_data.strides[0]) ) + __pyx_t_5 * __pyx_v_data.strides[1]) )));
 
-    /* "cutils.pyx":166
+    /* "cutils.pyx":169
  *     for i in range(obs):
  *         x = data[i, 0]
  *         y = data[i, 1]             # <<<<<<<<<<<<<<
- *         x_integral = int(x)
+ *         x_integral = <int> floor(x)
  *         x_fractional = x - x_integral
  */
     __pyx_t_6 = __pyx_v_i;
     __pyx_t_7 = 1;
     __pyx_v_y = (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_data.data + __pyx_t_6 * __pyx_v_data.strides[0]) ) + __pyx_t_7 * __pyx_v_data.strides[1]) )));
 
-    /* "cutils.pyx":167
+    /* "cutils.pyx":170
  *         x = data[i, 0]
  *         y = data[i, 1]
- *         x_integral = int(x)             # <<<<<<<<<<<<<<
+ *         x_integral = <int> floor(x)             # <<<<<<<<<<<<<<
  *         x_fractional = x - x_integral
- *         y_integral = int(y)
+ *         y_integral = <int> floor(y)
  */
-    __pyx_v_x_integral = ((int)__pyx_v_x);
+    __pyx_v_x_integral = ((int)floor(__pyx_v_x));
 
-    /* "cutils.pyx":168
+    /* "cutils.pyx":171
  *         y = data[i, 1]
- *         x_integral = int(x)
+ *         x_integral = <int> floor(x)
  *         x_fractional = x - x_integral             # <<<<<<<<<<<<<<
- *         y_integral = int(y)
+ *         y_integral = <int> floor(y)
  *         y_fractional = y - y_integral
  */
     __pyx_v_x_fractional = (__pyx_v_x - __pyx_v_x_integral);
 
-    /* "cutils.pyx":169
- *         x_integral = int(x)
+    /* "cutils.pyx":172
+ *         x_integral = <int> floor(x)
  *         x_fractional = x - x_integral
- *         y_integral = int(y)             # <<<<<<<<<<<<<<
+ *         y_integral = <int> floor(y)             # <<<<<<<<<<<<<<
  *         y_fractional = y - y_integral
  *         xy = x_fractional * y_fractional
  */
-    __pyx_v_y_integral = ((int)__pyx_v_y);
+    __pyx_v_y_integral = ((int)floor(__pyx_v_y));
 
-    /* "cutils.pyx":170
+    /* "cutils.pyx":173
  *         x_fractional = x - x_integral
- *         y_integral = int(y)
+ *         y_integral = <int> floor(y)
  *         y_fractional = y - y_integral             # <<<<<<<<<<<<<<
  *         xy = x_fractional * y_fractional
  *         y_xy = y_fractional - xy
  */
     __pyx_v_y_fractional = (__pyx_v_y - __pyx_v_y_integral);
 
-    /* "cutils.pyx":171
- *         y_integral = int(y)
+    /* "cutils.pyx":174
+ *         y_integral = <int> floor(y)
  *         y_fractional = y - y_integral
  *         xy = x_fractional * y_fractional             # <<<<<<<<<<<<<<
  *         y_xy = y_fractional - xy
@@ -3013,7 +3016,7 @@ static PyObject *__pyx_pf_6cutils_6iterate_data_2D(CYTHON_UNUSED PyObject *__pyx
  */
     __pyx_v_xy = (__pyx_v_x_fractional * __pyx_v_y_fractional);
 
-    /* "cutils.pyx":172
+    /* "cutils.pyx":175
  *         y_fractional = y - y_integral
  *         xy = x_fractional * y_fractional
  *         y_xy = y_fractional - xy             # <<<<<<<<<<<<<<
@@ -3022,7 +3025,7 @@ static PyObject *__pyx_pf_6cutils_6iterate_data_2D(CYTHON_UNUSED PyObject *__pyx
  */
     __pyx_v_y_xy = (__pyx_v_y_fractional - __pyx_v_xy);
 
-    /* "cutils.pyx":173
+    /* "cutils.pyx":176
  *         xy = x_fractional * y_fractional
  *         y_xy = y_fractional - xy
  *         x_xy = x_fractional - xy             # <<<<<<<<<<<<<<
@@ -3031,7 +3034,7 @@ static PyObject *__pyx_pf_6cutils_6iterate_data_2D(CYTHON_UNUSED PyObject *__pyx
  */
     __pyx_v_x_xy = (__pyx_v_x_fractional - __pyx_v_xy);
 
-    /* "cutils.pyx":174
+    /* "cutils.pyx":177
  *         y_xy = y_fractional - xy
  *         x_xy = x_fractional - xy
  *         grid_num1 = grid_num[1]             # <<<<<<<<<<<<<<
@@ -3041,7 +3044,7 @@ static PyObject *__pyx_pf_6cutils_6iterate_data_2D(CYTHON_UNUSED PyObject *__pyx
     __pyx_t_8 = 1;
     __pyx_v_grid_num1 = (*((long *) ( /* dim=0 */ (__pyx_v_grid_num.data + __pyx_t_8 * __pyx_v_grid_num.strides[0]) )));
 
-    /* "cutils.pyx":175
+    /* "cutils.pyx":178
  *         x_xy = x_fractional - xy
  *         grid_num1 = grid_num[1]
  *         index = y_integral + x_integral * grid_num1             # <<<<<<<<<<<<<<
@@ -3050,7 +3053,7 @@ static PyObject *__pyx_pf_6cutils_6iterate_data_2D(CYTHON_UNUSED PyObject *__pyx
  */
     __pyx_v_index = (__pyx_v_y_integral + (__pyx_v_x_integral * __pyx_v_grid_num1));
 
-    /* "cutils.pyx":176
+    /* "cutils.pyx":179
  *         grid_num1 = grid_num[1]
  *         index = y_integral + x_integral * grid_num1
  *         result[index % obs_tot] += (xy - x_fractional - y_fractional + 1)             # <<<<<<<<<<<<<<
@@ -3060,7 +3063,7 @@ static PyObject *__pyx_pf_6cutils_6iterate_data_2D(CYTHON_UNUSED PyObject *__pyx
     __pyx_t_9 = (__pyx_v_index % __pyx_v_obs_tot);
     *((double *) ( /* dim=0 */ (__pyx_v_result.data + __pyx_t_9 * __pyx_v_result.strides[0]) )) += (((__pyx_v_xy - __pyx_v_x_fractional) - __pyx_v_y_fractional) + 1.0);
 
-    /* "cutils.pyx":177
+    /* "cutils.pyx":180
  *         index = y_integral + x_integral * grid_num1
  *         result[index % obs_tot] += (xy - x_fractional - y_fractional + 1)
  *         index = y_integral + (x_integral + 1) * grid_num1             # <<<<<<<<<<<<<<
@@ -3069,7 +3072,7 @@ static PyObject *__pyx_pf_6cutils_6iterate_data_2D(CYTHON_UNUSED PyObject *__pyx
  */
     __pyx_v_index = (__pyx_v_y_integral + ((__pyx_v_x_integral + 1) * __pyx_v_grid_num1));
 
-    /* "cutils.pyx":178
+    /* "cutils.pyx":181
  *         result[index % obs_tot] += (xy - x_fractional - y_fractional + 1)
  *         index = y_integral + (x_integral + 1) * grid_num1
  *         result[index % obs_tot] += x_xy             # <<<<<<<<<<<<<<
@@ -3079,7 +3082,7 @@ static PyObject *__pyx_pf_6cutils_6iterate_data_2D(CYTHON_UNUSED PyObject *__pyx
     __pyx_t_10 = (__pyx_v_index % __pyx_v_obs_tot);
     *((double *) ( /* dim=0 */ (__pyx_v_result.data + __pyx_t_10 * __pyx_v_result.strides[0]) )) += __pyx_v_x_xy;
 
-    /* "cutils.pyx":179
+    /* "cutils.pyx":182
  *         index = y_integral + (x_integral + 1) * grid_num1
  *         result[index % obs_tot] += x_xy
  *         index = (y_integral + 1) + x_integral * grid_num1             # <<<<<<<<<<<<<<
@@ -3088,7 +3091,7 @@ static PyObject *__pyx_pf_6cutils_6iterate_data_2D(CYTHON_UNUSED PyObject *__pyx
  */
     __pyx_v_index = ((__pyx_v_y_integral + 1) + (__pyx_v_x_integral * __pyx_v_grid_num1));
 
-    /* "cutils.pyx":180
+    /* "cutils.pyx":183
  *         result[index % obs_tot] += x_xy
  *         index = (y_integral + 1) + x_integral * grid_num1
  *         result[index % obs_tot] += y_xy             # <<<<<<<<<<<<<<
@@ -3098,7 +3101,7 @@ static PyObject *__pyx_pf_6cutils_6iterate_data_2D(CYTHON_UNUSED PyObject *__pyx
     __pyx_t_11 = (__pyx_v_index % __pyx_v_obs_tot);
     *((double *) ( /* dim=0 */ (__pyx_v_result.data + __pyx_t_11 * __pyx_v_result.strides[0]) )) += __pyx_v_y_xy;
 
-    /* "cutils.pyx":181
+    /* "cutils.pyx":184
  *         index = (y_integral + 1) + x_integral * grid_num1
  *         result[index % obs_tot] += y_xy
  *         index = (y_integral + 1) + (x_integral + 1) * grid_num1             # <<<<<<<<<<<<<<
@@ -3107,7 +3110,7 @@ static PyObject *__pyx_pf_6cutils_6iterate_data_2D(CYTHON_UNUSED PyObject *__pyx
  */
     __pyx_v_index = ((__pyx_v_y_integral + 1) + ((__pyx_v_x_integral + 1) * __pyx_v_grid_num1));
 
-    /* "cutils.pyx":182
+    /* "cutils.pyx":185
  *         result[index % obs_tot] += y_xy
  *         index = (y_integral + 1) + (x_integral + 1) * grid_num1
  *         result[index % obs_tot] += xy             # <<<<<<<<<<<<<<
@@ -3118,7 +3121,7 @@ static PyObject *__pyx_pf_6cutils_6iterate_data_2D(CYTHON_UNUSED PyObject *__pyx
     *((double *) ( /* dim=0 */ (__pyx_v_result.data + __pyx_t_12 * __pyx_v_result.strides[0]) )) += __pyx_v_xy;
   }
 
-  /* "cutils.pyx":184
+  /* "cutils.pyx":187
  *         result[index % obs_tot] += xy
  * 
  *     return result             # <<<<<<<<<<<<<<
@@ -3126,13 +3129,13 @@ static PyObject *__pyx_pf_6cutils_6iterate_data_2D(CYTHON_UNUSED PyObject *__pyx
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_13 = __pyx_memoryview_fromslice(__pyx_v_result, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 184, __pyx_L1_error)
+  __pyx_t_13 = __pyx_memoryview_fromslice(__pyx_v_result, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 187, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_13);
   __pyx_r = __pyx_t_13;
   __pyx_t_13 = 0;
   goto __pyx_L0;
 
-  /* "cutils.pyx":146
+  /* "cutils.pyx":149
  * @cython.wraparound(False)
  * @cython.cdivision(True)
  * def iterate_data_2D(double[:, :] data, double[:] result, long[:] grid_num,             # <<<<<<<<<<<<<<
@@ -3154,7 +3157,7 @@ static PyObject *__pyx_pf_6cutils_6iterate_data_2D(CYTHON_UNUSED PyObject *__pyx
   return __pyx_r;
 }
 
-/* "cutils.pyx":190
+/* "cutils.pyx":193
  * @cython.wraparound(False)
  * @cython.cdivision(True)
  * def iterate_data_ND(double[:, :] data, double[:] result, long[:] grid_num,             # <<<<<<<<<<<<<<
@@ -3204,29 +3207,29 @@ static PyObject *__pyx_pw_6cutils_9iterate_data_ND(PyObject *__pyx_self, PyObjec
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_result)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("iterate_data_ND", 1, 5, 5, 1); __PYX_ERR(0, 190, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("iterate_data_ND", 1, 5, 5, 1); __PYX_ERR(0, 193, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_grid_num)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("iterate_data_ND", 1, 5, 5, 2); __PYX_ERR(0, 190, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("iterate_data_ND", 1, 5, 5, 2); __PYX_ERR(0, 193, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obs_tot)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("iterate_data_ND", 1, 5, 5, 3); __PYX_ERR(0, 190, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("iterate_data_ND", 1, 5, 5, 3); __PYX_ERR(0, 193, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_binary_flgs)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("iterate_data_ND", 1, 5, 5, 4); __PYX_ERR(0, 190, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("iterate_data_ND", 1, 5, 5, 4); __PYX_ERR(0, 193, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "iterate_data_ND") < 0)) __PYX_ERR(0, 190, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "iterate_data_ND") < 0)) __PYX_ERR(0, 193, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 5) {
       goto __pyx_L5_argtuple_error;
@@ -3237,15 +3240,15 @@ static PyObject *__pyx_pw_6cutils_9iterate_data_ND(PyObject *__pyx_self, PyObjec
       values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
       values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
     }
-    __pyx_v_data = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_data.memview)) __PYX_ERR(0, 190, __pyx_L3_error)
-    __pyx_v_result = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_result.memview)) __PYX_ERR(0, 190, __pyx_L3_error)
-    __pyx_v_grid_num = __Pyx_PyObject_to_MemoryviewSlice_ds_long(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_grid_num.memview)) __PYX_ERR(0, 190, __pyx_L3_error)
-    __pyx_v_obs_tot = __Pyx_PyInt_As_int(values[3]); if (unlikely((__pyx_v_obs_tot == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 191, __pyx_L3_error)
-    __pyx_v_binary_flgs = __Pyx_PyObject_to_MemoryviewSlice_dsds_long(values[4], PyBUF_WRITABLE); if (unlikely(!__pyx_v_binary_flgs.memview)) __PYX_ERR(0, 191, __pyx_L3_error)
+    __pyx_v_data = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_data.memview)) __PYX_ERR(0, 193, __pyx_L3_error)
+    __pyx_v_result = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_result.memview)) __PYX_ERR(0, 193, __pyx_L3_error)
+    __pyx_v_grid_num = __Pyx_PyObject_to_MemoryviewSlice_ds_long(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_grid_num.memview)) __PYX_ERR(0, 193, __pyx_L3_error)
+    __pyx_v_obs_tot = __Pyx_PyInt_As_int(values[3]); if (unlikely((__pyx_v_obs_tot == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 194, __pyx_L3_error)
+    __pyx_v_binary_flgs = __Pyx_PyObject_to_MemoryviewSlice_dsds_long(values[4], PyBUF_WRITABLE); if (unlikely(!__pyx_v_binary_flgs.memview)) __PYX_ERR(0, 194, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("iterate_data_ND", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 190, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("iterate_data_ND", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 193, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("cutils.iterate_data_ND", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -3299,7 +3302,7 @@ static PyObject *__pyx_pf_6cutils_8iterate_data_ND(CYTHON_UNUSED PyObject *__pyx
   PyObject *__pyx_t_24 = NULL;
   __Pyx_RefNannySetupContext("iterate_data_ND", 0);
 
-  /* "cutils.pyx":220
+  /* "cutils.pyx":223
  * 
  *     # Get the observations and dimensions of the data
  *     obs, dims = data.shape[0], data.shape[1]             # <<<<<<<<<<<<<<
@@ -3311,7 +3314,7 @@ static PyObject *__pyx_pf_6cutils_8iterate_data_ND(CYTHON_UNUSED PyObject *__pyx
   __pyx_v_obs = __pyx_t_1;
   __pyx_v_dims = __pyx_t_2;
 
-  /* "cutils.pyx":223
+  /* "cutils.pyx":226
  * 
  *     # For every dimension, there are two directions to find corners in
  *     corners = 2**dims             # <<<<<<<<<<<<<<
@@ -3320,7 +3323,7 @@ static PyObject *__pyx_pf_6cutils_8iterate_data_ND(CYTHON_UNUSED PyObject *__pyx
  */
   __pyx_v_corners = __Pyx_pow_long(2, ((long)__pyx_v_dims));
 
-  /* "cutils.pyx":226
+  /* "cutils.pyx":229
  * 
  *     # Loop through every data point
  *     for i in range(obs):             # <<<<<<<<<<<<<<
@@ -3332,7 +3335,7 @@ static PyObject *__pyx_pf_6cutils_8iterate_data_ND(CYTHON_UNUSED PyObject *__pyx
   for (__pyx_t_5 = 0; __pyx_t_5 < __pyx_t_4; __pyx_t_5+=1) {
     __pyx_v_i = __pyx_t_5;
 
-    /* "cutils.pyx":229
+    /* "cutils.pyx":232
  * 
  *         # Retrieve the data point to consider
  *         x_i = data[i, :]             # <<<<<<<<<<<<<<
@@ -3350,7 +3353,7 @@ static PyObject *__pyx_pf_6cutils_8iterate_data_ND(CYTHON_UNUSED PyObject *__pyx
         __pyx_tmp_idx += __pyx_tmp_shape;
     if (0 && (__pyx_tmp_idx < 0 || __pyx_tmp_idx >= __pyx_tmp_shape)) {
         PyErr_SetString(PyExc_IndexError, "Index out of bounds (axis 0)");
-        __PYX_ERR(0, 229, __pyx_L1_error)
+        __PYX_ERR(0, 232, __pyx_L1_error)
     }
         __pyx_t_6.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
@@ -3364,7 +3367,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_v_x_i, 1);
     __pyx_t_6.memview = NULL;
     __pyx_t_6.data = NULL;
 
-    /* "cutils.pyx":233
+    /* "cutils.pyx":236
  *         # The data point will be 'assigned' to the 2**dims corners of the grid
  *         # that are closed to it. To do this, we loop through every corner
  *         for corner in range(corners):             # <<<<<<<<<<<<<<
@@ -3376,7 +3379,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_v_x_i, 1);
     for (__pyx_t_9 = 0; __pyx_t_9 < __pyx_t_8; __pyx_t_9+=1) {
       __pyx_v_corner = __pyx_t_9;
 
-      /* "cutils.pyx":245
+      /* "cutils.pyx":248
  *             # Since we use flags to indicate x_1 or x_1 + 1, the following
  *             # code does the job:
  *             result_index = int(x_i[0])             # <<<<<<<<<<<<<<
@@ -3386,7 +3389,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_v_x_i, 1);
       __pyx_t_10 = 0;
       __pyx_v_result_index = ((int)(*((double *) ( /* dim=0 */ (__pyx_v_x_i.data + __pyx_t_10 * __pyx_v_x_i.strides[0]) ))));
 
-      /* "cutils.pyx":246
+      /* "cutils.pyx":249
  *             # code does the job:
  *             result_index = int(x_i[0])
  *             result_index += 0**binary_flgs[corner, 0]             # <<<<<<<<<<<<<<
@@ -3397,41 +3400,41 @@ __PYX_XDEC_MEMVIEW(&__pyx_v_x_i, 1);
       __pyx_t_12 = 0;
       __pyx_v_result_index = (__pyx_v_result_index + __Pyx_pow_long(0, (*((long *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_binary_flgs.data + __pyx_t_11 * __pyx_v_binary_flgs.strides[0]) ) + __pyx_t_12 * __pyx_v_binary_flgs.strides[1]) )))));
 
-      /* "cutils.pyx":247
+      /* "cutils.pyx":250
  *             result_index = int(x_i[0])
  *             result_index += 0**binary_flgs[corner, 0]
  *             for j in range(1, dims):             # <<<<<<<<<<<<<<
  *                 result_index *= grid_num[j]
- *                 integer_xi = int(x_i[j])
+ *                 integer_xi = <int> floor(x_i[j])
  */
       __pyx_t_13 = __pyx_v_dims;
       __pyx_t_14 = __pyx_t_13;
       for (__pyx_t_15 = 1; __pyx_t_15 < __pyx_t_14; __pyx_t_15+=1) {
         __pyx_v_j = __pyx_t_15;
 
-        /* "cutils.pyx":248
+        /* "cutils.pyx":251
  *             result_index += 0**binary_flgs[corner, 0]
  *             for j in range(1, dims):
  *                 result_index *= grid_num[j]             # <<<<<<<<<<<<<<
- *                 integer_xi = int(x_i[j])
+ *                 integer_xi = <int> floor(x_i[j])
  *                 result_index += (integer_xi + 0**binary_flgs[corner, j])
  */
         __pyx_t_16 = __pyx_v_j;
         __pyx_v_result_index = (__pyx_v_result_index * (*((long *) ( /* dim=0 */ (__pyx_v_grid_num.data + __pyx_t_16 * __pyx_v_grid_num.strides[0]) ))));
 
-        /* "cutils.pyx":249
+        /* "cutils.pyx":252
  *             for j in range(1, dims):
  *                 result_index *= grid_num[j]
- *                 integer_xi = int(x_i[j])             # <<<<<<<<<<<<<<
+ *                 integer_xi = <int> floor(x_i[j])             # <<<<<<<<<<<<<<
  *                 result_index += (integer_xi + 0**binary_flgs[corner, j])
  * 
  */
         __pyx_t_17 = __pyx_v_j;
-        __pyx_v_integer_xi = ((int)(*((double *) ( /* dim=0 */ (__pyx_v_x_i.data + __pyx_t_17 * __pyx_v_x_i.strides[0]) ))));
+        __pyx_v_integer_xi = ((int)floor((*((double *) ( /* dim=0 */ (__pyx_v_x_i.data + __pyx_t_17 * __pyx_v_x_i.strides[0]) )))));
 
-        /* "cutils.pyx":250
+        /* "cutils.pyx":253
  *                 result_index *= grid_num[j]
- *                 integer_xi = int(x_i[j])
+ *                 integer_xi = <int> floor(x_i[j])
  *                 result_index += (integer_xi + 0**binary_flgs[corner, j])             # <<<<<<<<<<<<<<
  * 
  *             # (2) The value is found by
@@ -3441,7 +3444,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_v_x_i, 1);
         __pyx_v_result_index = (__pyx_v_result_index + (__pyx_v_integer_xi + __Pyx_pow_long(0, (*((long *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_binary_flgs.data + __pyx_t_18 * __pyx_v_binary_flgs.strides[0]) ) + __pyx_t_19 * __pyx_v_binary_flgs.strides[1]) ))))));
       }
 
-      /* "cutils.pyx":254
+      /* "cutils.pyx":257
  *             # (2) The value is found by
  *             # PROD_{i=0} (1 - frac(x[i))**flg * frac(x[i]) ** (1 - flg)
  *             corner_value = 1.0             # <<<<<<<<<<<<<<
@@ -3450,7 +3453,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_v_x_i, 1);
  */
       __pyx_v_corner_value = 1.0;
 
-      /* "cutils.pyx":255
+      /* "cutils.pyx":258
  *             # PROD_{i=0} (1 - frac(x[i))**flg * frac(x[i]) ** (1 - flg)
  *             corner_value = 1.0
  *             for j in range(dims):             # <<<<<<<<<<<<<<
@@ -3462,7 +3465,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_v_x_i, 1);
       for (__pyx_t_15 = 0; __pyx_t_15 < __pyx_t_14; __pyx_t_15+=1) {
         __pyx_v_j = __pyx_t_15;
 
-        /* "cutils.pyx":256
+        /* "cutils.pyx":259
  *             corner_value = 1.0
  *             for j in range(dims):
  *                 flg = binary_flgs[corner, j]             # <<<<<<<<<<<<<<
@@ -3473,7 +3476,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_v_x_i, 1);
         __pyx_t_21 = __pyx_v_j;
         __pyx_v_flg = (*((long *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_binary_flgs.data + __pyx_t_20 * __pyx_v_binary_flgs.strides[0]) ) + __pyx_t_21 * __pyx_v_binary_flgs.strides[1]) )));
 
-        /* "cutils.pyx":259
+        /* "cutils.pyx":262
  *                 # Compute this part of the product, using binary flags to
  *                 # indicate whether the factor should be x_i or (1 - x_i)
  *                 fraction = x_i[j] % 1             # <<<<<<<<<<<<<<
@@ -3483,7 +3486,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_v_x_i, 1);
         __pyx_t_22 = __pyx_v_j;
         __pyx_v_fraction = fmod((*((double *) ( /* dim=0 */ (__pyx_v_x_i.data + __pyx_t_22 * __pyx_v_x_i.strides[0]) ))), 1.0);
 
-        /* "cutils.pyx":260
+        /* "cutils.pyx":263
  *                 # indicate whether the factor should be x_i or (1 - x_i)
  *                 fraction = x_i[j] % 1
  *                 corner_value *= (1 - fraction)**flg * fraction**(1 - flg)             # <<<<<<<<<<<<<<
@@ -3493,7 +3496,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_v_x_i, 1);
         __pyx_v_corner_value = (__pyx_v_corner_value * (pow((1.0 - __pyx_v_fraction), ((double)__pyx_v_flg)) * pow(__pyx_v_fraction, ((double)(1 - __pyx_v_flg)))));
       }
 
-      /* "cutils.pyx":263
+      /* "cutils.pyx":266
  * 
  *             # Finished computing index and result, add to the grid corner point
  *             result[result_index % obs_tot] += corner_value             # <<<<<<<<<<<<<<
@@ -3505,7 +3508,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_v_x_i, 1);
     }
   }
 
-  /* "cutils.pyx":265
+  /* "cutils.pyx":268
  *             result[result_index % obs_tot] += corner_value
  * 
  *     return result             # <<<<<<<<<<<<<<
@@ -3513,13 +3516,13 @@ __PYX_XDEC_MEMVIEW(&__pyx_v_x_i, 1);
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_24 = __pyx_memoryview_fromslice(__pyx_v_result, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 265, __pyx_L1_error)
+  __pyx_t_24 = __pyx_memoryview_fromslice(__pyx_v_result, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 268, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_24);
   __pyx_r = __pyx_t_24;
   __pyx_t_24 = 0;
   goto __pyx_L0;
 
-  /* "cutils.pyx":190
+  /* "cutils.pyx":193
  * @cython.wraparound(False)
  * @cython.cdivision(True)
  * def iterate_data_ND(double[:, :] data, double[:] result, long[:] grid_num,             # <<<<<<<<<<<<<<
@@ -3544,7 +3547,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_v_x_i, 1);
   return __pyx_r;
 }
 
-/* "cutils.pyx":271
+/* "cutils.pyx":274
  * @cython.wraparound(False)
  * @cython.cdivision(True)
  * def iterate_data_ND_weighted(double[:, :] data, double[:] weights, double[:] result,             # <<<<<<<<<<<<<<
@@ -3597,35 +3600,35 @@ static PyObject *__pyx_pw_6cutils_11iterate_data_ND_weighted(PyObject *__pyx_sel
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_weights)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("iterate_data_ND_weighted", 1, 6, 6, 1); __PYX_ERR(0, 271, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("iterate_data_ND_weighted", 1, 6, 6, 1); __PYX_ERR(0, 274, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_result)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("iterate_data_ND_weighted", 1, 6, 6, 2); __PYX_ERR(0, 271, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("iterate_data_ND_weighted", 1, 6, 6, 2); __PYX_ERR(0, 274, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_grid_num)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("iterate_data_ND_weighted", 1, 6, 6, 3); __PYX_ERR(0, 271, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("iterate_data_ND_weighted", 1, 6, 6, 3); __PYX_ERR(0, 274, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_obs_tot)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("iterate_data_ND_weighted", 1, 6, 6, 4); __PYX_ERR(0, 271, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("iterate_data_ND_weighted", 1, 6, 6, 4); __PYX_ERR(0, 274, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_binary_flgs)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("iterate_data_ND_weighted", 1, 6, 6, 5); __PYX_ERR(0, 271, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("iterate_data_ND_weighted", 1, 6, 6, 5); __PYX_ERR(0, 274, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "iterate_data_ND_weighted") < 0)) __PYX_ERR(0, 271, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "iterate_data_ND_weighted") < 0)) __PYX_ERR(0, 274, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 6) {
       goto __pyx_L5_argtuple_error;
@@ -3637,16 +3640,16 @@ static PyObject *__pyx_pw_6cutils_11iterate_data_ND_weighted(PyObject *__pyx_sel
       values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
       values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
     }
-    __pyx_v_data = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_data.memview)) __PYX_ERR(0, 271, __pyx_L3_error)
-    __pyx_v_weights = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_weights.memview)) __PYX_ERR(0, 271, __pyx_L3_error)
-    __pyx_v_result = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_result.memview)) __PYX_ERR(0, 271, __pyx_L3_error)
-    __pyx_v_grid_num = __Pyx_PyObject_to_MemoryviewSlice_ds_long(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_grid_num.memview)) __PYX_ERR(0, 272, __pyx_L3_error)
-    __pyx_v_obs_tot = __Pyx_PyInt_As_int(values[4]); if (unlikely((__pyx_v_obs_tot == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 272, __pyx_L3_error)
-    __pyx_v_binary_flgs = __Pyx_PyObject_to_MemoryviewSlice_dsds_long(values[5], PyBUF_WRITABLE); if (unlikely(!__pyx_v_binary_flgs.memview)) __PYX_ERR(0, 272, __pyx_L3_error)
+    __pyx_v_data = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_data.memview)) __PYX_ERR(0, 274, __pyx_L3_error)
+    __pyx_v_weights = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_weights.memview)) __PYX_ERR(0, 274, __pyx_L3_error)
+    __pyx_v_result = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_result.memview)) __PYX_ERR(0, 274, __pyx_L3_error)
+    __pyx_v_grid_num = __Pyx_PyObject_to_MemoryviewSlice_ds_long(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_grid_num.memview)) __PYX_ERR(0, 275, __pyx_L3_error)
+    __pyx_v_obs_tot = __Pyx_PyInt_As_int(values[4]); if (unlikely((__pyx_v_obs_tot == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 275, __pyx_L3_error)
+    __pyx_v_binary_flgs = __Pyx_PyObject_to_MemoryviewSlice_dsds_long(values[5], PyBUF_WRITABLE); if (unlikely(!__pyx_v_binary_flgs.memview)) __PYX_ERR(0, 275, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("iterate_data_ND_weighted", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 271, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("iterate_data_ND_weighted", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 274, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("cutils.iterate_data_ND_weighted", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -3702,7 +3705,7 @@ static PyObject *__pyx_pf_6cutils_10iterate_data_ND_weighted(CYTHON_UNUSED PyObj
   PyObject *__pyx_t_25 = NULL;
   __Pyx_RefNannySetupContext("iterate_data_ND_weighted", 0);
 
-  /* "cutils.pyx":280
+  /* "cutils.pyx":283
  *     cdef double[:] x_i
  * 
  *     obs, dims = data.shape[0], data.shape[1]             # <<<<<<<<<<<<<<
@@ -3714,7 +3717,7 @@ static PyObject *__pyx_pf_6cutils_10iterate_data_ND_weighted(CYTHON_UNUSED PyObj
   __pyx_v_obs = __pyx_t_1;
   __pyx_v_dims = __pyx_t_2;
 
-  /* "cutils.pyx":281
+  /* "cutils.pyx":284
  * 
  *     obs, dims = data.shape[0], data.shape[1]
  *     corners = 2**dims             # <<<<<<<<<<<<<<
@@ -3723,7 +3726,7 @@ static PyObject *__pyx_pf_6cutils_10iterate_data_ND_weighted(CYTHON_UNUSED PyObj
  */
   __pyx_v_corners = __Pyx_pow_long(2, ((long)__pyx_v_dims));
 
-  /* "cutils.pyx":283
+  /* "cutils.pyx":286
  *     corners = 2**dims
  * 
  *     for i in range(obs):             # <<<<<<<<<<<<<<
@@ -3735,7 +3738,7 @@ static PyObject *__pyx_pf_6cutils_10iterate_data_ND_weighted(CYTHON_UNUSED PyObj
   for (__pyx_t_5 = 0; __pyx_t_5 < __pyx_t_4; __pyx_t_5+=1) {
     __pyx_v_i = __pyx_t_5;
 
-    /* "cutils.pyx":284
+    /* "cutils.pyx":287
  * 
  *     for i in range(obs):
  *         x_i = data[i, :]             # <<<<<<<<<<<<<<
@@ -3753,7 +3756,7 @@ static PyObject *__pyx_pf_6cutils_10iterate_data_ND_weighted(CYTHON_UNUSED PyObj
         __pyx_tmp_idx += __pyx_tmp_shape;
     if (0 && (__pyx_tmp_idx < 0 || __pyx_tmp_idx >= __pyx_tmp_shape)) {
         PyErr_SetString(PyExc_IndexError, "Index out of bounds (axis 0)");
-        __PYX_ERR(0, 284, __pyx_L1_error)
+        __PYX_ERR(0, 287, __pyx_L1_error)
     }
         __pyx_t_6.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
@@ -3767,7 +3770,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_v_x_i, 1);
     __pyx_t_6.memview = NULL;
     __pyx_t_6.data = NULL;
 
-    /* "cutils.pyx":285
+    /* "cutils.pyx":288
  *     for i in range(obs):
  *         x_i = data[i, :]
  *         weight = weights[i]             # <<<<<<<<<<<<<<
@@ -3777,7 +3780,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_v_x_i, 1);
     __pyx_t_7 = __pyx_v_i;
     __pyx_v_weight = (*((double *) ( /* dim=0 */ (__pyx_v_weights.data + __pyx_t_7 * __pyx_v_weights.strides[0]) )));
 
-    /* "cutils.pyx":287
+    /* "cutils.pyx":290
  *         weight = weights[i]
  * 
  *         for corner in range(corners):             # <<<<<<<<<<<<<<
@@ -3789,7 +3792,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_v_x_i, 1);
     for (__pyx_t_10 = 0; __pyx_t_10 < __pyx_t_9; __pyx_t_10+=1) {
       __pyx_v_corner = __pyx_t_10;
 
-      /* "cutils.pyx":289
+      /* "cutils.pyx":292
  *         for corner in range(corners):
  * 
  *             result_index = int(x_i[0])             # <<<<<<<<<<<<<<
@@ -3799,7 +3802,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_v_x_i, 1);
       __pyx_t_11 = 0;
       __pyx_v_result_index = ((int)(*((double *) ( /* dim=0 */ (__pyx_v_x_i.data + __pyx_t_11 * __pyx_v_x_i.strides[0]) ))));
 
-      /* "cutils.pyx":290
+      /* "cutils.pyx":293
  * 
  *             result_index = int(x_i[0])
  *             result_index += 0**binary_flgs[corner, 0]             # <<<<<<<<<<<<<<
@@ -3810,41 +3813,41 @@ __PYX_XDEC_MEMVIEW(&__pyx_v_x_i, 1);
       __pyx_t_13 = 0;
       __pyx_v_result_index = (__pyx_v_result_index + __Pyx_pow_long(0, (*((long *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_binary_flgs.data + __pyx_t_12 * __pyx_v_binary_flgs.strides[0]) ) + __pyx_t_13 * __pyx_v_binary_flgs.strides[1]) )))));
 
-      /* "cutils.pyx":291
+      /* "cutils.pyx":294
  *             result_index = int(x_i[0])
  *             result_index += 0**binary_flgs[corner, 0]
  *             for j in range(1, dims):             # <<<<<<<<<<<<<<
  *                 result_index *= grid_num[j]
- *                 integer_xi = int(x_i[j])
+ *                 integer_xi = <int> floor(x_i[j])
  */
       __pyx_t_14 = __pyx_v_dims;
       __pyx_t_15 = __pyx_t_14;
       for (__pyx_t_16 = 1; __pyx_t_16 < __pyx_t_15; __pyx_t_16+=1) {
         __pyx_v_j = __pyx_t_16;
 
-        /* "cutils.pyx":292
+        /* "cutils.pyx":295
  *             result_index += 0**binary_flgs[corner, 0]
  *             for j in range(1, dims):
  *                 result_index *= grid_num[j]             # <<<<<<<<<<<<<<
- *                 integer_xi = int(x_i[j])
+ *                 integer_xi = <int> floor(x_i[j])
  *                 result_index += (integer_xi + 0**binary_flgs[corner, j])
  */
         __pyx_t_17 = __pyx_v_j;
         __pyx_v_result_index = (__pyx_v_result_index * (*((long *) ( /* dim=0 */ (__pyx_v_grid_num.data + __pyx_t_17 * __pyx_v_grid_num.strides[0]) ))));
 
-        /* "cutils.pyx":293
+        /* "cutils.pyx":296
  *             for j in range(1, dims):
  *                 result_index *= grid_num[j]
- *                 integer_xi = int(x_i[j])             # <<<<<<<<<<<<<<
+ *                 integer_xi = <int> floor(x_i[j])             # <<<<<<<<<<<<<<
  *                 result_index += (integer_xi + 0**binary_flgs[corner, j])
  * 
  */
         __pyx_t_18 = __pyx_v_j;
-        __pyx_v_integer_xi = ((int)(*((double *) ( /* dim=0 */ (__pyx_v_x_i.data + __pyx_t_18 * __pyx_v_x_i.strides[0]) ))));
+        __pyx_v_integer_xi = ((int)floor((*((double *) ( /* dim=0 */ (__pyx_v_x_i.data + __pyx_t_18 * __pyx_v_x_i.strides[0]) )))));
 
-        /* "cutils.pyx":294
+        /* "cutils.pyx":297
  *                 result_index *= grid_num[j]
- *                 integer_xi = int(x_i[j])
+ *                 integer_xi = <int> floor(x_i[j])
  *                 result_index += (integer_xi + 0**binary_flgs[corner, j])             # <<<<<<<<<<<<<<
  * 
  *             corner_value = 1.0
@@ -3854,7 +3857,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_v_x_i, 1);
         __pyx_v_result_index = (__pyx_v_result_index + (__pyx_v_integer_xi + __Pyx_pow_long(0, (*((long *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_binary_flgs.data + __pyx_t_19 * __pyx_v_binary_flgs.strides[0]) ) + __pyx_t_20 * __pyx_v_binary_flgs.strides[1]) ))))));
       }
 
-      /* "cutils.pyx":296
+      /* "cutils.pyx":299
  *                 result_index += (integer_xi + 0**binary_flgs[corner, j])
  * 
  *             corner_value = 1.0             # <<<<<<<<<<<<<<
@@ -3863,7 +3866,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_v_x_i, 1);
  */
       __pyx_v_corner_value = 1.0;
 
-      /* "cutils.pyx":297
+      /* "cutils.pyx":300
  * 
  *             corner_value = 1.0
  *             for j in range(dims):             # <<<<<<<<<<<<<<
@@ -3875,7 +3878,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_v_x_i, 1);
       for (__pyx_t_16 = 0; __pyx_t_16 < __pyx_t_15; __pyx_t_16+=1) {
         __pyx_v_j = __pyx_t_16;
 
-        /* "cutils.pyx":298
+        /* "cutils.pyx":301
  *             corner_value = 1.0
  *             for j in range(dims):
  *                 flg = binary_flgs[corner, j]             # <<<<<<<<<<<<<<
@@ -3886,7 +3889,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_v_x_i, 1);
         __pyx_t_22 = __pyx_v_j;
         __pyx_v_flg = (*((long *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_binary_flgs.data + __pyx_t_21 * __pyx_v_binary_flgs.strides[0]) ) + __pyx_t_22 * __pyx_v_binary_flgs.strides[1]) )));
 
-        /* "cutils.pyx":299
+        /* "cutils.pyx":302
  *             for j in range(dims):
  *                 flg = binary_flgs[corner, j]
  *                 fraction = x_i[j] % 1             # <<<<<<<<<<<<<<
@@ -3896,7 +3899,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_v_x_i, 1);
         __pyx_t_23 = __pyx_v_j;
         __pyx_v_fraction = fmod((*((double *) ( /* dim=0 */ (__pyx_v_x_i.data + __pyx_t_23 * __pyx_v_x_i.strides[0]) ))), 1.0);
 
-        /* "cutils.pyx":300
+        /* "cutils.pyx":303
  *                 flg = binary_flgs[corner, j]
  *                 fraction = x_i[j] % 1
  *                 corner_value *= (1 - fraction)**flg * fraction**(1 - flg)             # <<<<<<<<<<<<<<
@@ -3906,7 +3909,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_v_x_i, 1);
         __pyx_v_corner_value = (__pyx_v_corner_value * (pow((1.0 - __pyx_v_fraction), ((double)__pyx_v_flg)) * pow(__pyx_v_fraction, ((double)(1 - __pyx_v_flg)))));
       }
 
-      /* "cutils.pyx":302
+      /* "cutils.pyx":305
  *                 corner_value *= (1 - fraction)**flg * fraction**(1 - flg)
  * 
  *             result[result_index % obs_tot] += corner_value  * weight             # <<<<<<<<<<<<<<
@@ -3918,19 +3921,19 @@ __PYX_XDEC_MEMVIEW(&__pyx_v_x_i, 1);
     }
   }
 
-  /* "cutils.pyx":304
+  /* "cutils.pyx":307
  *             result[result_index % obs_tot] += corner_value  * weight
  * 
  *     return result             # <<<<<<<<<<<<<<
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_25 = __pyx_memoryview_fromslice(__pyx_v_result, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 304, __pyx_L1_error)
+  __pyx_t_25 = __pyx_memoryview_fromslice(__pyx_v_result, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 307, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_25);
   __pyx_r = __pyx_t_25;
   __pyx_t_25 = 0;
   goto __pyx_L0;
 
-  /* "cutils.pyx":271
+  /* "cutils.pyx":274
  * @cython.wraparound(False)
  * @cython.cdivision(True)
  * def iterate_data_ND_weighted(double[:, :] data, double[:] weights, double[:] result,             # <<<<<<<<<<<<<<
@@ -17713,7 +17716,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 50, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 51, __pyx_L1_error)
   __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(1, 132, __pyx_L1_error)
   __pyx_builtin_MemoryError = __Pyx_GetBuiltinName(__pyx_n_s_MemoryError); if (!__pyx_builtin_MemoryError) __PYX_ERR(1, 147, __pyx_L1_error)
   __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_n_s_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(1, 150, __pyx_L1_error)
@@ -17955,77 +17958,77 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__21);
   __Pyx_GIVEREF(__pyx_tuple__21);
 
-  /* "cutils.pyx":34
+  /* "cutils.pyx":35
  * @cython.wraparound(False)
  * @cython.cdivision(True)
  * def iterate_data_1D_weighted(double[:] transformed_data, double[:] weights, double[:] result):             # <<<<<<<<<<<<<<
  *     """
  *     1D fast binning with weights. Faster than N-dimensional cython function
  */
-  __pyx_tuple__22 = PyTuple_Pack(10, __pyx_n_s_transformed_data, __pyx_n_s_weights, __pyx_n_s_result, __pyx_n_s_obs, __pyx_n_s_integral, __pyx_n_s_data_point, __pyx_n_s_weight, __pyx_n_s_fractional, __pyx_n_s_frac_times_weight, __pyx_n_s_i); if (unlikely(!__pyx_tuple__22)) __PYX_ERR(0, 34, __pyx_L1_error)
+  __pyx_tuple__22 = PyTuple_Pack(10, __pyx_n_s_transformed_data, __pyx_n_s_weights, __pyx_n_s_result, __pyx_n_s_obs, __pyx_n_s_integral, __pyx_n_s_data_point, __pyx_n_s_weight, __pyx_n_s_fractional, __pyx_n_s_frac_times_weight, __pyx_n_s_i); if (unlikely(!__pyx_tuple__22)) __PYX_ERR(0, 35, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__22);
   __Pyx_GIVEREF(__pyx_tuple__22);
-  __pyx_codeobj__23 = (PyObject*)__Pyx_PyCode_New(3, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__22, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_KDEpy_cutils_pyx, __pyx_n_s_iterate_data_1D_weighted, 34, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__23)) __PYX_ERR(0, 34, __pyx_L1_error)
+  __pyx_codeobj__23 = (PyObject*)__Pyx_PyCode_New(3, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__22, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_KDEpy_cutils_pyx, __pyx_n_s_iterate_data_1D_weighted, 35, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__23)) __PYX_ERR(0, 35, __pyx_L1_error)
 
-  /* "cutils.pyx":65
+  /* "cutils.pyx":68
  * @cython.wraparound(False)
  * @cython.cdivision(True)
  * def iterate_data_1D(double[:] transformed_data, double[:] result):             # <<<<<<<<<<<<<<
  *     """
  *     1D fast binning weights. Faster than N-dimensional cython function
  */
-  __pyx_tuple__24 = PyTuple_Pack(8, __pyx_n_s_transformed_data, __pyx_n_s_result, __pyx_n_s_obs, __pyx_n_s_integral, __pyx_n_s_data_point, __pyx_n_s_weight, __pyx_n_s_fractional, __pyx_n_s_i); if (unlikely(!__pyx_tuple__24)) __PYX_ERR(0, 65, __pyx_L1_error)
+  __pyx_tuple__24 = PyTuple_Pack(8, __pyx_n_s_transformed_data, __pyx_n_s_result, __pyx_n_s_obs, __pyx_n_s_integral, __pyx_n_s_data_point, __pyx_n_s_weight, __pyx_n_s_fractional, __pyx_n_s_i); if (unlikely(!__pyx_tuple__24)) __PYX_ERR(0, 68, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__24);
   __Pyx_GIVEREF(__pyx_tuple__24);
-  __pyx_codeobj__25 = (PyObject*)__Pyx_PyCode_New(2, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__24, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_KDEpy_cutils_pyx, __pyx_n_s_iterate_data_1D, 65, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__25)) __PYX_ERR(0, 65, __pyx_L1_error)
+  __pyx_codeobj__25 = (PyObject*)__Pyx_PyCode_New(2, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__24, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_KDEpy_cutils_pyx, __pyx_n_s_iterate_data_1D, 68, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__25)) __PYX_ERR(0, 68, __pyx_L1_error)
 
-  /* "cutils.pyx":91
+  /* "cutils.pyx":94
  * @cython.wraparound(False)
  * @cython.cdivision(True)
  * def iterate_data_2D_weighted(double[:, :] data, double[:] weights,             # <<<<<<<<<<<<<<
  *                              double[:] result, long[:] grid_num, int obs_tot):
  *     """
  */
-  __pyx_tuple__26 = PyTuple_Pack(20, __pyx_n_s_data, __pyx_n_s_weights, __pyx_n_s_result, __pyx_n_s_grid_num, __pyx_n_s_obs_tot, __pyx_n_s_obs, __pyx_n_s_index, __pyx_n_s_i, __pyx_n_s_x_integral, __pyx_n_s_y_integral, __pyx_n_s_grid_num1, __pyx_n_s_x, __pyx_n_s_y, __pyx_n_s_weight, __pyx_n_s_x_fractional, __pyx_n_s_y_fractional, __pyx_n_s_value, __pyx_n_s_xy, __pyx_n_s_y_xy, __pyx_n_s_x_xy); if (unlikely(!__pyx_tuple__26)) __PYX_ERR(0, 91, __pyx_L1_error)
+  __pyx_tuple__26 = PyTuple_Pack(20, __pyx_n_s_data, __pyx_n_s_weights, __pyx_n_s_result, __pyx_n_s_grid_num, __pyx_n_s_obs_tot, __pyx_n_s_obs, __pyx_n_s_index, __pyx_n_s_i, __pyx_n_s_x_integral, __pyx_n_s_y_integral, __pyx_n_s_grid_num1, __pyx_n_s_x, __pyx_n_s_y, __pyx_n_s_weight, __pyx_n_s_x_fractional, __pyx_n_s_y_fractional, __pyx_n_s_value, __pyx_n_s_xy, __pyx_n_s_y_xy, __pyx_n_s_x_xy); if (unlikely(!__pyx_tuple__26)) __PYX_ERR(0, 94, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__26);
   __Pyx_GIVEREF(__pyx_tuple__26);
-  __pyx_codeobj__27 = (PyObject*)__Pyx_PyCode_New(5, 0, 20, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__26, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_KDEpy_cutils_pyx, __pyx_n_s_iterate_data_2D_weighted, 91, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__27)) __PYX_ERR(0, 91, __pyx_L1_error)
+  __pyx_codeobj__27 = (PyObject*)__Pyx_PyCode_New(5, 0, 20, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__26, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_KDEpy_cutils_pyx, __pyx_n_s_iterate_data_2D_weighted, 94, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__27)) __PYX_ERR(0, 94, __pyx_L1_error)
 
-  /* "cutils.pyx":146
+  /* "cutils.pyx":149
  * @cython.wraparound(False)
  * @cython.cdivision(True)
  * def iterate_data_2D(double[:, :] data, double[:] result, long[:] grid_num,             # <<<<<<<<<<<<<<
  *                     int obs_tot):
  *     """
  */
-  __pyx_tuple__28 = PyTuple_Pack(18, __pyx_n_s_data, __pyx_n_s_result, __pyx_n_s_grid_num, __pyx_n_s_obs_tot, __pyx_n_s_obs, __pyx_n_s_index, __pyx_n_s_i, __pyx_n_s_x_integral, __pyx_n_s_y_integral, __pyx_n_s_grid_num1, __pyx_n_s_x, __pyx_n_s_y, __pyx_n_s_x_fractional, __pyx_n_s_y_fractional, __pyx_n_s_value, __pyx_n_s_xy, __pyx_n_s_y_xy, __pyx_n_s_x_xy); if (unlikely(!__pyx_tuple__28)) __PYX_ERR(0, 146, __pyx_L1_error)
+  __pyx_tuple__28 = PyTuple_Pack(18, __pyx_n_s_data, __pyx_n_s_result, __pyx_n_s_grid_num, __pyx_n_s_obs_tot, __pyx_n_s_obs, __pyx_n_s_index, __pyx_n_s_i, __pyx_n_s_x_integral, __pyx_n_s_y_integral, __pyx_n_s_grid_num1, __pyx_n_s_x, __pyx_n_s_y, __pyx_n_s_x_fractional, __pyx_n_s_y_fractional, __pyx_n_s_value, __pyx_n_s_xy, __pyx_n_s_y_xy, __pyx_n_s_x_xy); if (unlikely(!__pyx_tuple__28)) __PYX_ERR(0, 149, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__28);
   __Pyx_GIVEREF(__pyx_tuple__28);
-  __pyx_codeobj__29 = (PyObject*)__Pyx_PyCode_New(4, 0, 18, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__28, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_KDEpy_cutils_pyx, __pyx_n_s_iterate_data_2D, 146, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__29)) __PYX_ERR(0, 146, __pyx_L1_error)
+  __pyx_codeobj__29 = (PyObject*)__Pyx_PyCode_New(4, 0, 18, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__28, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_KDEpy_cutils_pyx, __pyx_n_s_iterate_data_2D, 149, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__29)) __PYX_ERR(0, 149, __pyx_L1_error)
 
-  /* "cutils.pyx":190
+  /* "cutils.pyx":193
  * @cython.wraparound(False)
  * @cython.cdivision(True)
  * def iterate_data_ND(double[:, :] data, double[:] result, long[:] grid_num,             # <<<<<<<<<<<<<<
  *                     int obs_tot, long[:, :] binary_flgs):
  *     """
  */
-  __pyx_tuple__30 = PyTuple_Pack(17, __pyx_n_s_data, __pyx_n_s_result, __pyx_n_s_grid_num, __pyx_n_s_obs_tot, __pyx_n_s_binary_flgs, __pyx_n_s_obs, __pyx_n_s_result_index, __pyx_n_s_i, __pyx_n_s_dims, __pyx_n_s_corners, __pyx_n_s_j, __pyx_n_s_flg, __pyx_n_s_corner, __pyx_n_s_integer_xi, __pyx_n_s_corner_value, __pyx_n_s_fraction, __pyx_n_s_x_i); if (unlikely(!__pyx_tuple__30)) __PYX_ERR(0, 190, __pyx_L1_error)
+  __pyx_tuple__30 = PyTuple_Pack(17, __pyx_n_s_data, __pyx_n_s_result, __pyx_n_s_grid_num, __pyx_n_s_obs_tot, __pyx_n_s_binary_flgs, __pyx_n_s_obs, __pyx_n_s_result_index, __pyx_n_s_i, __pyx_n_s_dims, __pyx_n_s_corners, __pyx_n_s_j, __pyx_n_s_flg, __pyx_n_s_corner, __pyx_n_s_integer_xi, __pyx_n_s_corner_value, __pyx_n_s_fraction, __pyx_n_s_x_i); if (unlikely(!__pyx_tuple__30)) __PYX_ERR(0, 193, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__30);
   __Pyx_GIVEREF(__pyx_tuple__30);
-  __pyx_codeobj__31 = (PyObject*)__Pyx_PyCode_New(5, 0, 17, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__30, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_KDEpy_cutils_pyx, __pyx_n_s_iterate_data_ND, 190, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__31)) __PYX_ERR(0, 190, __pyx_L1_error)
+  __pyx_codeobj__31 = (PyObject*)__Pyx_PyCode_New(5, 0, 17, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__30, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_KDEpy_cutils_pyx, __pyx_n_s_iterate_data_ND, 193, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__31)) __PYX_ERR(0, 193, __pyx_L1_error)
 
-  /* "cutils.pyx":271
+  /* "cutils.pyx":274
  * @cython.wraparound(False)
  * @cython.cdivision(True)
  * def iterate_data_ND_weighted(double[:, :] data, double[:] weights, double[:] result,             # <<<<<<<<<<<<<<
  *                     long[:] grid_num, int obs_tot, long[:, :] binary_flgs):
  *     """
  */
-  __pyx_tuple__32 = PyTuple_Pack(19, __pyx_n_s_data, __pyx_n_s_weights, __pyx_n_s_result, __pyx_n_s_grid_num, __pyx_n_s_obs_tot, __pyx_n_s_binary_flgs, __pyx_n_s_obs, __pyx_n_s_result_index, __pyx_n_s_i, __pyx_n_s_dims, __pyx_n_s_corners, __pyx_n_s_j, __pyx_n_s_flg, __pyx_n_s_corner, __pyx_n_s_integer_xi, __pyx_n_s_corner_value, __pyx_n_s_fraction, __pyx_n_s_weight, __pyx_n_s_x_i); if (unlikely(!__pyx_tuple__32)) __PYX_ERR(0, 271, __pyx_L1_error)
+  __pyx_tuple__32 = PyTuple_Pack(19, __pyx_n_s_data, __pyx_n_s_weights, __pyx_n_s_result, __pyx_n_s_grid_num, __pyx_n_s_obs_tot, __pyx_n_s_binary_flgs, __pyx_n_s_obs, __pyx_n_s_result_index, __pyx_n_s_i, __pyx_n_s_dims, __pyx_n_s_corners, __pyx_n_s_j, __pyx_n_s_flg, __pyx_n_s_corner, __pyx_n_s_integer_xi, __pyx_n_s_corner_value, __pyx_n_s_fraction, __pyx_n_s_weight, __pyx_n_s_x_i); if (unlikely(!__pyx_tuple__32)) __PYX_ERR(0, 274, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__32);
   __Pyx_GIVEREF(__pyx_tuple__32);
-  __pyx_codeobj__33 = (PyObject*)__Pyx_PyCode_New(6, 0, 19, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__32, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_KDEpy_cutils_pyx, __pyx_n_s_iterate_data_ND_weighted, 271, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__33)) __PYX_ERR(0, 271, __pyx_L1_error)
+  __pyx_codeobj__33 = (PyObject*)__Pyx_PyCode_New(6, 0, 19, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__32, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_KDEpy_cutils_pyx, __pyx_n_s_iterate_data_ND_weighted, 274, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__33)) __PYX_ERR(0, 274, __pyx_L1_error)
 
   /* "View.MemoryView":285
  *         return self.name
@@ -18398,76 +18401,76 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "cutils.pyx":34
+  /* "cutils.pyx":35
  * @cython.wraparound(False)
  * @cython.cdivision(True)
  * def iterate_data_1D_weighted(double[:] transformed_data, double[:] weights, double[:] result):             # <<<<<<<<<<<<<<
  *     """
  *     1D fast binning with weights. Faster than N-dimensional cython function
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6cutils_1iterate_data_1D_weighted, NULL, __pyx_n_s_cutils); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 34, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6cutils_1iterate_data_1D_weighted, NULL, __pyx_n_s_cutils); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 35, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_iterate_data_1D_weighted, __pyx_t_1) < 0) __PYX_ERR(0, 34, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_iterate_data_1D_weighted, __pyx_t_1) < 0) __PYX_ERR(0, 35, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "cutils.pyx":65
+  /* "cutils.pyx":68
  * @cython.wraparound(False)
  * @cython.cdivision(True)
  * def iterate_data_1D(double[:] transformed_data, double[:] result):             # <<<<<<<<<<<<<<
  *     """
  *     1D fast binning weights. Faster than N-dimensional cython function
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6cutils_3iterate_data_1D, NULL, __pyx_n_s_cutils); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 65, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6cutils_3iterate_data_1D, NULL, __pyx_n_s_cutils); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 68, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_iterate_data_1D, __pyx_t_1) < 0) __PYX_ERR(0, 65, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_iterate_data_1D, __pyx_t_1) < 0) __PYX_ERR(0, 68, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "cutils.pyx":91
+  /* "cutils.pyx":94
  * @cython.wraparound(False)
  * @cython.cdivision(True)
  * def iterate_data_2D_weighted(double[:, :] data, double[:] weights,             # <<<<<<<<<<<<<<
  *                              double[:] result, long[:] grid_num, int obs_tot):
  *     """
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6cutils_5iterate_data_2D_weighted, NULL, __pyx_n_s_cutils); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 91, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6cutils_5iterate_data_2D_weighted, NULL, __pyx_n_s_cutils); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 94, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_iterate_data_2D_weighted, __pyx_t_1) < 0) __PYX_ERR(0, 91, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_iterate_data_2D_weighted, __pyx_t_1) < 0) __PYX_ERR(0, 94, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "cutils.pyx":146
+  /* "cutils.pyx":149
  * @cython.wraparound(False)
  * @cython.cdivision(True)
  * def iterate_data_2D(double[:, :] data, double[:] result, long[:] grid_num,             # <<<<<<<<<<<<<<
  *                     int obs_tot):
  *     """
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6cutils_7iterate_data_2D, NULL, __pyx_n_s_cutils); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 146, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6cutils_7iterate_data_2D, NULL, __pyx_n_s_cutils); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 149, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_iterate_data_2D, __pyx_t_1) < 0) __PYX_ERR(0, 146, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_iterate_data_2D, __pyx_t_1) < 0) __PYX_ERR(0, 149, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "cutils.pyx":190
+  /* "cutils.pyx":193
  * @cython.wraparound(False)
  * @cython.cdivision(True)
  * def iterate_data_ND(double[:, :] data, double[:] result, long[:] grid_num,             # <<<<<<<<<<<<<<
  *                     int obs_tot, long[:, :] binary_flgs):
  *     """
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6cutils_9iterate_data_ND, NULL, __pyx_n_s_cutils); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 190, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6cutils_9iterate_data_ND, NULL, __pyx_n_s_cutils); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 193, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_iterate_data_ND, __pyx_t_1) < 0) __PYX_ERR(0, 190, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_iterate_data_ND, __pyx_t_1) < 0) __PYX_ERR(0, 193, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "cutils.pyx":271
+  /* "cutils.pyx":274
  * @cython.wraparound(False)
  * @cython.cdivision(True)
  * def iterate_data_ND_weighted(double[:, :] data, double[:] weights, double[:] result,             # <<<<<<<<<<<<<<
  *                     long[:] grid_num, int obs_tot, long[:, :] binary_flgs):
  *     """
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6cutils_11iterate_data_ND_weighted, NULL, __pyx_n_s_cutils); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 271, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6cutils_11iterate_data_ND_weighted, NULL, __pyx_n_s_cutils); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 274, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_iterate_data_ND_weighted, __pyx_t_1) < 0) __PYX_ERR(0, 271, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_iterate_data_ND_weighted, __pyx_t_1) < 0) __PYX_ERR(0, 274, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "cutils.pyx":1

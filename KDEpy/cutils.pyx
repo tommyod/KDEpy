@@ -17,6 +17,7 @@ is gone.
 """
 
 cimport cython
+from libc.math cimport floor
 
 # boundscheck(False) -> Cython is free to assume that indexing will not cause 
 # any IndexErrors to be raised.
@@ -50,7 +51,9 @@ def iterate_data_1D_weighted(double[:] transformed_data, double[:] weights, doub
     for i in range(obs):
         data_point = transformed_data[i]
         weight = weights[i]
-        integral = int(data_point)
+        # Using <int> as shown below is faster than int( . ) 
+        # integral = int(data_point)
+        integral = <int> floor(data_point)
         fractional = data_point - integral
         frac_times_weight = fractional * weight  # Compute product once
         result[integral + 1] += frac_times_weight
@@ -77,7 +80,7 @@ def iterate_data_1D(double[:] transformed_data, double[:] result):
     obs = transformed_data.shape[0]
     for i in range(obs):
         data_point = transformed_data[i]
-        integral = int(data_point)
+        integral = <int> floor(data_point)
         fractional = data_point - integral
         result[integral] += 1 - fractional
         result[integral + 1] += fractional
@@ -112,9 +115,9 @@ def iterate_data_2D_weighted(double[:, :] data, double[:] weights,
         y = data[i, 1]
         weight = weights[i]
         
-        x_integral = int(x)
+        x_integral = <int> floor(x)
         x_fractional = x - x_integral
-        y_integral = int(y)
+        y_integral = <int> floor(y)
         y_fractional = y - y_integral
 
         # Computations with few flops
@@ -164,9 +167,9 @@ def iterate_data_2D(double[:, :] data, double[:] result, long[:] grid_num,
     for i in range(obs):
         x = data[i, 0]
         y = data[i, 1]
-        x_integral = int(x)
+        x_integral = <int> floor(x)
         x_fractional = x - x_integral
-        y_integral = int(y)
+        y_integral = <int> floor(y)
         y_fractional = y - y_integral
         xy = x_fractional * y_fractional
         y_xy = y_fractional - xy
@@ -246,7 +249,7 @@ def iterate_data_ND(double[:, :] data, double[:] result, long[:] grid_num,
             result_index += 0**binary_flgs[corner, 0]
             for j in range(1, dims):
                 result_index *= grid_num[j]
-                integer_xi = int(x_i[j])
+                integer_xi = <int> floor(x_i[j])
                 result_index += (integer_xi + 0**binary_flgs[corner, j])
                 
             # (2) The value is found by
@@ -290,7 +293,7 @@ def iterate_data_ND_weighted(double[:, :] data, double[:] weights, double[:] res
             result_index += 0**binary_flgs[corner, 0]
             for j in range(1, dims):
                 result_index *= grid_num[j]
-                integer_xi = int(x_i[j])
+                integer_xi = <int> floor(x_i[j])
                 result_index += (integer_xi + 0**binary_flgs[corner, j])
 
             corner_value = 1.0
