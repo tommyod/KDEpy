@@ -20,54 +20,60 @@ here = os.path.abspath(os.path.dirname(__file__))
 save_path = os.path.join(here, r'../docs/source/_static/img/')
 
 
-def timed(n=5):
-    
+def timed(n=20, max_time=5):
+    """
+    Return a timing function running n times.
+    """
     
     def time_function(function):
-        
         @functools.wraps(function)
         def wrapped(*args, **kwargs):
             times = []
             for run in range(n):
                 start_time = time.perf_counter()
-                y = function(*args, **kwargs)
-                if time.perf_counter() - start_time > 2:
+                function(*args, **kwargs)
+                if time.perf_counter() - start_time > max_time:
                     return None
                 times.append(time.perf_counter() - start_time)
                 
             return times
-        
         return wrapped
-        
-        
     return time_function
 
+# -----------------------------------------------------------------------------
+# --------- Profiling the 1D implementations ----------------------------------
+# -----------------------------------------------------------------------------
 
 @timed()
-def KDE_KDEpyFFTKDE(data):
-    return FFTKDE().fit(data)()
+def KDE_KDEpyFFTKDE(data, kernel='gaussian'):
+    return FFTKDE(kernel=kernel).fit(data)()
 
 
 @timed()
-def KDE_scipy(data):
+def KDE_scipy(data, kernel='gaussian'):
     kde = gaussian_kde(data)
     x = np.linspace(np.min(data) - 1, np.max(data) + 1, num=2**10)
     return kde(x)
 
 
 @timed()
-def KDE_statsmodels(data):
+def KDE_statsmodels(data, kernel='gaussian'):
+    fft = True
+    if kernel == 'epa':
+        fft = False
     kde = sm.nonparametric.KDEUnivariate(data)
-    kde.fit(fft=True, gridsize=2**10) # Estimate the densities
+    kde.fit(fft=fft, gridsize=2**10) # Estimate the densities
     x, y = kde.support, kde.density
     return y
 
 
 @timed()
-def KDE_sklearn(data):
+def KDE_sklearn(data, kernel='gaussian'):
+    if kernel == 'epa':
+        kernel = 'epanechnikov'
     
     # instantiate and fit the KDE model
-    kde = KernelDensity(bandwidth=1.0, kernel='gaussian', rtol=1E-4)
+    kde = KernelDensity(bandwidth=1.0, kernel=kernel, rtol=1E-4)
     kde.fit(data.reshape(-1, 1))
     
     # score_samples returns the log of the probability density
@@ -75,39 +81,125 @@ def KDE_sklearn(data):
     logprob = kde.score_samples(x.reshape(-1, 1))
     return np.exp(logprob)
     
+if False:
+    data_sizes_orig = np.logspace(1, 8, num=15)
+    
+    plt.figure(figsize=(8, 4))
+    plt.title('Profiling KDE implementations. Epanechnikov (Gaussian) kernel on $2^{10}$ grid points.')
+    for function, name in zip([KDE_KDEpyFFTKDE, KDE_scipy, KDE_statsmodels, KDE_sklearn],
+                              ['KDEpy.FFTKDE', 'scipy', 'statsmodels', 'sklearn']):
+        agg_times = []
+        data_sizes = []
+        for data_size in data_sizes_orig:
+            np.random.seed(int(data_size % 7))
+            data = np.random.randn(int(data_size)) * np.random.randint(1, 10)
+            times = function(data, kernel='gaussian')
+            
+            if not times is None:
+                print(name, data_size)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+                agg_times.append(np.percentile(times, q= [25, 50, 75]))
+                data_sizes.append(data_size)
+            else:
+                break
+            
+        plt.loglog(data_sizes, [t[1] for t in agg_times], zorder=15, label=name)
+        plt.fill_between(data_sizes, 
+                         [t[0] for t in agg_times], 
+                         [t[2] for t in agg_times], alpha=0.5, zorder=-15)
+    
+    plt.legend(loc='best')
+    plt.xlabel('Number of data points $N$')
+    plt.ylabel('Evaluation time $t$')
+    plt.grid(True)
+    plt.tight_layout()
+    #plt.savefig(os.path.join(save_path, r'profiling_2D_gauss.png'))
+    plt.show()
 
-data_sizes_orig = [10**n for n in range(1, 9)]
-data_sizes_orig = list(itertools.accumulate((5, 2) * 7, operator.mul))
-data_sizes_orig = np.logspace(1, 8, num=15)
+# -----------------------------------------------------------------------------
+# --------- Profiling the 2D implementations ----------------------------------
+# -----------------------------------------------------------------------------
+from KDEpy.utils import cartesian
+
+@timed()
+def KDE_KDEpyFFTKDE(data1, data2, kernel='gaussian'):
+    data = np.concatenate((data1.reshape(-1, 1), data2.reshape(-1, 1)), axis=1)
+    x, y = FFTKDE(kernel=kernel).fit(data)((64, 64))
+    assert len(y) == 64*64
+    return y
+
+
+@timed()
+def KDE_scipy(data1, data2, kernel='gaussian'):
+    kde = gaussian_kde(np.vstack([data1, data2]))
+    X, Y = np.mgrid[-7:7:64j, -7:7:64j]
+    x = np.vstack([X.ravel(), Y.ravel()])
+    y = kde(x)
+    assert len(y) == 64*64
+    return y
+
+
+@timed()
+def KDE_statsmodels(data1, data2, kernel='gaussian'):
+    kde = sm.nonparametric.KDEMultivariate([data1.reshape(-1, 1), data2.reshape(-1, 1)],
+                                            var_type='cc')
+    grid = cartesian([np.linspace(-7, 7, num=64), 
+                      np.linspace(-7, 7, num=64)])
+    y = kde.pdf(grid)
+    assert len(y) == 64*64
+    return y
+
+@timed()
+def KDE_sklearn(data1, data2, kernel='gaussian'):
+    if kernel == 'epa':
+        kernel = 'epanechnikov'
+    
+    # instantiate and fit the KDE model
+    kde = KernelDensity(bandwidth=1.0, kernel=kernel, rtol=1E-4)
+    data = np.concatenate((data1.reshape(-1, 1), data2.reshape(-1, 1)), axis=1)
+    kde.fit(data)
+    
+    # score_samples returns the log of the probability density
+    #x = np.linspace(np.min(data) - 1, np.max(data) + 1, num=2**10)
+    grid = cartesian([np.linspace(-7, 7, num=64), np.linspace(-7, 7, num=64)])
+    logprob = kde.score_samples(grid)
+    y = np.exp(logprob)
+    assert len(y) == 64*64
+    return y
+    
+    
+
+data_sizes_orig = np.logspace(1, 6, num=11)
 
 plt.figure(figsize=(8, 4))
-plt.title('Profiling KDE implementations')
+plt.title(r'Profiling KDE implementations. Gaussian kernel on $64 \times 64$ grid points.')
 for function, name in zip([KDE_KDEpyFFTKDE, KDE_scipy, KDE_statsmodels, KDE_sklearn],
                           ['KDEpy.FFTKDE', 'scipy', 'statsmodels', 'sklearn']):
+    print(name)
     agg_times = []
     data_sizes = []
     for data_size in data_sizes_orig:
+        np.random.seed(int(data_size % 7))
         data = np.random.randn(int(data_size)) * np.random.randint(1, 10)
-        times = function(data)
-        print(data_size, times)
-        if not times is None:
-            agg_times.append(np.percentile(times, q= [10, 50, 90]))
+        data2 = np.random.randn(int(data_size)) * np.random.randint(1, 10)
+        times = function(data, data2, kernel='gaussian')
+        
+        if not times is None:  
+            print(name, data_size)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+            agg_times.append(np.percentile(times, q= [25, 50, 75]))
             data_sizes.append(data_size)
         else:
             break
-        
-        
         
     plt.loglog(data_sizes, [t[1] for t in agg_times], zorder=15, label=name)
     plt.fill_between(data_sizes, 
                      [t[0] for t in agg_times], 
                      [t[2] for t in agg_times], alpha=0.5, zorder=-15)
 
-plt.legend(loc='best')
+plt.legend(loc='upper left')
 plt.xlabel('Number of data points $N$')
 plt.ylabel('Evaluation time $t$')
 plt.grid(True)
 plt.tight_layout()
-plt.savefig(os.path.join(save_path, r'profiling.png'))
+plt.savefig(os.path.join(save_path, r'profiling_2D_gauss.png'))
 plt.show()
 

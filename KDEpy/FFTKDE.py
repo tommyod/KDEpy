@@ -154,7 +154,13 @@ class FFTKDE(BaseKDE):
         if self.kernel.finite_support:
             real_bw = self.kernel.support * self.bw
         else:
-            real_bw = self.kernel.practical_support(self.bw)
+            # The parent class should compute this already. If not, compute
+            # it again. This optimization only dominates a little bit with
+            # few data points
+            try:
+                real_bw = self._kernel_practical_support
+            except NameError:
+                real_bw = self.kernel.practical_support(self.bw)
             
         # Compute L, the number of dx'es to move out from 0 in kernel
         L = np.minimum(np.floor(real_bw / dx), num_intervals + 1)
@@ -177,4 +183,9 @@ class FFTKDE(BaseKDE):
 
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
-    pytest.main(args=['.', '--doctest-modules', '-v', '--capture=sys'])
+    # pytest.main(args=['.', '--doctest-modules', '-v', '--capture=sys'])
+    
+    data = np.random.randn(10**3)
+    def main(data):
+        x, y = FFTKDE().fit(data)()
+    main(data)

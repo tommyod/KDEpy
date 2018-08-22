@@ -61,7 +61,8 @@ Table of contents
    :maxdepth: 1
 
    index.rst
-   introduction.ipynb 
+   introduction.ipynb
+   comparison.rst
    bandwidth.rst
    examples.rst
    literature.rst

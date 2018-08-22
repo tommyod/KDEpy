@@ -88,7 +88,7 @@ plot_pre_code = r"""
 from matplotlib import pyplot as plt
 import numpy as np
 np.random.seed(42)
-plt.figure(figsize=(7, 3))
+fig = plt.figure(figsize=(7, 3))
 """
 
 

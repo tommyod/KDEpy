@@ -154,6 +154,8 @@ class BaseKDE(ABC):
             self._user_supplied_grid = False
             bw_grid = self.kernel.practical_support(bw)
             grid_points = autogrid(self.data, bw_grid, grid_points)
+            # Set it here, so as not to call kernel.practical_support(bw) again
+            self._kernel_practical_support = bw_grid
         else:
             self._user_supplied_grid = True
             grid_points = self._process_sequence(grid_points)
