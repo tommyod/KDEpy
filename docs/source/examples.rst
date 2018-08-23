@@ -12,7 +12,7 @@ Kernels with bounded support are annotated with **B**.
 .. plot::
    :include-source:
 
-    from KDEpy import NaiveKDE
+    from KDEpy import FFTKDE
 
     # Create 2D data of shape (obs, dims)
     data = np.concatenate((np.random.randn(16).reshape(-1, 1),
@@ -22,14 +22,13 @@ Kernels with bounded support are annotated with **B**.
     grid_points = 2**5  # Grid points in each dimension
     N = 16  # Number of contours
 
-    fig, axes = plt.subplots(ncols=3, figsize=(10, 3))
+    for plt_num, norm in enumerate([1, 2, np.inf], 1):
 
-    for ax, norm in zip(axes, [1, 2, np.inf]):
-
+        ax = fig.add_subplot(1, 3, plt_num)
         ax.set_title(f'Norm $p={norm}$')
 
         # Compute the kernel density estimate
-        kde = NaiveKDE(kernel='gaussian', norm=norm)
+        kde = FFTKDE(kernel='gaussian', norm=norm)
         grid, points = kde.fit(data).evaluate(grid_points)
 
         # The grid is of shape (obs, dims), points are of shape (obs, 1)

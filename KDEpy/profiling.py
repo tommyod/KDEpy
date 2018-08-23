@@ -170,36 +170,85 @@ def KDE_sklearn(data1, data2, kernel='gaussian'):
 
 data_sizes_orig = np.logspace(1, 6, num=11)
 
+if False:
+    plt.figure(figsize=(8, 4))
+    plt.title(r'Profiling KDE implementations. Gaussian kernel on $64 \times 64$ grid points.')
+    for function, name in zip([KDE_KDEpyFFTKDE, KDE_scipy, KDE_statsmodels, KDE_sklearn],
+                              ['KDEpy.FFTKDE', 'scipy', 'statsmodels', 'sklearn']):
+        print(name)
+        agg_times = []
+        data_sizes = []
+        for data_size in data_sizes_orig:
+            np.random.seed(int(data_size % 7))
+            data = np.random.randn(int(data_size)) * np.random.randint(1, 10)
+            data2 = np.random.randn(int(data_size)) * np.random.randint(1, 10)
+            times = function(data, data2, kernel='gaussian')
+            
+            if not times is None:  
+                print(name, data_size)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+                agg_times.append(np.percentile(times, q= [25, 50, 75]))
+                data_sizes.append(data_size)
+            else:
+                break
+            
+        plt.loglog(data_sizes, [t[1] for t in agg_times], zorder=15, label=name)
+        plt.fill_between(data_sizes, 
+                         [t[0] for t in agg_times], 
+                         [t[2] for t in agg_times], alpha=0.5, zorder=-15)
+    
+    plt.legend(loc='upper left')
+    plt.xlabel('Number of data points $N$')
+    plt.ylabel('Evaluation time $t$')
+    plt.grid(True)
+    plt.tight_layout()
+    plt.savefig(os.path.join(save_path, r'profiling_2D_gauss.png'))
+    plt.show()
+    
+
+
+# -----------------------------------------------------------------------------
+# --------- Profiling the 2D implementations ----------------------------------
+# -----------------------------------------------------------------------------
+@timed(n=20, max_time=5)
+def KDE_KDEpyFFTKDE(data, grid_pts, kernel='epa'):
+    x, y = FFTKDE(kernel=kernel).fit(data)(grid_pts)
+    return y
+
 plt.figure(figsize=(8, 4))
-plt.title(r'Profiling KDE implementations. Gaussian kernel on $64 \times 64$ grid points.')
-for function, name in zip([KDE_KDEpyFFTKDE, KDE_scipy, KDE_statsmodels, KDE_sklearn],
-                          ['KDEpy.FFTKDE', 'scipy', 'statsmodels', 'sklearn']):
-    print(name)
+plt.title(r'Profiling FFTKDE over dimensions on $\sim 4096$ grid points.')
+
+
+for data_size in [2, 3, 4, 5]:
     agg_times = []
-    data_sizes = []
-    for data_size in data_sizes_orig:
-        np.random.seed(int(data_size % 7))
-        data = np.random.randn(int(data_size)) * np.random.randint(1, 10)
-        data2 = np.random.randn(int(data_size)) * np.random.randint(1, 10)
-        times = function(data, data2, kernel='gaussian')
+    dims_list = []
+    for dims in range(1, 9):
         
-        if not times is None:  
-            print(name, data_size)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+        np.random.seed(dims)
+        gen = (np.random.randn(10**data_size).reshape(-1, 1) for i in range(dims))
+        data = np.concatenate(tuple(gen), axis=1)
+        print(data.shape)
+        grid_pts = (int(np.round(4096**(1/dims))),) * dims
+        print(grid_pts, functools.reduce(operator.mul, grid_pts))
+        times = KDE_KDEpyFFTKDE(data, grid_pts, kernel='epa')
+        #print(times)
+        
+        if not times is None:                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
             agg_times.append(np.percentile(times, q= [25, 50, 75]))
-            data_sizes.append(data_size)
+            dims_list.append(dims)
         else:
             break
         
-    plt.loglog(data_sizes, [t[1] for t in agg_times], zorder=15, label=name)
-    plt.fill_between(data_sizes, 
-                     [t[0] for t in agg_times], 
-                     [t[2] for t in agg_times], alpha=0.5, zorder=-15)
-
+        
+    plt.semilogy(dims_list, [t[1] for t in agg_times], zorder=15, label=f'$N = 10^{data_size}$')
+    plt.fill_between(dims_list, 
+                             [t[0] for t in agg_times], 
+                             [t[2] for t in agg_times], alpha=0.5, zorder=-15)  
+     
+plt.xticks(list(range(1, 9)))
 plt.legend(loc='upper left')
-plt.xlabel('Number of data points $N$')
+plt.xlabel('Dimension $d$')
 plt.ylabel('Evaluation time $t$')
 plt.grid(True)
 plt.tight_layout()
-plt.savefig(os.path.join(save_path, r'profiling_2D_gauss.png'))
+plt.savefig(os.path.join(save_path, r'profiling_ND.png'))
 plt.show()
-
