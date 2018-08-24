@@ -15,18 +15,16 @@ import numpy as np
 # To use a consistent encoding
 from codecs import open
 from os import path
-from KDEpy import __version__
-VERSION = __version__
-
-here = path.abspath(path.dirname(__file__))
+# from KDEpy import __version__
+VERSION = '0.4' # __version__
 
 
 def read(fname):
     return open(path.join(here, fname)).read()
 
 
-SRC_DIR = path.join(".", "KDEpy")
-
+here = path.abspath(path.dirname(__file__))
+SRC_DIR = path.join('.', "KDEpy")
 ext_1 = Extension("cutils",
                   [path.join(SRC_DIR, "cutils.pyx")],
                   libraries=[])

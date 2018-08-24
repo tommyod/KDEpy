@@ -159,7 +159,7 @@ class FFTKDE(BaseKDE):
             # few data points
             try:
                 real_bw = self._kernel_practical_support
-            except NameError:
+            except AttributeError:
                 real_bw = self.kernel.practical_support(self.bw)
             
         # Compute L, the number of dx'es to move out from 0 in kernel
@@ -183,9 +183,4 @@ class FFTKDE(BaseKDE):
 
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
-    # pytest.main(args=['.', '--doctest-modules', '-v', '--capture=sys'])
-    
-    data = np.random.randn(10**3)
-    def main(data):
-        x, y = FFTKDE().fit(data)()
-    main(data)
+    pytest.main(args=['.', '--doctest-modules', '-v', '--capture=sys'])

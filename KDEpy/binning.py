@@ -24,8 +24,9 @@ C ------------------------------ C
 
 References
 ----------
-- Fan, Jianqing, and James S. Marron. “Fast Implementations of Nonparametric Curve Estimators.” 
-  Journal of Computational and Graphical Statistics 3, no. 1 (March 1, 1994): 35–56. 
+- Fan, Jianqing, and James S. Marron. 
+  “Fast Implementations of Nonparametric Curve Estimators.” 
+  Journal of Computational and Graphical Statistics 3, no. 1 (March 1, 1994). 
   https://doi.org/10.1080/10618600.1994.10474629.
 """
 import numpy as np
@@ -407,7 +408,3 @@ if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
     pytest.main(args=['.', '--doctest-modules', '-v', '--capture=sys'])
     # pytest.main(args=[__file__, '--doctest-modules', '-v', '--capture=sys'])
-
-    
-    
-    

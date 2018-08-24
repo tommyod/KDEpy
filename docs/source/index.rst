@@ -1,16 +1,19 @@
-.. KDEpy documentation master file, created by
-   sphinx-quickstart on Sat Mar 31 09:23:26 2018.
-
 KDEpy
 =====
 
 .. currentmodule:: KDEpy
 
-This Python package implements various Kernel Density Esimators (KDE).
+This Python package implements various Kernel Density Estimators (KDE).
 The long-term goal is to support state-of-the-art KDE algorithms, and eventually have the most complete implementation in the scientific Python universe.
 As of now, three algorithms are implemented through the same API: :class:`~KDEpy.NaiveKDE.NaiveKDE`, :class:`~KDEpy.TreeKDE.TreeKDE` and :class:`~KDEpy.FFTKDE.FFTKDE`.
+The :class:`~KDEpy.FFTKDE.FFTKDE` outperforms other popular implementions, see `the comparison <comparison.rst>`_.
 
-.. image:: _static/img/example3.png
+.. note:: KDEpy is relatively stable, but the plan is to finish active development by the end of 2018.
+   Cython is a requirement, and building on Windows is not yet supported.
+   If you have feedback, please report an Issue on GitHub.
+
+
+.. image:: _static/img/showcase.png
    :target: #
 
 The code generating the above graph is found in `KDEpy/examples.py <https://github.com/tommyod/KDEpy/blob/master/KDEpy/examples.py>`_.
