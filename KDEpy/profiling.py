@@ -87,8 +87,8 @@ def main():
     # Set up data, create the figure, perform the computations and create plot.
     data_sizes_orig = np.logspace(1, 8, num=15)
     plt.figure(figsize=(8, 4))
-    plt.title('Profiling KDE implementations. \
-Gaussian kernel on $2^{10}$ grid points.') # Epanechnikov
+    plt.title('Profiling KDE implementations.' +
+              r'Gaussian kernel on $2^{10}$ grid points.')  # Epanechnikov
     algorithms = [KDE_KDEpyFFTKDE, KDE_scipy, KDE_statsmodels, KDE_sklearn]
     names = ['KDEpy.FFTKDE', 'scipy', 'statsmodels', 'sklearn']
     for function, name in zip(algorithms, names):
@@ -171,8 +171,8 @@ Gaussian kernel on $2^{10}$ grid points.') # Epanechnikov
         
     data_sizes_orig = np.logspace(1, 6, num=11)
     plt.figure(figsize=(8, 4))
-    plt.title(r'Profiling KDE implementations. ' + \
-r'Gaussian kernel on $64 \times 64$ grid points.')
+    plt.title(r'Profiling KDE implementations. ' + 
+              r'Gaussian kernel on $64 \times 64$ grid points.')
     functions = [KDE_KDEpyFFTKDE, KDE_scipy, KDE_statsmodels, KDE_sklearn]
     names = ['KDEpy.FFTKDE', 'scipy', 'statsmodels', 'sklearn']
     for function, name in zip(functions, names):
