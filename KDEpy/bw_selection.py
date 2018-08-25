@@ -10,6 +10,11 @@ from KDEpy.utils import autogrid
 from scipy import fftpack
 from scipy.optimize import brentq
 
+try:
+    FLOAT = scipy.float128
+except AttributeError:
+    FLOAT = np.float64
+
 
 def _fixed_point(t, N, I_sq, a2):
     r"""
@@ -46,8 +51,8 @@ def _fixed_point(t, N, I_sq, a2):
     """
     
     # This is important, as the powers might overflow if not done
-    I_sq = np.asfarray(I_sq, dtype=scipy.float128)
-    a2 = np.asfarray(a2, dtype=scipy.float128)
+    I_sq = np.asfarray(I_sq, dtype=FLOAT)
+    a2 = np.asfarray(a2, dtype=FLOAT)
     
     # ell = 7 corresponds to the 5 steps recommended in the paper
     ell = 7
@@ -64,8 +69,7 @@ def _fixed_point(t, N, I_sq, a2):
         # but this is faster so and requires an import less
         
         # Step one: estimate t_s from |f^(s+1)|^2
-        odd_numbers_prod = np.product(np.arange(1, 2 * s + 1, 2, 
-                                                dtype=scipy.float128))
+        odd_numbers_prod = np.product(np.arange(1, 2 * s + 1, 2, dtype=FLOAT))
         K0 = odd_numbers_prod / np.sqrt(2 * np.pi)
         const = (1 + (1 / 2) ** (s + 1 / 2)) / 3
         time = np.power((2 * const * K0 / (N * f)), 
@@ -158,7 +162,7 @@ def improved_sheather_jones(data):
     a = fftpack.dct(initial_data)
     
     # Compute the bandwidth
-    I_sq = np.power(np.arange(1, n, dtype=scipy.float128), 2)
+    I_sq = np.power(np.arange(1, n, dtype=FLOAT), 2)
     a2 = a[1:]**2 / 4
 
     # Solve for the optimal (in the AMISE sense) t
