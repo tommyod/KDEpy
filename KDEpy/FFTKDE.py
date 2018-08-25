@@ -14,19 +14,19 @@ from KDEpy.utils import cartesian
 
 class FFTKDE(BaseKDE):
     """
-    This class implements a FFT computation of a 1D kernel density estimate. 
+    This class implements a convolution (FFT) computation of a KDE. 
     While this implementation is very fast, there are some limitations: (1) the 
     bandwidth must be constant and (2) the KDE must be evaluated on an 
     equidistant grid. The finer the grid, the smaller the error.
     
     The evaluation step is split into two phases. First the :math:`N` data 
     points are binned using a linear binning routine on an equidistant grid `x`
-    with :math:`n` grid points. This runs in :math:`O(N)` time.
+    with :math:`n` grid points. This runs in :math:`O(N 2^d)` time.
     Then the kernel is evaluated once on :math:`\leq n` points and the result 
     of the kernel evaluation and the binned data is convolved. Using the
     convolution theorem, this step runs in :math:`O(n \log n)` time.
     While :math:`N` may be millions, :math:`n` is typically 2**10. The total
-    running time of the algorithm is :math:`O(N + n \log n)`. See references.
+    running time of the algorithm is :math:`O(N 2 + n \log n)`. See references.
     
     The implementation is reminiscent of the one found in statsmodels. However,
     ulike the statsmodels implementation every kernel is available for FFT
@@ -46,14 +46,14 @@ class FFTKDE(BaseKDE):
     Examples
     --------
     >>> data = np.random.randn(2**10)
-    >>> # Automatic bw selection using Improved Sheather Jones
+    >>> # (1) Automatic bw selection using Improved Sheather Jones
     >>> x, y = FFTKDE(bw='ISJ').fit(data).evaluate()
-    >>> # Explicit choice of kernel and bw (standard deviation of kernel)
+    >>> # (2) Explicit choice of kernel and bw (standard deviation of kernel)
     >>> x, y = FFTKDE(kernel='triweight', bw=0.5).fit(data).evaluate()
     >>> weights = data + 10
-    >>> # Using a grid and weights for the data
+    >>> # (3) Using a grid and weights for the data
     >>> y = FFTKDE(kernel='epa', bw=0.5).fit(data, weights).evaluate(x)
-    >>> # If you supply your own grid, it must be equidistant (use linspace)
+    >>> # (4) If you supply your own grid, it must be equidistant
     >>> y = FFTKDE().fit(data)(np.linspace(-10, 10, num=2**12))
     
     References
@@ -101,14 +101,16 @@ class FFTKDE(BaseKDE):
     
     def evaluate(self, grid_points=None):
         """
-        Evaluate on the equidistant grid points.
+        Evaluate on equidistant grid points.
         
         Parameters
         ----------
-        grid_points: None, integer or tuple
-            If None, a grid will be created. An integer specifies the number of
-            equidistant grid points. A tuple specifies the number of grid
-            points in each dimension of the data.
+        grid_points: array-like, int, tuple or None
+            A grid (mesh) to evaluate on. High dimensional grids must have 
+            shape (obs, dims). If an integer is passed, it's the number of grid
+            points on an equidistant grid. If a tuple is passed, it's the
+            number of grid points in each dimension. If None, a grid will be 
+            automatically created.
             
         Returns
         -------
@@ -121,8 +123,8 @@ class FFTKDE(BaseKDE):
         >>> kde = FFTKDE().fit([1, 3, 4, 7])
         >>> # Two ways to evaluate, either with a grid or without
         >>> x, y = kde.evaluate()
-        >>> # kde.evaluate() is equivalent to kde()
-        >>> y = kde(grid_points=np.linspace(0, 10, num=2**10))
+        >>> x, y = kde.evaluate(256)
+        >>> y = kde.evaluate(x)
         """
         
         # This method sets self.grid_points and verifies it

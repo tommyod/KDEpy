@@ -17,7 +17,7 @@ class NaiveKDE(BaseKDE):
     This class implements a naive computation of a kernel density estimate. The
     advantages are that choices of bandwidth, norms, weights and grids are
     straightforward -- the user can do almost anything. The disadvantage is 
-    that computations are slow with on than a couple of thousand data points.
+    that computations are slow on more than a couple of thousand data points.
 
     Parameters
     ----------
@@ -35,12 +35,12 @@ class NaiveKDE(BaseKDE):
     Examples
     --------
     >>> data = np.random.randn(2**10)
-    >>> # Automatic bw selection using Improved Sheather Jones
+    >>> # (1) Automatic bw selection using Improved Sheather Jones
     >>> x, y = NaiveKDE(bw='ISJ').fit(data).evaluate()
-    >>> # Explicit choice of kernel and bw (standard deviation of kernel)
+    >>> # (2) Explicit choice of kernel and bw (standard deviation of kernel)
     >>> x, y = NaiveKDE(kernel='triweight', bw=0.5).fit(data).evaluate()
     >>> weights = data + 10
-    >>> # Using a grid and weights for the data
+    >>> # (3) Using a grid and weights for the data
     >>> y = NaiveKDE(kernel='epa', bw=0.5).fit(data, weights).evaluate(x)
     
     References
@@ -59,14 +59,15 @@ class NaiveKDE(BaseKDE):
     def fit(self, data, weights=None):
         """
         Fit the KDE to the data. This validates the data and stores it. 
-        Computations are performed upon evaluation on a grid.
+        Computations are performed when the KDE is evaluated on a grid.
     
         Parameters
         ----------
         data: array-like
             The data points. High dimensional data must have shape (obs, dims).
         weights: array-like
-            One weight per data point. Must have same shape as the data.
+            One weight per data point. Must have shape (obs,). If None is
+            passed, uniform weights are used.
             
         Returns
         -------
@@ -87,13 +88,16 @@ class NaiveKDE(BaseKDE):
     
     def evaluate(self, grid_points=None):
         """
-        Evaluate on the grid points.
+        Evaluate on grid points.
         
         Parameters
         ----------
-        grid_points: array-like or None
+        grid_points: array-like, int, tuple or None
             A grid (mesh) to evaluate on. High dimensional grids must have 
-            shape (obs, dims). If None, a grid will be automatically created.
+            shape (obs, dims). If an integer is passed, it's the number of grid
+            points on an equidistant grid. If a tuple is passed, it's the
+            number of grid points in each dimension. If None, a grid will be 
+            automatically created.
             
         Returns
         -------
@@ -106,8 +110,8 @@ class NaiveKDE(BaseKDE):
         >>> kde = NaiveKDE().fit([1, 3, 4, 7])
         >>> # Two ways to evaluate, either with a grid or without
         >>> x, y = kde.evaluate()
-        >>> # kde.evaluate() is equivalent to kde()
-        >>> y = kde(grid_points=np.linspace(0, 10, num=2**10))
+        >>> x, y = kde.evaluate(256)
+        >>> y = kde.evaluate(x)
         """
         # This method sets self.grid points and verifies it
         super().evaluate(grid_points)

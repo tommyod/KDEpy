@@ -6,10 +6,9 @@ FFTKDE. It includes profiling a 1D example, a 2D example and several higher
 dimensions.
 """
 import functools
-import operator
 import time
 import numpy as np
-# import os
+import os
 import statsmodels.api as sm
 import matplotlib.pyplot as plt
 from KDEpy import FFTKDE
@@ -19,21 +18,26 @@ from KDEpy.utils import cartesian
 
 
 def main():
-    # here = os.path.abspath(os.path.dirname(__file__))
-    # save_path = os.path.join(here, r'../docs/source/_static/img/')
+    here = os.path.abspath(os.path.dirname(__file__))
+    save_path = os.path.join(here, r'../docs/source/_static/img/')
     
-    def timed(n=20, max_time=3):
+    def timed(n=20, max_time=1, use_data_size=True):
         """
         Return a timing function running n times.
         """
         
         def time_function(function):
             @functools.wraps(function)
-            def wrapped(*args, **kwargs):
+            def wrapped(data_size, *args, **kwargs):
                 times = []
                 for run in range(n):
+                    if use_data_size:
+                        np.random.seed(run)
+                        data = np.random.randn(int(data_size))
+                    else:
+                        data = data_size
                     start_time = time.perf_counter()
-                    function(*args, **kwargs)
+                    function(data, *args, **kwargs)
                     if time.perf_counter() - start_time > max_time:
                         return None
                     times.append(time.perf_counter() - start_time)
@@ -84,16 +88,15 @@ def main():
     data_sizes_orig = np.logspace(1, 8, num=15)
     plt.figure(figsize=(8, 4))
     plt.title('Profiling KDE implementations. \
-               Epanechnikov (Gaussian) kernel on $2^{10}$ grid points.')
+Gaussian kernel on $2^{10}$ grid points.') # Epanechnikov
     algorithms = [KDE_KDEpyFFTKDE, KDE_scipy, KDE_statsmodels, KDE_sklearn]
     names = ['KDEpy.FFTKDE', 'scipy', 'statsmodels', 'sklearn']
     for function, name in zip(algorithms, names):
         agg_times = []
         data_sizes = []
         for data_size in data_sizes_orig:
-            np.random.seed(int(data_size % 7))
-            data = np.random.randn(int(data_size)) * np.random.randint(1, 10)
-            times = function(data, kernel='gaussian')
+            print(name, data_size)
+            times = function(data_size, kernel='gaussian')
             
             if times is not None:
                 agg_times.append(np.percentile(times, q=[25, 50, 75]))
@@ -112,7 +115,7 @@ def main():
     plt.ylabel('Evaluation time $t$')
     plt.grid(True)
     plt.tight_layout()
-    # plt.savefig(os.path.join(save_path, r'profiling_2D_gauss.png'))
+    plt.savefig(os.path.join(save_path, r'profiling_1D_gauss.png'))
     plt.show()
     
     # -------------------------------------------------------------------------
@@ -120,16 +123,17 @@ def main():
     # -------------------------------------------------------------------------
     
     @timed()
-    def KDE_KDEpyFFTKDE(data1, data2, kernel='gaussian'):
-        data = np.concatenate((data1.reshape(-1, 1), data2.reshape(-1, 1)), 
-                              axis=1)
+    def KDE_KDEpyFFTKDE(data, kernel='gaussian'):
+        data = np.concatenate((data.reshape(-1, 1), 
+                               data.reshape(-1, 1) * 0.5), axis=1)
         x, y = FFTKDE(kernel=kernel).fit(data)((64, 64))
         assert len(y) == 64 * 64
         return y
     
     @timed()
-    def KDE_scipy(data1, data2, kernel='gaussian'):
-        kde = gaussian_kde(np.vstack([data1, data2]))
+    def KDE_scipy(data, kernel='gaussian'):
+        eps = np.random.randn(len(data)) / 100
+        kde = gaussian_kde(np.vstack([data, (data + eps) * 0.5]))
         X, Y = np.mgrid[-7:7:64j, -7:7:64j]
         x = np.vstack([X.ravel(), Y.ravel()])
         y = kde(x)
@@ -137,8 +141,8 @@ def main():
         return y
     
     @timed()
-    def KDE_statsmodels(data1, data2, kernel='gaussian'):
-        data = [data1.reshape(-1, 1), data2.reshape(-1, 1)]
+    def KDE_statsmodels(data, kernel='gaussian'):
+        data = [data.reshape(-1, 1), data.reshape(-1, 1) * 0.5]
         kde = sm.nonparametric.KDEMultivariate(data, var_type='cc')
         grid = cartesian([np.linspace(-7, 7, num=64), 
                           np.linspace(-7, 7, num=64)])
@@ -147,13 +151,13 @@ def main():
         return y
     
     @timed()
-    def KDE_sklearn(data1, data2, kernel='gaussian'):
+    def KDE_sklearn(data, kernel='gaussian'):
         if kernel == 'epa':
             kernel = 'epanechnikov'
         
         # instantiate and fit the KDE model
         kde = KernelDensity(bandwidth=1.0, kernel=kernel, rtol=1E-4)
-        data = np.concatenate((data1.reshape(-1, 1), data2.reshape(-1, 1)), 
+        data = np.concatenate((data.reshape(-1, 1), data.reshape(-1, 1) * 0.5), 
                               axis=1)
         kde.fit(data)
         
@@ -167,19 +171,17 @@ def main():
         
     data_sizes_orig = np.logspace(1, 6, num=11)
     plt.figure(figsize=(8, 4))
-    plt.title(r'Profiling KDE implementations. \
-              Gaussian kernel on $64 \times 64$ grid points.')
+    plt.title(r'Profiling KDE implementations. ' + \
+r'Gaussian kernel on $64 \times 64$ grid points.')
     functions = [KDE_KDEpyFFTKDE, KDE_scipy, KDE_statsmodels, KDE_sklearn]
     names = ['KDEpy.FFTKDE', 'scipy', 'statsmodels', 'sklearn']
     for function, name in zip(functions, names):
-        print(name)
+        
         agg_times = []
         data_sizes = []
         for data_size in data_sizes_orig:
-            np.random.seed(int(data_size % 7))
-            data = np.random.randn(int(data_size)) * np.random.randint(1, 10)
-            data2 = np.random.randn(int(data_size)) * np.random.randint(1, 10)
-            times = function(data, data2, kernel='gaussian')
+            times = function(data_size, kernel='gaussian')
+            print(name, data_size)
             
             if times is not None:
                 agg_times.append(np.percentile(times, q=[25, 50, 75]))
@@ -198,14 +200,14 @@ def main():
     plt.ylabel('Evaluation time $t$')
     plt.grid(True)
     plt.tight_layout()
-    # plt.savefig(os.path.join(save_path, r'profiling_2D_gauss.png'))
+    plt.savefig(os.path.join(save_path, r'profiling_2D_gauss.png'))
     plt.show()
         
     # -------------------------------------------------------------------------
     # --------- Profiling the FFTKDE on higher dimenions ----------------------
     # -------------------------------------------------------------------------
     
-    @timed(n=20, max_time=5)
+    @timed(n=40, max_time=3, use_data_size=False)
     def KDE_KDEpyFFTKDE(data, grid_pts, kernel='epa'):
         x, y = FFTKDE(kernel=kernel).fit(data)(grid_pts)
         return y
@@ -222,9 +224,8 @@ def main():
             gen = (np.random.randn(10**data_size).reshape(-1, 1) 
                    for i in range(dims))
             data = np.concatenate(tuple(gen), axis=1)
-            print(data.shape)
+            print(data_size, dims)
             grid_pts = (int(np.round(4096**(1 / dims))),) * dims
-            print(grid_pts, functools.reduce(operator.mul, grid_pts))
             times = KDE_KDEpyFFTKDE(data, grid_pts, kernel='epa')
             
             if times is not None:
@@ -244,7 +245,7 @@ def main():
     plt.ylabel('Evaluation time $t$')
     plt.grid(True)
     plt.tight_layout()
-    # plt.savefig(os.path.join(save_path, r'profiling_ND.png'))
+    plt.savefig(os.path.join(save_path, r'profiling_ND.png'))
     plt.show()
     
 

@@ -20,7 +20,8 @@ class TreeKDE(BaseKDE):
     This makes computing a kernel density estimate at a location easier, since 
     we are able to query the tree structure for nearby points instead of having 
     to evaluate the kernel function on all data points. For kernels without 
-    finite support, their support is approximated.
+    finite support, their support is approximated. The ``scipy`` k-d tree is
+    used as the underlying algorithm.
     
     Parameters
     ----------
@@ -38,12 +39,12 @@ class TreeKDE(BaseKDE):
     Examples
     --------
     >>> data = np.random.randn(2**10)
-    >>> # Automatic bw selection using Improved Sheather Jones
+    >>> # (1) Automatic bw selection using Improved Sheather Jones
     >>> x, y = TreeKDE(bw='ISJ').fit(data).evaluate()
-    >>> # Explicit choice of kernel and bw (standard deviation of kernel)
+    >>> # (2) Explicit choice of kernel and bw (standard deviation of kernel)
     >>> x, y = TreeKDE(kernel='triweight', bw=0.5).fit(data).evaluate()
     >>> weights = data + 10
-    >>> # Using a grid and weights for the data
+    >>> # (3) Using a grid and weights for the data
     >>> y = TreeKDE(kernel='epa', bw=0.5).fit(data, weights).evaluate(x)
     
     References
@@ -96,12 +97,15 @@ class TreeKDE(BaseKDE):
     
     def evaluate(self, grid_points=None, eps=10e-4):
         """
-        Evaluate on the grid points.
+        Evaluate on grid points.
         
         Parameters
         ----------
-        grid_points: array-like or None
-            A 1D grid (mesh) to evaluate on. If None, a grid will be 
+        grid_points: array-like, int, tuple or None
+            A grid (mesh) to evaluate on. High dimensional grids must have 
+            shape (obs, dims). If an integer is passed, it's the number of grid
+            points on an equidistant grid. If a tuple is passed, it's the
+            number of grid points in each dimension. If None, a grid will be 
             automatically created.
         eps: float
             The maximal total error in absolute terms when estimating the 
@@ -119,8 +123,8 @@ class TreeKDE(BaseKDE):
         >>> kde = TreeKDE().fit([1, 3, 4, 7])
         >>> # Two ways to evaluate, either with a grid or without
         >>> x, y = kde.evaluate()
-        >>> # kde.evaluate() is equivalent to kde()
-        >>> y = kde(grid_points=np.linspace(0, 10, num=2**10))
+        >>> x, y = kde.evaluate(256)
+        >>> y = kde.evaluate(x)
         """
         
         # This method sets self.grid points and verifies it
@@ -177,7 +181,6 @@ class TreeKDE(BaseKDE):
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
     pytest.main(args=['.', '--doctest-modules', '-v'])
-    pass
 
 if __name__ == '__main__':
     

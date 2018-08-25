@@ -62,9 +62,8 @@ Table of contents
 -----------------
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
-   index.rst
    introduction.ipynb
    comparison.rst
    bandwidth.rst

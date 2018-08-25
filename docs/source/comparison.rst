@@ -59,7 +59,7 @@ The times for the 2D :math:`N=10^2 \times 10^2` data points are also based on th
 Speed in 1D
 -----------
 
-We run the algorithms 20 times on random data and compare the medians of the running times.
+We run the algorithms 20 times on normally distributed data and compare the medians of the running times.
 The plot below compares the speed of the implementations with a **Gaussian kernel**.
 The 1D ``statsmodels`` implementation uses a similar algorithm when the kernel is Gaussian, and the performance is therefore somewhat comparable.
 
@@ -82,8 +82,8 @@ The difference is tremendous.
 Speed in 2D
 -----------
 
-We run the 2D algorithms 20 times on random data and compared medians on 2D data.
-:class:`~KDEpy.FFTKDE.FFTKDE` is fast because it implements a :math:`d`- dimensional linear binning routine and uses :math:`d`-dimensional convolution.
+We run the 2D algorithms 20 times on normally distributed data and compare medians of the running times.
+:class:`~KDEpy.FFTKDE.FFTKDE` is fast because of the underlying algorithm -- it implements a :math:`d`- dimensional linear binning routine and uses :math:`d`-dimensional convolution.
 
 
 .. image:: _static/img/profiling_2D_gauss.png
@@ -94,14 +94,14 @@ We run the 2D algorithms 20 times on random data and compared medians on 2D data
 Speed as dimension increases
 ----------------------------
 
-We will now look at how :class:`~KDEpy.FFTKDE.FFTKDE` performs as the dimension increases.
+We will now look at how :class:`~KDEpy.FFTKDE.FFTKDE` performs as the dimensionality of the data increases.
 The plot below shows how speed is affected as the dimension :math:`d` increases across different number of data points :math:`N`.
-The time taken increases exponentially with :math:`d`, this is expected as the binning routine has runtime :math:`\mathcal{O}(N 2^d )`.
+The running time increases exponentially with :math:`d`, and this is no surprise as the binning routine has a theoretical runtime :math:`\mathcal{O}(N 2^d )`.
 
 .. image:: _static/img/profiling_ND.png
    :scale: 100 %
    :align: center
 
 
-The :math:`N`-dimensional binning routine has runtime :math:`\mathcal{O}(N 2^d)`, and the convolution (using FFT if needed) has runtime :math:`N \log N`.
-The runtime of the complete algorithm is :math:`\mathcal{O}\left( N2^d + N \log N\right)`
+The :math:`N`-dimensional binning routine has runtime :math:`\mathcal{O}(N 2^d)`, and the convolution (using FFT if needed) has runtime :math:`n \log n`, where :math:`n` is the number of grid points.
+The runtime of the complete algorithm is :math:`\mathcal{O}\left( N2^d + n \log n\right)`.
