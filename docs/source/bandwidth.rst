@@ -1,31 +1,32 @@
-
 Bandwidth
 =========
 
-The choice of bandwidth is more important than the choice of kernel function.
+It is widely accepted in the literature that the choice of bandwidth :math:`h` is more important than the choice of kernel :math:`K`.
 Consider a kernel density estimator based on :math:`N` points, weighting the
-data points :math:`X_i` with weights :math:`w_i`.
+data points :math:`x_i` with weights :math:`w_i`.
+We require that :math:`\sum_i w_i = 1`.
 
 .. math::
 
-   \widehat{f}(x) = h^{-D} \sum_{i=1}^{N} w_i K \left( \frac{\left \| x - X_i \right \|_p}{h} \right)
+   \widehat{f}(x) = \sum_{i=1}^{N} w_i K \left( \left \| x - x_i \right \|_p \right)
 
-We extend by diving by a scaling factor :math:`h` called the *bandwidth*.
-When diving with :math:`h`, every dimension :math:`D` is stretched, so we must
-re-scale with :math:`h^D` so that the integral of :math:`\widehat{f}(x)`
+To extend the equation above we divide by a scaling factor :math:`h` called the *bandwidth*.
+When diving with :math:`h`, every dimension :math:`d` is stretched, so we must
+re-scale with :math:`h^d` to ensure that :math:`\int \widehat{f}(x) \, dx`
 evaluates to unity.
 
 .. math::
 
-   \widehat{f}(x) = h^{-D} \sum_{i=1}^{N} w_i K \left( \frac{\left \| x - X_i \right \|_p}{h} \right)
+   \widehat{f}(x) = h^{-d} \sum_{i=1}^{N} w_i K \left( \frac{\left \| x - x_i \right \|_p}{h} \right)
 
 We will now briefly explain two ways to find a good :math:`h`.
 
 Normal reference rules
 ----------------------
 
-If the data is unimodal and close to normal, *silverman's rule of thumb* or
-*scott's rule of thumb* may be used. They are computationally very fast.
+If the data is **unimodal and close to normal**, *silverman's rule of thumb* may be used.
+It's computationally very fast, but derived by assuming that the true density is normal.
+This is somewhat paradoxal, since if we knew that the data was truly normal it would render a kernel density estimator unnecessary.
 
 An example using ``bw='silverman'`` is shown in the code snippet below.
 
@@ -78,17 +79,18 @@ The details are found in [1]
 
 
 
-asdfasdfasdfsdfsd
+Available kernels
 -----------------
 
-You are most likely here because you wonder what kernels are available.
+You might be reading this because you wonder what kernels are available.
 Every available kernel is shown in the figure below.
 Kernels with bounded support are annotated with **B**.
+A listing of every available option is found in ``FFTKDE._available_kernels.items()``.
 
 .. plot::
    :include-source:
 
-   from KDEpy import *
+   from KDEpy import NaiveKDE
 
 
    for name, func in NaiveKDE._available_kernels.items():
@@ -97,8 +99,8 @@ Kernels with bounded support are annotated with **B**.
 
    plt.grid(True, ls='--', zorder=-15); plt.legend();
 
-Basic properties
-----------------
+Kernel properties
+-----------------
 
 Let us discuss the basic properties of kernel functions.
 We will impose the following requirements on the kernel functions :math:`K(x)`.

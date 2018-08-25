@@ -3,21 +3,27 @@ Comparison
 
 .. currentmodule:: KDEpy
 
-In this section we will compare :class:`~KDEpy.FFTKDE.FFTKDE` with three popular implementations.
+In this section we will compare the fast :class:`~KDEpy.FFTKDE.FFTKDE` with three popular implementations.
 
-- `scipy.stats.gaussian_kde <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.gaussian_kde.html>`_
-- `sklearn.neighbors.KernelDensity <http://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KernelDensity.html>`_
-- `statsmodels.nonparametric.kde.KDEUnivariate <https://www.statsmodels.org/stable/generated/statsmodels.nonparametric.kde.KDEUnivariate.html>`_ / `statsmodels.nonparametric.kernel_density.KDEMultivariate <https://www.statsmodels.org/stable/generated/statsmodels.nonparametric.kernel_density.KDEMultivariate.html>`_
+- ``scipy`` - `scipy.stats.gaussian_kde <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.gaussian_kde.html>`_
+- ``sklearn``- `sklearn.neighbors.KernelDensity <http://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KernelDensity.html>`_
+- ``statsmodels`` - `statsmodels.nonparametric.kde.KDEUnivariate <https://www.statsmodels.org/stable/generated/statsmodels.nonparametric.kde.KDEUnivariate.html>`_ / `statsmodels.nonparametric.kernel_density.KDEMultivariate <https://www.statsmodels.org/stable/generated/statsmodels.nonparametric.kernel_density.KDEMultivariate.html>`_
 
-This section is inspired by `Kernel Density Estimation in Python <https://jakevdp.github.io/blog/2013/12/01/kernel-density-estimation/>`_, where Jake VanderPlas (the author of the ``sklearn`` implementation) compared kernel density estimators in 2013.
+This page is inspired by `Kernel Density Estimation in Python <https://jakevdp.github.io/blog/2013/12/01/kernel-density-estimation/>`_, where Jake VanderPlas (the original author of the ``sklearn`` implementation) compared kernel density estimators in 2013.
 
 .. note::
 
-   Times will vary from computer to computer, and should only be used to compare the relative speed of the implementations.
-   The processor used was the Intel Core i5-6400 CPU.
+   Times will vary from computer to computer, and should only be used to compare the relative speed of the algorithms.
+   The processor used here is an Intel Core i5-6400 CPU.
 
-Features and timings
---------------------
+.. image:: _static/img/profiling_1D_epa.png
+   :scale: 100 %
+   :align: center
+
+The graph above shows the difference in speed when using an Epanechnikov kernel.
+
+Feature summary
+---------------
 
 The table below summarizes the features available across the libraries.
 
@@ -40,14 +46,14 @@ The table below summarizes the features available across the libraries.
 The choice of kernel is typically not important, but it might be nice to experiment with different functions.
 Most users will be interested in 1D or 2D estimates, but it's assuring to know that every implementation generalizes to arbitrary dimensions :math:`d`.
 Being able to weight each data point individually *and* use a fast algorithm is a great benefit of :class:`~KDEpy.FFTKDE.FFTKDE`, which is not found in the other libraries.
-``statsmodels`` implements a fast algorithm for unweighed data using the Gaussian kernel in 1D, but everything else runs using a naive algorithm.
+``statsmodels`` implements a fast algorithm for unweighed data using the Gaussian kernel in 1D, but everything else runs using a naive algorithm, which is many orders of magnitude slower.
 
 Automatic bandwidth selection is not available out-of-the-box in ``sklearn``, but every other implementation has one or more options.
 Normal reference rules (NR) assume a normal distribution when selecting the optimal bandwidth, cross valiation (CV) minimizes an error function and the improved Sheather-Jones (ISJ) algorithm provides an asymptotically optimal bandwidth as the number of data points :math:`N \to \infty`.
 
-The times for the 1D :math:`N = 10^6` data points were computed taking the median of 5 runs.
+The times for the one-dimensional :math:`N = 10^6` data points were computed taking the median of 5 runs.
 The kernel was Gaussian and the number of grid points were :math:`n=2^{10}`.
-The times for the 2D :math:`N=10^2 \times 10^2` data points are also based on the median of 5 runs.
+The times for the 2D :math:`N=10^2 \times 10^2` data points are also based on the median of 5 runs using a Gaussian kernel.
 
 
 Speed in 1D
@@ -55,7 +61,7 @@ Speed in 1D
 
 We run the algorithms 20 times on random data and compare the medians of the running times.
 The plot below compares the speed of the implementations with a **Gaussian kernel**.
-The 1D ``statsmodels`` implementation uses a similar algorithm when the kernel is Gaussian, and the performance is somewhat comparable.
+The 1D ``statsmodels`` implementation uses a similar algorithm when the kernel is Gaussian, and the performance is therefore somewhat comparable.
 
 :class:`~KDEpy.FFTKDE.FFTKDE` is slower initially because it solves a non-linear equation to obtain a support threshold for the Gaussian kernel (which does not have finite support).
 This is a constant cost, and as :math:`N \to \infty` it the algorithm is orders of magnitude faster than the competitors.

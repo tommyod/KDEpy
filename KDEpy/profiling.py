@@ -22,7 +22,7 @@ def main():
     # here = os.path.abspath(os.path.dirname(__file__))
     # save_path = os.path.join(here, r'../docs/source/_static/img/')
     
-    def timed(n=20, max_time=5):
+    def timed(n=20, max_time=3):
         """
         Return a timing function running n times.
         """

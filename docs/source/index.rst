@@ -3,14 +3,15 @@ KDEpy
 
 .. currentmodule:: KDEpy
 
-This Python package implements various Kernel Density Estimators (KDE).
+This Python 3.6 package implements various Kernel Density Estimators (KDE).
 The long-term goal is to support state-of-the-art KDE algorithms, and eventually have the most complete implementation in the scientific Python universe.
 As of now, three algorithms are implemented through the same API: :class:`~KDEpy.NaiveKDE.NaiveKDE`, :class:`~KDEpy.TreeKDE.TreeKDE` and :class:`~KDEpy.FFTKDE.FFTKDE`.
-The :class:`~KDEpy.FFTKDE.FFTKDE` outperforms other popular implementions, see `the comparison <comparison.rst>`_.
+The :class:`~KDEpy.FFTKDE.FFTKDE` outperforms other popular implementations, see the `comparison page <comparison.rst>`_.
 
-.. note:: KDEpy is relatively stable, but the plan is to finish active development by the end of 2018.
-   Cython is a requirement, and building on Windows is not yet supported.
-   If you have feedback, please report an Issue on GitHub.
+.. note:: KDEpy is relatively stable, and the plan is to finish active development by the end of 2018.
+   C code must be built via Cython.
+   If you have feedback, please report an `Issue <https://github.com/tommyod/KDEpy/issues>`_ on GitHub.
+   Contributions to code and documentation is welcome too.
 
 
 .. image:: _static/img/showcase.png
@@ -30,8 +31,8 @@ Example
 -----------------------
 
 Here's an example showing the usage of :class:`~KDEpy.FFTKDE.FFTKDE`, the fastest algorithm implemented.
-Notice how the *kernel* and *bandwidth* are set, and how *weights* may be passed.
-The other classes share this common API, and are used the same way.
+Notice how the *kernel* and *bandwidth* are set, and how the *weights* argument is used.
+The other classes share this common API of instantiating, fitting and then evaluating.
 
 .. plot::
    :include-source:
@@ -39,15 +40,15 @@ The other classes share this common API, and are used the same way.
    from KDEpy import FFTKDE
    from scipy.stats import norm
 
-   # Generate a distribution and 2**6 data points
+   # Generate a distribution and draw 2**6 data points
    dist = norm(loc=0, scale=1)
    data = dist.rvs(2**6)
-   weights = np.arange(len(data)) + 1
 
    # Compute kernel density estimate on a grid using Silverman's rule for bw
-   x, y1 = FFTKDE().fit(data)()
+   x, y1 = FFTKDE().fit(data)(2**10)
 
    # Compute a weighted estimate on the same grid, using verbose API
+   weights = np.arange(len(data)) + 1
    estimator = FFTKDE(kernel='biweight', bw='silverman')
    y2 = estimator.fit(data, weights=weights).evaluate(x)
 
