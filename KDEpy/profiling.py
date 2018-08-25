@@ -5,19 +5,20 @@ This file compares the speed of various other implementations to that of
 FFTKDE. It includes profiling a 1D example, a 2D example and several higher
 dimensions.
 """
-import functools
-import time
-import numpy as np
-import os
-import statsmodels.api as sm
-import matplotlib.pyplot as plt
-from KDEpy import FFTKDE
-from scipy.stats import gaussian_kde
-from sklearn.neighbors import KernelDensity
-from KDEpy.utils import cartesian
 
 
 def main():
+    import functools
+    import time
+    import numpy as np
+    import os
+    import statsmodels.api as sm
+    import matplotlib.pyplot as plt
+    from KDEpy import FFTKDE
+    from scipy.stats import gaussian_kde
+    from sklearn.neighbors import KernelDensity
+    from KDEpy.utils import cartesian
+    
     here = os.path.abspath(os.path.dirname(__file__))
     save_path = os.path.join(here, r'../docs/source/_static/img/')
     
