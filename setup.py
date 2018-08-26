@@ -14,7 +14,7 @@ import numpy as np
 from codecs import open
 from os import path
 # from KDEpy import __version__
-VERSION = '0.5.1' # __version__
+VERSION = '0.5.2' # __version__
 
 
 def read(fname):
