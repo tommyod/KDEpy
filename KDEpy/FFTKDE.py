@@ -3,7 +3,6 @@
 """
 Module for the FFTKDE.
 """
-import pytest
 import numbers
 import numpy as np
 from KDEpy.BaseKDE import BaseKDE
@@ -184,5 +183,6 @@ class FFTKDE(BaseKDE):
 
 
 if __name__ == "__main__":
+    import pytest
     # --durations=10  <- May be used to show potentially slow tests
     pytest.main(args=['.', '--doctest-modules', '-v', '--capture=sys'])

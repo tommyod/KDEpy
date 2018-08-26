@@ -5,7 +5,6 @@ Created on Sun Feb  4 10:52:17 2018
 
 @author: tommy
 """
-import pytest
 import numbers
 import itertools
 import numpy as np
@@ -138,6 +137,7 @@ class NaiveKDE(BaseKDE):
 
 
 if __name__ == "__main__":
+    import pytest
     # --durations=10  <- May be used to show potentially slow tests
     pytest.main(args=['.', '--doctest-modules', '-v'])
     

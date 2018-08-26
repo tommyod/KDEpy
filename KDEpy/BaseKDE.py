@@ -5,7 +5,6 @@ Module for the BaseKDE class.
 """
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
-import pytest
 import numbers
 import numpy as np
 from KDEpy.kernel_funcs import _kernel_functions
@@ -219,5 +218,6 @@ class BaseKDE(ABC):
 
 
 if __name__ == "__main__":
+    import pytest
     # --durations=10  <- May be used to show potentially slow tests
     pytest.main(args=['.', '--doctest-modules', '-v'])

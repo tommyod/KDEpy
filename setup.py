@@ -16,7 +16,7 @@ import numpy as np
 from codecs import open
 from os import path
 # from KDEpy import __version__
-VERSION = '0.5' # __version__
+VERSION = '0.5.1' # __version__
 
 
 def read(fname):
@@ -87,7 +87,8 @@ setup(
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
     'numpy>=1.14.2',
-    'scipy>=1.0.1'],
+    'scipy>=1.0.1',
+    'cython>=0.28.4'],
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,

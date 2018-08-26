@@ -5,7 +5,6 @@ Created on Sun Feb  4 10:52:17 2018
 
 @author: tommy
 """
-import pytest
 from scipy.spatial import cKDTree
 import numbers
 import numpy as np
@@ -179,6 +178,7 @@ class TreeKDE(BaseKDE):
 
 
 if __name__ == "__main__":
+    import pytest
     # --durations=10  <- May be used to show potentially slow tests
     pytest.main(args=['.', '--doctest-modules', '-v'])
 
