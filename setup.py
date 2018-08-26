@@ -9,8 +9,6 @@ https://github.com/pypa/sampleproject
 
 # Always prefer setuptools over distutils
 from setuptools import setup, find_packages, Extension
-from Cython.Build import cythonize
-from Cython.Distutils import build_ext
 import numpy as np
 # To use a consistent encoding
 from codecs import open
@@ -25,11 +23,22 @@ def read(fname):
 
 here = path.abspath(path.dirname(__file__))
 SRC_DIR = path.join('.', "KDEpy")
-ext_1 = Extension("cutils",
-                  [path.join(SRC_DIR, "cutils.pyx")],
-                  libraries=[])
 
-EXTENSIONS = [ext_1]
+try:
+    from Cython.Distutils import build_ext
+except ImportError:
+    use_cython = False
+else:
+    use_cython = True
+
+cmdclass = { }
+ext_modules = [ ]
+
+if use_cython:
+    ext_modules += [Extension("cutils", [path.join(SRC_DIR, "cutils.pyx")]),]
+    cmdclass.update({ 'build_ext': build_ext })
+else:
+    ext_modules += [Extension("cutils", [path.join(SRC_DIR, "cutils.pyx")]),]
 
 
 setup(
@@ -110,9 +119,9 @@ setup(
 
     # For cython, see: http://cython.readthedocs.io/en/latest/src/tutorial/cython_tutorial.html
     # ext_modules = cythonize(path.join(".", "KDEpy", "cutils.pyx")),
-    cmdclass={"build_ext": build_ext},
+    cmdclass=cmdclass,
     include_dirs=[np.get_include()],
-    ext_modules=EXTENSIONS,
+    ext_modules=ext_modules,
 
     # Although 'package_data' is the preferred approach, in some case you may
     # need to place data files outside of your packages. See:
