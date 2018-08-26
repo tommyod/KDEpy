@@ -14,15 +14,12 @@ import numpy as np
 from codecs import open
 from os import path
 # from KDEpy import __version__
-VERSION = '0.5.3' # __version__
+VERSION = '0.5.4' # __version__
 
 
 def read(fname):
-    return open(path.join(here, fname)).read()
+    return open(path.join('.', fname)).read()
 
-
-here = path.abspath(path.dirname(__file__))
-SRC_DIR = path.join('.', "KDEpy")
 
 try:
     from Cython.Distutils import build_ext
@@ -31,14 +28,14 @@ except ImportError:
 else:
     use_cython = True
 
-cmdclass = { }
-ext_modules = [ ]
+cmdclass = {}
+ext_modules = []
 
 if use_cython:
-    ext_modules += [Extension("cutils", [path.join(SRC_DIR, "cutils.pyx")]),]
+    ext_modules += [Extension("cutils", [path.join('KDEpy', 'cutils.pyx')]),]
     cmdclass.update({ 'build_ext': build_ext })
 else:
-    ext_modules += [Extension("cutils", [path.join(SRC_DIR, "cutils.pyx")]),]
+    ext_modules += [Extension("cutils", [path.join('KDEpy', 'cutils.c')]),]
 
 
 setup(
