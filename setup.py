@@ -88,7 +88,8 @@ setup(
     install_requires=[
     'numpy>=1.14.2',
     'scipy>=1.0.1',
-    'cython>=0.28.4'],
+    'cython>=0.28.4',
+    'setuptools>=39.2.0'],
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
