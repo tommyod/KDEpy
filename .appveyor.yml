@@ -39,10 +39,13 @@ artifacts:
   # bdist_wheel puts your built wheel in the dist directory
   - path: dist\*
 
-#on_success:
+on_success:
 #  You can use this step to upload your artifacts to a public website.
 #  See Appveyor's documentation for more details. Or you can simply
 #  access your wheels from the Appveyor "artifacts" tab for your build.
+
+  - pip install twine
+  - twine upload dist --skip-existing -u tommyod -p $TWINE_PASSWORD
 
 
 
