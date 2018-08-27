@@ -28,25 +28,17 @@ test_script:
 - pytest --doctest-modules -v --doctest-glob="*.rst" --capture=sys
 
 
-after_test:
-  # This step builds your wheels.
-  # Again, you only need build.cmd if you're building C extensions for
-  # 64-bit Python 3.3/3.4. And you need to use %PYTHON% to get the correct
-  # interpreter
-  - "python setup.py bdist_wheel"
-
 artifacts:
   # bdist_wheel puts your built wheel in the dist directory
   - path: dist\*
 
+
+after_test:
+  - cmd: "echo [pypi] > %USERPROFILE%\\.pypirc"
+  - cmd: "echo username: tommyod >> %USERPROFILE%\\.pypirc"
+  - cmd: "echo password: %TWINE_PASSWORD% >> %USERPROFILE%\\.pypirc"
+  - python setup.py bdist_wheel
+
 on_success:
-#  You can use this step to upload your artifacts to a public website.
-#  See Appveyor's documentation for more details. Or you can simply
-#  access your wheels from the Appveyor "artifacts" tab for your build.
-
-  - pip install twine
-  - twine upload dist\* -u tommyod -p $env:TWINE_PASSWORD --skip-existing 
-
-
-
+- cmd: "twine upload dist\\*.whl --skip-existing"
 
