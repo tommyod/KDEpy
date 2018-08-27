@@ -10,10 +10,6 @@ matrix:
       install:
         - docker pull $DOCKER_IMAGE
         - python setup.py develop
-        
-    - os: osx
-      language: generic
-      env: PIP=pip2
       
 notifications:
   email: false
