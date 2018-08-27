@@ -1,18 +1,34 @@
 language: python
+
+matrix:
+  include:
+    - sudo: required
+      services:
+        - docker
+      env: PIP=pip
+    - os: osx
+      language: generic
+      env: PIP=pip2
+
+
 notifications:
   email: false
+env:
+  global:
+    - TWINE_USERNAME=tommyod
 python:
   - '3.6'
 before_install:
-  - pip install pep8
-  - pip install flake8
-  - pip install -r requirements.txt
+  - $pip install pep8
+  - $pip install flake8
+  - $pip install -r requirements.txt
 install:
   - python setup.py develop
 before_script:
   - flake8 --show-source --ignore=F811,W293,W391,W292,W291 --max-line-length=79 --exclude="*examples.py, *kde.py" KDEpy
 script:
   - pytest --doctest-modules -v --doctest-glob="*.rst" --capture=sys
+  - $pip install cibuildwheel==0.7.1
 deploy:
   provider: pypi
   user: tommyod
