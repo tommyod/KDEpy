@@ -1,44 +1,47 @@
 language: python
-
 matrix:
   include:
-    - sudo: required
-      services:
-        - docker
-      env: PIP=pip
-    - os: osx
-      language: generic
-      env: PIP=pip2
-
+  - sudo: required
+    services:
+    - docker
+    env: PIP=pip
+  - os: osx
+    language: generic
+    env: PIP=pip2
 notifications:
   email: false
 env:
   global:
-    - TWINE_USERNAME=tommyod
+  - TWINE_USERNAME=tommyod
 python:
-  - '3.6'
+- '3.6'
 before_install:
-  - $PIP install pep8
-  - $PIP install flake8
-  - $PIP install -r requirements.txt
+- "$PIP install pep8"
+- "$PIP install flake8"
+- "$PIP install numpy>=1.14.2"
+- "$PIP install scipy>=1.0.1"
+- "$PIP install pytest>=3.6.2"
+- "$PIP install cython>=0.28.4"
+- "$PIP install flake8"
 install:
-  - python setup.py develop
+- python setup.py develop
 before_script:
-  - flake8 --show-source --ignore=F811,W293,W391,W292,W291 --max-line-length=79 --exclude="*examples.py, *kde.py" KDEpy
+- flake8 --show-source --ignore=F811,W293,W391,W292,W291 --max-line-length=79 --exclude="*examples.py,
+  *kde.py" KDEpy
 script:
-  - pytest --doctest-modules -v --doctest-glob="*.rst" --capture=sys
-  - $PIP install cibuildwheel==0.7.1
-  - cibuildwheel --output-dir wheelhouse
-  - |
-    if [[ $TRAVIS_TAG ]]; then
-      python -m pip install twine
-      python -m twine upload wheelhouse/*.whl
-    fi
+- pytest --doctest-modules -v --doctest-glob="*.rst" --capture=sys
+- "$PIP install cibuildwheel==0.7.1"
+- cibuildwheel --output-dir wheelhouse
+- |
+  if [[ $TRAVIS_TAG ]]; then
+    python -m pip install twine
+    python -m twine upload wheelhouse/*.whl
+  fi
 deploy:
   provider: pypi
   user: tommyod
   password:
-    secure: QBWqi7xXIbDiTETu7+owv31B3AFPQ8FxK8rEkNFWvtQce4oWQQ70tEbh2uP9Pz+skxbLqW6w3I4/JofJgHPaSOmDn9YEj3kJF8odPbYNX231Qo5tNRmwtHr/GIBDk+a0Hk0oS1VjuJ48JBT2Uq3KI+4Kmxsyl1tJbho67SjIKTb3CtsGemz/O3ifEjYrQYxkl4BhpqgoIZUh/Nb2Vsyfa+d4PuxMq4XbbNYuHpb7B1DbHAAsqy8MkMQQJNpQU5xNTTlCeD0SLmhlWiMbtLdQ8bv+VrnWxYvESo00BxA4wRnlObwwx6eTAvVWQOfVCMAxCnw+Pa17h4pOLkJGNgaGJmHL38mLBb46M4s5Qw95mM2GOCCpo24b/nTFvvRHuJxGoWQAcoauz4NBcIlml+YzbDl9BwyMAnCcrO/JRlkYEOFQWnVrPttXHf9qCd0X9iRtFZ/RRbijFkoz505aWmHjoCNtaXopHGdHSNZPreHr8IF16yfCSutww0KszhwurXHdyh8JjKSFkkv8Kr+V826bNEgYC1AECMIAHfqws16ZgXczXRNhityXbNOEVp2S3jGZ/yA6zsSQehzlBOTSV6odlo58lhQqN5JMhW3AjosaJFtOt2tBEFqvb+KEins636PFXp+q2D6y5PjWRlQQsJuS9BNy+Xa63RSs1ZCUo1oVeRw=
+    secure: TWz68NpFZRZuduywHVHmRcdizB2+JtTUzts02X+H9AzJ+4GBosGwmjkr4ltvCsEJCdQs3SKOwgt9DJwcJlMQOVp9xcuMiBpJJ2R0XRURDUFbsFRrczLGN4XgRwWlUQOkRe3N0cTdrSVq3CRgbtz4UYYWtmNv6AyHtc5wcWzpT2NvY1RmTkxmct/kO8HDBMrvGZJjNerVYxlDC6FPziPnjEcmeN3VaYGAlIjIC7+u2JF2ZBM+DL6u36BrAN97u3K8HS2Dr/pROehbu9+yktG3bH8HklkgCbGE0vF4eav5rhv2EdgZO80Ld0Ek0pRGp1t7APJLeHjrehc7+niSqlNJYRu8eH3w6l3Kp8iCzmD4vNG16CwTDcJQpeANmrUAH6J+9NjIcfZ2idLhP5AAoNVg8wm8t2OB21EUzJ/T/SRcmqcPCq4SCnNNJxybpXv96gqC94xqWUu849hckFrqUKDLTMHudMTXZ/z0Xyn0pkS305muo77eclzdvQhTa4ww4nCG1jZi9a61IUtfTbrlRqpPR0aGG1KMddJ60dYdG4geRmCHa8Xj80M/s9WH8AnSx2LExk4UixCuq0zZDCYTIQC3YZPTrhInwsX9OwQi9mcjXCb6pCS6IcObS6c2TNbUwJyhnetCxjEl8tngRpnI9v+psrwN5bGAwyeX6G2XOKwwpSg=
   on:
-    tags: true
-  distributions: "sdist bdist_wheel"
+    tags: false
+  distributions: sdist bdist_wheel
