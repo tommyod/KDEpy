@@ -44,7 +44,7 @@ before_script:
 - flake8 --show-source --ignore=F811,W293,W391,W292,W291 --max-line-length=79 --exclude="*examples.py,
   *kde.py" KDEpy
 script:
-- pytest . --doctest-modules -v --doctest-glob="*.rst" --capture=sys
+- pwd
 - docker run --rm -v `pwd`:/io $DOCKER_IMAGE $PRE_CMD /io/travis/build-wheels.sh
 - ls wheelhouse/
 deploy:
