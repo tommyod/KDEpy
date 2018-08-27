@@ -22,7 +22,7 @@ before_install:
 - "$PIP install scipy>=1.0.1"
 - "$PIP install pytest>=3.6.2"
 - "$PIP install cython>=0.28.4"
-- "$PIP install flake8"
+- "$PIP install matplotlib>=2.2.2"
 install:
 - python setup.py develop
 before_script:
