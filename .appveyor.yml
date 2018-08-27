@@ -40,5 +40,6 @@ after_test:
   - python setup.py bdist_wheel
 
 on_success:
+- pip install twine
 - cmd: "twine upload dist\\*.whl --skip-existing"
 
