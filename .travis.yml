@@ -8,6 +8,7 @@ matrix:
            PIP=pip
       install:
         - docker pull $DOCKER_IMAGE
+        - python setup.py develop
 
     - sudo: required
       services:
@@ -17,6 +18,7 @@ matrix:
            PIP=pip
       install:
         - docker pull $DOCKER_IMAGE
+        - python setup.py develop
 
     - os: osx
       language: generic
@@ -36,8 +38,6 @@ before_install:
 - "$PIP install pytest>=3.6.2"
 - "$PIP install cython>=0.28.4"
 - "$PIP install matplotlib>=2.2.2"
-install:
-- python setup.py develop
 before_script:
 - flake8 --show-source --ignore=F811,W293,W391,W292,W291 --max-line-length=79 --exclude="*examples.py,
   *kde.py" KDEpy
