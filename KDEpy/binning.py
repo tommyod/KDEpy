@@ -68,7 +68,8 @@ def linbin_cython(data, grid_points, weights=None):
     True
     >>> data = np.array([2, 2.5, 3, 4])
     >>> ans = linbin_cython(data, np.arange(1, 7), weights=None)
-    >>> np.allclose(ans, array([0, 0.375, 0.375, 0.25, 0, 0]))
+    >>> np.allclose(ans, np.array([0, 0.375, 0.375, 0.25, 0, 0]))
+    True
     """
     # Convert the data and grid points
     data = np.asarray_chkfinite(data, dtype=np.float)
@@ -132,7 +133,8 @@ def linbin_numpy(data, grid_points, weights=None):
     True
     >>> data = np.array([2, 2.5, 3, 4])
     >>> ans = linbin_numpy(data, np.arange(1, 7), weights=None)
-    >>> np.allclose(ans, array([0, 0.375, 0.375, 0.25, 0, 0]))
+    >>> np.allclose(ans, np.array([0, 0.375, 0.375, 0.25, 0, 0]))
+    True
     """
     # Convert the data and grid points
     data = np.asarray_chkfinite(data, dtype=np.float)
