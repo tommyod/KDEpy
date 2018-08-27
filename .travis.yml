@@ -6,12 +6,18 @@ matrix:
         - docker
       env: DOCKER_IMAGE=quay.io/pypa/manylinux1_x86_64
            PIP=pip
+      install:
+        - docker pull $DOCKER_IMAGE
+
     - sudo: required
       services:
         - docker
       env: DOCKER_IMAGE=quay.io/pypa/manylinux1_i686
            PRE_CMD=linux32
            PIP=pip
+      install:
+        - docker pull $DOCKER_IMAGE
+
     - os: osx
       language: generic
       env: PIP=pip2
@@ -31,15 +37,12 @@ before_install:
 - "$PIP install cython>=0.28.4"
 - "$PIP install matplotlib>=2.2.2"
 install:
-- docker pull $DOCKER_IMAGE
 - python setup.py develop
 before_script:
 - flake8 --show-source --ignore=F811,W293,W391,W292,W291 --max-line-length=79 --exclude="*examples.py,
   *kde.py" KDEpy
 script:
 - pytest . --doctest-modules -v --doctest-glob="*.rst" --capture=sys
-- docker run --rm -v `pwd`:/io $DOCKER_IMAGE $PRE_CMD /io/travis/build-wheels.sh
-- ls wheelhouse/
 deploy:
   provider: pypi
   user: tommyod
