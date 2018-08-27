@@ -123,7 +123,7 @@ class BaseKDE(ABC):
             assert self.data.shape[0] == len(self.weights)
     
     @abstractmethod
-    def evaluate(self, grid_points=None):
+    def evaluate(self, grid_points=None, bw_to_scalar=True):
         """
         Evaluate the kernel density estimator on the grid points.
         
@@ -139,7 +139,10 @@ class BaseKDE(ABC):
             
         # -------------- Set up the bandwidth depending on inputs -------------
         if isinstance(self.bw, (np.ndarray, Sequence)):
-            bw = max(self.bw)
+            if bw_to_scalar:
+                bw = max(self.bw)
+            else:
+                bw = self.bw
         elif callable(self.bw):
             bw = self.bw(self.data)
         else:
@@ -165,8 +168,9 @@ class BaseKDE(ABC):
         self.grid_points = grid_points
     
         # Test quickly that the method has done what is was supposed to do
-        assert isinstance(self.bw, numbers.Number)
-        assert self.bw > 0
+        if bw_to_scalar:
+            assert isinstance(self.bw, numbers.Number)
+            assert self.bw > 0
         assert len(self.grid_points.shape) == 2
            
     @staticmethod

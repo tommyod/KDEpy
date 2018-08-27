@@ -113,7 +113,9 @@ class NaiveKDE(BaseKDE):
         >>> y = kde.evaluate(x)
         """
         # This method sets self.grid points and verifies it
-        super().evaluate(grid_points)
+        # NaiveKDE does not convert the bw to a scalar, since a vector is
+        # allowed too.
+        super().evaluate(grid_points, bw_to_scalar=False)
 
         # Create zeros on the grid points
         evaluated = np.zeros(self.grid_points.shape[0])
