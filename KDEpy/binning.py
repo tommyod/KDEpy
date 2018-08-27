@@ -60,13 +60,15 @@ def linbin_cython(data, grid_points, weights=None):
     Examples
     --------
     >>> data = np.array([2, 2.5, 3, 4])
-    >>> linbin_cython(data, np.arange(6), weights=None)
-    array([0.   , 0.   , 0.375, 0.375, 0.25 , 0.   ])
-    >>> linbin_cython(data, np.arange(6), weights=np.arange(1, 5))
-    array([0. , 0. , 0.2, 0.4, 0.4, 0. ])
+    >>> ans = linbin_cython(data, np.arange(6), weights=None)
+    >>> np.allclose(ans, np.array([0, 0, 0.375, 0.375, 0.25, 0]))
+    True
+    >>> ans = linbin_cython(data, np.arange(6), weights=np.arange(1, 5))
+    >>> np.allclose(ans, np.array([0, 0, 0.2, 0.4, 0.4, 0]))
+    True
     >>> data = np.array([2, 2.5, 3, 4])
-    >>> linbin_cython(data, np.arange(1, 7), weights=None)
-    array([0.   , 0.375, 0.375, 0.25 , 0.   , 0.   ])
+    >>> ans = linbin_cython(data, np.arange(1, 7), weights=None)
+    >>> np.allclose(ans, array([0, 0.375, 0.375, 0.25, 0, 0]))
     """
     # Convert the data and grid points
     data = np.asarray_chkfinite(data, dtype=np.float)
@@ -122,13 +124,15 @@ def linbin_numpy(data, grid_points, weights=None):
     Examples
     --------
     >>> data = np.array([2, 2.5, 3, 4])
-    >>> linbin_numpy(data, np.arange(6), weights=None)
-    array([0.   , 0.   , 0.375, 0.375, 0.25 , 0.   ])
-    >>> linbin_numpy(data, np.arange(6), weights=np.arange(1, 5))
-    array([0. , 0. , 0.2, 0.4, 0.4, 0. ])
+    >>> ans = linbin_numpy(data, np.arange(6), weights=None)
+    >>> np.allclose(ans, np.array([0, 0, 0.375, 0.375, 0.25, 0]))
+    True
+    >>> ans = linbin_numpy(data, np.arange(6), weights=np.arange(1, 5))
+    >>> np.allclose(ans, np.array([0, 0, 0.2, 0.4, 0.4, 0]))
+    True
     >>> data = np.array([2, 2.5, 3, 4])
-    >>> linbin_numpy(data, np.arange(1, 7), weights=None)
-    array([0.   , 0.375, 0.375, 0.25 , 0.   , 0.   ])
+    >>> ans = linbin_numpy(data, np.arange(1, 7), weights=None)
+    >>> np.allclose(ans, array([0, 0.375, 0.375, 0.25, 0, 0]))
     """
     # Convert the data and grid points
     data = np.asarray_chkfinite(data, dtype=np.float)

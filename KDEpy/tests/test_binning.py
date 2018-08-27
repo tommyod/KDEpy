@@ -22,13 +22,13 @@ def naivebinning(data, grid_points, weights=None):
     Examples
     --------
     >>> data = np.array([2, 2.5, 3, 4])
-    >>> naivebinning(data, np.arange(6), weights=None)
-    array([0.   , 0.   , 0.375, 0.375, 0.25 , 0.   ])
-    >>> naivebinning(data, np.arange(6), weights=np.arange(1, 5))
-    array([0. , 0. , 0.2, 0.4, 0.4, 0. ])
+    >>> ans = naivebinning(data, np.arange(6), weights=None)
+    >>> assert np.allclose(ans, np.array([0, 0, 0.375, 0.375, 0.25, 0]))
+    >>> ans = naivebinning(data, np.arange(6), weights=np.arange(1, 5))
+    >>> assert np.allclose(ans, np.array([0, 0, 0.2, 0.4, 0.4, 0]))
     >>> data = np.array([2, 2.5, 3, 4])
-    >>> naivebinning(data, np.arange(1, 7), weights=None)
-    array([0.   , 0.375, 0.375, 0.25 , 0.   , 0.   ])
+    >>> ans = naivebinning(data, np.arange(1, 7), weights=None)
+    >>> assert np.allclose(ans, np.array([0, 0.375, 0.375, 0.25, 0, 0]))
     """
     
     # Convert the data to numpy Arrays
@@ -148,5 +148,4 @@ class TestBinningFunctions():
     
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
-    pytest.main(args=['.', '--doctest-modules', '-v', 
-                      '-k correctness', '--durations=15'])
+    pytest.main(args=['.', '--doctest-modules', '-v', '--durations=15'])

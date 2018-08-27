@@ -93,7 +93,8 @@ def _root(function, N, args):
     >>> # From the matlab code
     >>> ints = np.arange(1, 51)
     >>> ans = _root(_fixed_point, N=50, args=(50, ints, ints))
-    >>> assert np.allclose(ans, 5.203713947289470e-05)
+    >>> np.allclose(ans, 5.203713947289470e-05)
+    True
     """
     # From the implementation by Botev, the original paper author
     # Rule of thumb of obtaining a feasible solution
@@ -198,8 +199,8 @@ def scotts_rule(data):
     Examples
     --------
     >>> data = np.arange(9).reshape(-1, 1)
-    >>> scotts_rule(data)
-    1.76474568962182
+    >>> ans = scotts_rule(data)
+    >>> assert np.allclose(ans, 1.76474568962182)
     """
     if not len(data.shape) == 2:
         raise ValueError('Data must be of shape (obs, dims).')
@@ -227,8 +228,8 @@ def silvermans_rule(data):
     Examples
     --------
     >>> data = np.arange(9).reshape(-1, 1)
-    >>> silvermans_rule(data)
-    1.8692607078355594
+    >>> ans = silvermans_rule(data)
+    >>> assert np.allclose(ans, 1.8692607078355594)
     """
     if not len(data.shape) == 2:
         raise ValueError('Data must be of shape (obs, dims).')
