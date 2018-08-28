@@ -56,37 +56,67 @@ def main():
     plt.legend()
     plt.show()
     
+    print('-'*32)
+    
     # -----------------------------------------------------------------------
     # Mirror at bounds
-    from scipy.integrate import trapz
-    low_bound = 1
-    data = np.concatenate((data, low_bound - data))
-
     plt.figure(figsize=(14, 6))
     
-    kernel = 'triweight'
+    # Beta distribution, where x=1 is a hard lower limit
+    dist = stats.beta(a=1.05, b=3, loc=0, scale=1)
     
-    N = 10**2.2
-    data = dist.rvs(int(N))
-    plt.scatter(data, np.zeros_like(data), marker='|')
-    x, y = FFTKDE(bw=0.3, kernel=kernel).fit(data)(2**10)
-    plt.plot(x, y, label='FFTKDE')
+    # Plot the normal KDE and the true density
+    data = dist.rvs(10**2)
+    plt.figure(figsize=(14, 6))
+    kde = FFTKDE(bw='silverman', kernel='triweight')
+    x, y = kde.fit(data)(2**10)
+    plt.figure(figsize=(14, 6))
     plt.plot(x, dist.pdf(x), label='True')
+    plt.plot(x, y, label='FFTKDE')
+    plt.scatter(data, np.zeros_like(data), marker='|')
+    print(np.min(data), np.max(data))
     
-    y[x <= low_bound] = 0
-    area = trapz(y, x)
-    print(area)
-
-    y  = y / area
-    plt.plot(x, y, label='FFTKDE_mirror')
-    print(trapz(y / area, x))
+    data_transformed = np.log(data)
+    plt.scatter(data_transformed, np.zeros_like(data_transformed), marker='|')
+    kde = FFTKDE(bw='silverman', kernel='triweight')
+    x, y = kde.fit(data_transformed)(2**10)
+    plt.plot(x, y, label='FFTKDE - transformed')
     
- 
+    print(x)
+    print(y)
+    plt.plot(np.exp(x), 2*np.exp(y)*(1 + y) - 2)
     
-    plt.ylim([0, 0.7])
+    plt.ylim([0, 3])
+    plt.xlim([-1, 4])
     
     plt.legend()
     plt.show()
+    
+    
+    # -------------------------------------------------------------------------
+    # Data on a circle
+    # Beta distribution, where x=1 is a hard lower limit
+    np.random.seed(123)
+    
+    dist1 = stats.norm(loc=0, scale=1)
+    dist2 = stats.norm(loc=20, scale=1)
+    dist3 = stats.norm(loc=40, scale=1)
+    data = np.hstack([dist1.rvs(10**3), dist2.rvs(10**3), dist3.rvs(10**3)])
+
+
+    plt.figure(figsize=(14, 6))
+    x, y = FFTKDE(bw='silverman').fit(data)()
+    plt.plot(x, (dist1.pdf(x) + dist2.pdf(x)+ dist3.pdf(x)) / 3, label='True distribution')
+    plt.plot(x, y, label="FFTKDE with Silverman's rule")
+
+    y = FFTKDE(bw='ISJ').fit(data)(x)
+    plt.plot(x, y, label="FFTKDE with Improved Sheather Jones (ISJ)")
+
+    
+    plt.legend()
+    plt.show()
+    
+    
     
     
 if __name__ == "__main__":

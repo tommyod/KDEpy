@@ -26,6 +26,7 @@ build_script:
 
 test_script:
 - pytest --doctest-modules -v --doctest-glob="*.rst" --capture=sys
+- pytest KDEpy --doctest-modules --capture=sys
 
 
 artifacts:
@@ -42,4 +43,3 @@ after_test:
 on_success:
 - pip install twine
 - cmd: "twine upload dist\\*.whl --skip-existing"
-

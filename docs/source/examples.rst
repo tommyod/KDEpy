@@ -56,6 +56,118 @@ Weighted data
     plt.tight_layout(); plt.legend(loc='best');
 
 
+Multimodal distributions
+------------------------
+
+The Improved Sheather Jones (ISJ) algorithm for automatic bandwidth selection is implemented in KDEpy.
+It does not assume normality, and is robust to multimodal distributions.
+The disadvantage is that it requires more data to make accurate assessments, and that the running time is slower.
+
+.. plot::
+   :include-source:
+
+    from scipy import stats
+    from KDEpy import FFTKDE
+
+    # Create a bimodal distribution from two Gaussians and draw data
+    dist1 = stats.norm(loc=0, scale=1)
+    dist2 = stats.norm(loc=20, scale=1)
+    data = np.hstack([dist1.rvs(10**3), dist2.rvs(10**3)])
+
+    # Plot the true distribution and KDE using Silverman's Rule
+    x, y = FFTKDE(bw='silverman').fit(data)()
+    plt.plot(x, (dist1.pdf(x) + dist2.pdf(x)) / 2, label='True distribution')
+    plt.plot(x, y, label="FFTKDE with Silverman's rule")
+
+    # KDE using ISJ - robust to multimodality, but needs more data
+    y = FFTKDE(bw='ISJ').fit(data)(x)
+    plt.plot(x, y, label="FFTKDE with Improved Sheather Jones (ISJ)")
+
+    plt.title('Silverman vs. Improved Sheather Jones')
+    plt.tight_layout(); plt.legend(loc='best');
+
+
+Boundary correction using mirroring
+-----------------------------------
+
+If the domain is bounded and you expect observations to fall near the boundary, a KDE might put density outside of the domain.
+Mirroring the data about the boundary is an elementary way to reduce this unfortunate effect.
+If :math:`\hat{g}(x)` is the original KDE, then :math:`\hat{g}_*(x)=\hat{g}(x-2a)` is the KDE obtained when mirroring the data about :math:`x=a`.
+Note that at the boundary :math:`a`, the derivative of the final estimate :math:`\hat{f}(x)` is zero, since
+
+.. math::
+
+   \hat{f}'(a) = \hat{g}'(x) + \hat{g}_*'(x)  \bigr |_a  = \hat{g}'(x) - \hat{g}'(2a - x)  \bigr |_a = \hat{g}'(a) - \hat{g}'(a) = 0,
+
+where the change of sign is due to the chain rule of calculus.
+The reduction of boundary bias and the fact that the derivative is zero is demonstrated graphically in the example below.
+
+.. plot::
+   :include-source:
+
+    from scipy import stats
+    from KDEpy import FFTKDE
+
+    # Beta distribution, where x=1 is a hard lower limit
+    dist = stats.beta(a=1.05, b=3, loc=1, scale=10)
+
+    data = dist.rvs(10**2)
+    kde = FFTKDE(bw='silverman', kernel='triweight')
+    x, y = kde.fit(data)(2**10)  # Two-step proceudure to get bw
+    plt.plot(x, dist.pdf(x), label='True distribution')
+    plt.plot(x, y, label='FFTKDE')
+    plt.scatter(data, np.zeros_like(data), marker='|')
+
+    # Mirror the data about the domain boundary
+    low_bound = 1
+    data = np.concatenate((data, 2 * low_bound - data))
+
+    # Compute KDE using the bandwidth found, and twice as many grid points
+    x, y = FFTKDE(bw=kde.bw, kernel='triweight').fit(data)(2**11)
+    y[x<=low_bound] = 0  # Set the KDE to zero outside of the domain
+    y = y * 2  # Double the y-values to get integral of ~1
+
+    plt.plot(x, y, label='Mirrored FFTKDE')
+    plt.title('Mirroring data to help overcome boundary bias')
+    plt.tight_layout(); plt.legend();
+
+
+Estimating density on the circle
+--------------------------------
+
+If the data is bounded on a circle and the domain is known, the data can be *repeated* instead of *reflected*.
+The result of this is shown graphically below.
+The derivative of :math:`\hat{f}(x)` at the lower and upper boundary will have the same value.
+
+.. plot::
+   :include-source:
+
+    from scipy import stats
+    from KDEpy import FFTKDE
+
+    # The Von Mises distribution - normal distribution on a circle
+    dist = stats.vonmises(kappa=0.5)
+    data = dist.rvs(10**2)
+
+    # Plot the normal KDE and the true density
+    kde = FFTKDE(bw='silverman', kernel='triweight')
+    x, y = kde.fit(data).evaluate()
+    plt.plot(x, dist.pdf(x), label='True distribution')
+    plt.plot(x, y, label='FFTKDE')
+    plt.xlim([np.min(x), np.max(x)])
+
+    # Repeat the data and fit a KDE to adjust for boundary effects
+    a, b = (-np.pi, np.pi)
+    data = np.concatenate((data - (b - a), data, data + (b - a)))
+    x, y = FFTKDE(bw=kde.bw, kernel='biweight').fit(data).evaluate()
+    y = y * 3  # Multiply by three since we tripled data observations
+
+    plt.plot(x, y, label='Repeated FFTKDE')
+    plt.plot([a, a], list(plt.ylim()), '--k', label='Domain lower bound')
+    plt.plot([b, b], list(plt.ylim()), '--k', label='Domain upper bound')
+    plt.tight_layout(); plt.legend();
+
+
 
 The effect of norms in 2D
 -------------------------
