@@ -38,7 +38,7 @@ script:
 - "echo username: tommyod >> ~/.pypirc"
 - "echo password: %TWINE_PASSWORD% >> ~/.pypirc"
 - python setup.py sdist
-- twine upload dist\\*.whl --skip-existing
+- twine upload dist/* --skip-existing
 deploy:
   provider: pypi
   user: tommyod
