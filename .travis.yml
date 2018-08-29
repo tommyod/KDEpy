@@ -6,12 +6,6 @@ matrix:
         - docker
       env: DOCKER_IMAGE=quay.io/pypa/manylinux1_x86_64
            PIP=pip
-           PYTHON=3.6.3
-      os: linux
-
-    - env: PIP=pip2
-           PYTHON=3.6.3
-      os: osx
 
 
 notifications:
@@ -19,7 +13,7 @@ notifications:
 python:
 - '3.6'
 before_install: |
-  if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
     brew update
     # Per the `pyenv homebrew recommendations <https://github.com/yyuu/pyenv/wiki#suggested-build-environment>`_.
     brew install openssl readline
