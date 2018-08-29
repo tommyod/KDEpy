@@ -1,14 +1,20 @@
 language: python
-matrix:
-  include:
-    - sudo: required
-      services:
-        - docker
-      env: DOCKER_IMAGE=quay.io/pypa/manylinux1_x86_64
-           PIP=pip
 
 notifications:
   email: false
+
+matrix:
+  include:
+    - os: linux
+      sudo: required
+      services: docker
+      env: DOCKER_IMAGE=quay.io/pypa/manylinux1_x86_64
+           PIP=pip
+
+    - os: osx
+      language: generic
+      env: PIP=pip2
+
 python:
 - '3.6'
 before_install:
