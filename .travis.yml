@@ -13,7 +13,7 @@ matrix:
 
 env:
   global:
-    CIBW_SKIP="cp27-* cp33-*"
+    CIBW_SKIP="cp27-* cp33-* cp34-* cp35-*"
 
 python:
 - '3.6'
