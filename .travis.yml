@@ -39,3 +39,4 @@ script:
 - echo 'pytest KDEpy --doctest-modules --capture=sys'
 - python setup.py sdist
 - twine upload dist/* -u tommyod -p $TWINE_PASSWORD --skip-existing
+- twine upload wheelhouse/* -u tommyod -p $TWINE_PASSWORD --skip-existing
