@@ -41,8 +41,10 @@ ext_modules = []
 if use_cython and use_numpy:
     ext_modules += [Extension("cutils", [path.join('KDEpy', 'cutils.pyx')]),]
     cmdclass.update({ 'build_ext': build_ext })
+    include_dirs = [np.get_include()]
 else:
     ext_modules += [Extension("cutils", [path.join('KDEpy', 'cutils.c')]),]
+    include_dirs = []
 
 
 setup(
@@ -123,7 +125,7 @@ setup(
     # For cython, see: http://cython.readthedocs.io/en/latest/src/tutorial/cython_tutorial.html
     # ext_modules = cythonize(path.join(".", "KDEpy", "cutils.pyx")),
     cmdclass=cmdclass,
-    include_dirs=[np.get_include()],
+    include_dirs=include_dirs,
     ext_modules=ext_modules,
 
     # Although 'package_data' is the preferred approach, in some case you may
