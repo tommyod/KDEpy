@@ -6,7 +6,6 @@ env:
 matrix:
   include:
     - language: python
-      dist: xenial    # required for Python 3.7 (travis-ci/travis-ci#9069)
       sudo: required
       python: "3.6"
       services:
