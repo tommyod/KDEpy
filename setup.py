@@ -9,7 +9,6 @@ https://github.com/pypa/sampleproject
 
 # Always prefer setuptools over distutils
 from setuptools import setup, find_packages, Extension
-import numpy as np
 # To use a consistent encoding
 from codecs import open
 from os import path
@@ -28,10 +27,18 @@ except ImportError:
 else:
     use_cython = True
 
+
+try:
+    import numpy as np
+except ImportError:
+    use_numpy = False
+else:
+    use_numpy = True
+
 cmdclass = {}
 ext_modules = []
 
-if use_cython:
+if use_cython and use_numpy:
     ext_modules += [Extension("cutils", [path.join('KDEpy', 'cutils.pyx')]),]
     cmdclass.update({ 'build_ext': build_ext })
 else:
