@@ -8,7 +8,6 @@ matrix:
            PIP=pip
            PYTHON=3.6.3
       os: linux
-      env: PYTHON=3.5.1
 
     - sudo: required
       env: PIP=pip2
