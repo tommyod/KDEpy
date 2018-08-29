@@ -53,7 +53,7 @@ before_install: |
 - "$PIP install twine"
 
 install:
-  - if [ "$TRAVIS_OS_NAME" -ne "osx" ]; then docker pull $DOCKER_IMAGE fi
+  - if [ "$TRAVIS_OS_NAME" != "osx" ]; then docker pull $DOCKER_IMAGE fi
   - python setup.py develop
 
 before_script:
