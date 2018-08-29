@@ -1,19 +1,22 @@
 env:
   global:
   # websockets only works on Python >= 3.4.
-    - CIBW_SKIP="cp27-* cp33-* cp34-* cp35-*"
-
+    - CIBW_SKIP="cp27-* cp33-*"
+    - CIBW_TEST_COMMAND="python3 -W default -m unittest"
+    - WEBSOCKETS_TESTS_TIMEOUT_FACTOR=100
 
 matrix:
   include:
     - language: python
+      dist: xenial    # required for Python 3.7 (travis-ci/travis-ci#9069)
       sudo: required
-      python: "3.6"
+      python: "3.7"
       services:
         - docker
+    - os: osx
+      osx_image: xcode8.3
 
-
-before_install:
+install:
 # Python 3 is needed to run cibuildwheel for websockets.
   - if [ "${TRAVIS_OS_NAME:-}" == "osx" ]; then
       brew update;
@@ -23,19 +26,6 @@ before_install:
   - pip3 install --upgrade cibuildwheel
 # Create file '.cibuildwheel' so that extension build is not optional (c.f. setup.py).
   - touch .cibuildwheel
-
-
-install:
-- python --version
-- "pip3 install pep8>=1.7.1"
-- "pip3 install flake8>=3.5.0"
-- "pip3 install numpy>=1.14.2"
-- "pip3 install scipy>=1.0.1"
-- "pip3 install pytest>=3.6.2"
-- "pip3 install cython>=0.28.4"
-- "pip3 install matplotlib>=2.2.2"
-- python setup.py develop
-
 
 script:
   - cibuildwheel --output-dir wheelhouse
