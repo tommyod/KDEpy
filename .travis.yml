@@ -9,8 +9,7 @@ matrix:
            PYTHON=3.6.3
       os: linux
 
-    - sudo: required
-      env: PIP=pip2
+    - env: PIP=pip2
            PYTHON=3.6.3
       os: osx
 
