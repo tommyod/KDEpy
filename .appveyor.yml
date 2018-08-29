@@ -7,6 +7,7 @@ environment:
   matrix:
     - PY_MAJOR_VER: 3
       PYTHON_ARCH: "x86_64"
+      CIBW_SKIP: cp27-* cp33-* cp34-* cp35-*
 
 platform:
     - x64
@@ -22,7 +23,10 @@ build_script:
   - conda update conda --quiet
   - pip install wheel
   - pip install -r requirements.txt
-  - ps: python setup.py develop
+  - pip install --upgrade cibuildwheel
+  - touch .cibuildwheel
+  - python setup.py develop
+  - python -m cibuildwheel --output-dir wheelhouse
 
 test_script:
 - pytest --doctest-modules -v --doctest-glob="*.rst" --capture=sys
@@ -42,4 +46,5 @@ after_test:
 
 on_success:
 - pip install twine
-- cmd: "twine upload dist\\*.whl --skip-existing"
+- "twine upload dist\\*.whl --skip-existing"
+- "twine upload wheelhouse\\*.whl --skip-existing"
