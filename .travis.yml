@@ -3,6 +3,7 @@ env:
   # websockets only works on Python >= 3.4.
     - CIBW_SKIP="cp27-* cp33-* cp34-* cp35-*"
 
+
 matrix:
   include:
     - language: python
@@ -10,8 +11,7 @@ matrix:
       python: "3.6"
       services:
         - docker
-    - os: osx
-      osx_image: xcode8.3
+
 
 before_install:
 # Python 3 is needed to run cibuildwheel for websockets.
@@ -23,6 +23,7 @@ before_install:
   - pip3 install --upgrade cibuildwheel
 # Create file '.cibuildwheel' so that extension build is not optional (c.f. setup.py).
   - touch .cibuildwheel
+
 
 install:
 - python --version
