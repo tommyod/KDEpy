@@ -10,6 +10,11 @@ matrix:
       services: docker
       env: PIP=pip
 
+
+env:
+  global:
+    CIBW_SKIP="cp27-* cp33-*"
+
 python:
 - '3.6'
 before_install:
