@@ -1,36 +1,35 @@
-env:
-  global:
-  # websockets only works on Python >= 3.4.
-    - CIBW_SKIP="cp27-* cp33-*"
-    - CIBW_TEST_COMMAND="python3 -W default -m unittest"
-    - WEBSOCKETS_TESTS_TIMEOUT_FACTOR=100
+language: python
+
+notifications:
+  email: false
 
 matrix:
   include:
-    - language: python
-      dist: xenial    # required for Python 3.7 (travis-ci/travis-ci#9069)
+    - os: linux
       sudo: required
-      python: "3.7"
-      services:
-        - docker
-    - os: osx
-      osx_image: xcode8.3
+      services: docker
+      env: PIP=pip
+
+python:
+- '3.6'
+before_install:
+- python --version
+- "$PIP install pep8>=1.7.1"
+- "$PIP install flake8>=3.5.0"
+- "$PIP install numpy>=1.14.2"
+- "$PIP install scipy>=1.0.1"
+- "$PIP install pytest>=3.6.2"
+- "$PIP install cython>=0.28.4"
+- "$PIP install matplotlib>=2.2.2"
+- "$PIP install twine"
+- "$PIP install cibuildwheel"
 
 install:
-# Python 3 is needed to run cibuildwheel for websockets.
-  - if [ "${TRAVIS_OS_NAME:-}" == "osx" ]; then
-      brew update;
-      brew upgrade python;
-    fi
-# Install cibuildwheel using pip3 to make sure Python 3 is used.
-  - pip3 install --upgrade cibuildwheel
-# Create file '.cibuildwheel' so that extension build is not optional (c.f. setup.py).
-  - touch .cibuildwheel
-
+  - python setup.py develop
+before_script:
+- flake8 --show-source --ignore=F811,W293,W391,W292,W291 --max-line-length=79 --exclude="*examples.py,
+  *kde.py" KDEpy
 script:
-  - cibuildwheel --output-dir wheelhouse
-# Upload to PyPI on tags
-  - if [ "${TRAVIS_TAG:-}" != "" ]; then
-      pip3 install twine;
-      python3 -m twine upload --skip-existing wheelhouse/*;
-fi
+- echo 'pytest KDEpy --doctest-modules --capture=sys'
+- python setup.py sdist
+- twine upload dist/* -u tommyod -p $TWINE_PASSWORD --skip-existing
