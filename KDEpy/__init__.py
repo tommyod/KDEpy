@@ -6,7 +6,7 @@ from KDEpy.NaiveKDE import NaiveKDE
 from KDEpy.TreeKDE import TreeKDE
 from KDEpy.FFTKDE import FFTKDE
 
-__version__ = '0.5.4'
+__version__ = '0.5.6'
 __author__ = 'tommyod'
 
 TreeKDE = TreeKDE

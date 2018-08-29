@@ -1,7 +1,6 @@
 language: python
 matrix:
   include:
-
     - sudo: required
       services:
         - docker
@@ -10,6 +9,8 @@ matrix:
       install:
         - docker pull $DOCKER_IMAGE
         - python setup.py develop
+
+
 
 notifications:
   email: false
@@ -38,7 +39,7 @@ script:
 - "echo username: tommyod >> ~/.pypirc"
 - "echo password: %TWINE_PASSWORD% >> ~/.pypirc"
 - python setup.py sdist
-- twine upload dist/* --skip-existing
+- twine upload dist/* -u tommyod -p $TWINE_PASSWORD --skip-existing
 deploy:
   provider: pypi
   user: tommyod
