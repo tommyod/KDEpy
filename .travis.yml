@@ -37,7 +37,7 @@ before_install:
 - "$PIP install matplotlib>=2.2.2"
 - "$PIP install pep8>=1.7.1"
 - "$PIP install flake8>=3.5.0"
-- "$PYTHON -m pytest KDEpy --doctest-modules --doctest-glob="*.rst" --capture=sys"
+- "$PYTHON -m pytest KDEpy --doctest-modules --doctest-glob='*.rst' --capture=sys"
 - "$PYTHON setup.py sdist"
 
 install:
