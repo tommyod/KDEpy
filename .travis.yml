@@ -10,6 +10,10 @@ matrix:
       services: docker
       env: PIP=pip
 
+    - os: osx
+      language: generic
+      env: PIP=pip2
+
 
 env:
   global:
@@ -18,6 +22,11 @@ env:
 python:
 - '3.6'
 before_install:
+- python --version
+- if [ "${TRAVIS_OS_NAME:-}" == "osx" ]; then
+    brew update;
+    brew upgrade python;
+  fi
 - python --version
 - "$PIP install -r requirements.txt"
 - "$PIP install pep8>=1.7.1"
