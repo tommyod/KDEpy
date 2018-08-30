@@ -12,9 +12,7 @@ matrix:
       sudo: required
       services: docker
       language: python
-      python:
-        - '3.7'
-        - '3.6'
+      python: '3.6'
       env: PIP=pip
            PYTHON=python
 
