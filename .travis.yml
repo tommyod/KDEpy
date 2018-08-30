@@ -24,18 +24,13 @@ env:
 python:
 - '3.6'
 before_install:
-- python --version
+# The default version on OSX is 2.7 - this installs python 3.7 as python3
 - if [ "${TRAVIS_OS_NAME:-}" == "osx" ]; then
     brew update;
     brew upgrade python;
   fi
-- python --version
 - "$PYTHON --version"
-- "$PIP install numpy>=1.14.2"
-- "$PIP install scipy>=1.0.1"
-- "$PIP install pytest>=3.6.2"
-- "$PIP install cython>=0.28.4"
-- "$PIP install matplotlib>=2.2.2"
+- "$PIP install -r requirements.txt"
 - "$PIP install pep8>=1.7.1"
 - "$PIP install flake8>=3.5.0"
 
