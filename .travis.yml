@@ -5,10 +5,11 @@ notifications:
 
 matrix:
   include:
-  #  - os: linux
-  #    sudo: required
-  #    services: docker
-  #    env: PIP=pip
+    - os: linux
+      sudo: required
+      services: docker
+      env: PIP=pip
+           PYTHON=python
 
     - os: osx
       language: generic
