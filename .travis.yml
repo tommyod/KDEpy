@@ -49,13 +49,17 @@ before_install:
 install:
 - "$PYTHON setup.py develop sdist"
 - "$PYTHON -m pytest KDEpy --doctest-modules --capture=sys"
+
 before_script:
 - $PYTHON -m flake8 --show-source --ignore=F811,W293,W391,W292,W291 --max-line-length=79 --exclude="*examples.py,
   *kde.py" KDEpy
+
+# If a tag was used, build wheels and deply to pypi
 script:
-#- "$PIP install twine"
-- "$PIP install cibuildwheel"
-- "$PYTHON -m cibuildwheel --output-dir wheelhouse"
-- "$PIP install twine"
-- "$PYTHON -m twine upload dist/* -u tommyod -p $TWINE_PASSWORD --skip-existing"
-- "$PYTHON -m twine upload wheelhouse/* -u tommyod -p $TWINE_PASSWORD --skip-existing"
+- if [ "${TRAVIS_TAG:-}" != "" ]; then
+      "$PIP install cibuildwheel";
+      "$PYTHON -m cibuildwheel --output-dir wheelhouse";
+      "$PIP install twine";
+      "$PYTHON -m twine upload dist/* -u tommyod -p $TWINE_PASSWORD --skip-existing";
+      "$PYTHON -m twine upload wheelhouse/* -u tommyod -p $TWINE_PASSWORD --skip-existing";
+  fi
