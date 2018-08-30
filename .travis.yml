@@ -37,11 +37,10 @@ before_install:
 - "$PIP install matplotlib>=2.2.2"
 - "$PIP install pep8>=1.7.1"
 - "$PIP install flake8>=3.5.0"
-- "$PYTHON -m pytest KDEpy --doctest-modules --capture=sys"
-- "$PYTHON setup.py sdist"
 
 install:
-  - "$PYTHON setup.py develop"
+- "$PYTHON setup.py develop sdist"
+- "$PYTHON -m pytest KDEpy --doctest-modules --capture=sys"
 before_script:
 - $PYTHON -m flake8 --show-source --ignore=F811,W293,W391,W292,W291 --max-line-length=79 --exclude="*examples.py,
   *kde.py" KDEpy
