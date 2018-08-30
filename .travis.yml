@@ -27,7 +27,7 @@ matrix:
 
     - os: osx
       language: generic
-      # OSX defaults to py2, so we explicitly set pip3 and python3 here
+      # OSX defaults to py2, so we explicitly set pip3 and python3 here 
       env: PIP=pip3
            PYTHON=python3
 
