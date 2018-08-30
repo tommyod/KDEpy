@@ -37,6 +37,8 @@ before_install:
 - "$PIP install matplotlib>=2.2.2"
 - "$PIP install pep8>=1.7.1"
 - "$PIP install flake8>=3.5.0"
+- "$PYTHON -m pytest KDEpy --doctest-modules --doctest-glob="*.rst" --capture=sys"
+- "$PYTHON setup.py sdist"
 
 install:
   - "$PYTHON setup.py develop"
@@ -46,8 +48,6 @@ before_script:
 script:
 #- "$PIP install twine"
 - "$PIP install cibuildwheel"
-- $PYTHON -m cibuildwheel --output-dir wheelhouse
-- $PYTHON -m pytest KDEpy --doctest-modules --doctest-glob="*.rst" --capture=sys
-- $PYTHON python setup.py sdist
-- twine upload dist/* -u tommyod -p $TWINE_PASSWORD --skip-existing
-- twine upload wheelhouse/* -u tommyod -p $TWINE_PASSWORD --skip-existing
+- "$PYTHON -m cibuildwheel --output-dir wheelhouse"
+- "$PYTHON -m twine upload dist/* -u tommyod -p $TWINE_PASSWORD --skip-existing"
+- "$PYTHON -m twine upload wheelhouse/* -u tommyod -p $TWINE_PASSWORD --skip-existing"
