@@ -12,7 +12,7 @@ matrix:
 
     - os: osx
       language: generic
-      env: PIP=pip2
+      env: PIP=pip
 
 
 env:
@@ -28,7 +28,11 @@ before_install:
     brew upgrade python;
   fi
 - python --version
-- "$PIP install -r requirements.txt"
+- "$PIP install numpy>=1.14.2"
+- "$PIP install scipy>=1.0.1"
+- "$PIP install pytest>=3.6.2"
+- "$PIP install cython>=0.28.4"
+- "$PIP install matplotlib>=2.2.2"
 - "$PIP install pep8>=1.7.1"
 - "$PIP install flake8>=3.5.0"
 - "$PIP install twine"
