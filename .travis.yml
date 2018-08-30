@@ -12,13 +12,12 @@ matrix:
       sudo: required
       services: docker
       language: python
-        - python: '3.6'
       env: PIP=pip
            PYTHON=python
 
     - os: osx
       language: generic
-      # OSX defaults to py2, so we explicitly set pip3 and python3 here
+      # OSX defaults to py2, so we explicitly set pip3 and python3
       env: PIP=pip3
            PYTHON=python3
 
@@ -28,6 +27,9 @@ matrix:
 env:
   global:
     CIBW_SKIP="cp27-* cp33-* cp34-* cp35-*"
+
+python:
+- '3.6'
 
 before_install:
 # The default version on OSX is 2.7 - this installs python 3.7 as python3
