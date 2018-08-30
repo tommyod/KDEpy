@@ -5,14 +5,14 @@ notifications:
 
 matrix:
   include:
-    - os: linux
-      sudo: required
-      services: docker
-      env: PIP=pip
+  #  - os: linux
+  #    sudo: required
+  #    services: docker
+  #    env: PIP=pip
 
     - os: osx
       language: generic
-      env: PIP=pip
+      env: PIP=pip3
 
 
 env:
@@ -35,8 +35,6 @@ before_install:
 - "$PIP install matplotlib>=2.2.2"
 - "$PIP install pep8>=1.7.1"
 - "$PIP install flake8>=3.5.0"
-- "$PIP install twine"
-- "$PIP install cibuildwheel"
 
 install:
   - python setup.py develop
@@ -44,6 +42,8 @@ before_script:
 - flake8 --show-source --ignore=F811,W293,W391,W292,W291 --max-line-length=79 --exclude="*examples.py,
   *kde.py" KDEpy
 script:
+- "$PIP install twine"
+- "$PIP install cibuildwheel"
 - cibuildwheel --output-dir wheelhouse
 - pytest KDEpy --doctest-modules --doctest-glob="*.rst" --capture=sys
 - python setup.py sdist
