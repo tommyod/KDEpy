@@ -21,7 +21,6 @@ matrix:
       env: PIP=pip3
            PYTHON=python3
 
-
 # This global variable is used by cibuildwheel, for docs of this package, see:
 # https://github.com/joerick/cibuildwheel
 env:
