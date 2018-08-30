@@ -26,9 +26,12 @@ matrix:
     - os: osx
 
 # The global environments are for the cibuildwheel python package
+# They denote which versions to SKIP and test commands to run
 env:
   global:
     - CIBW_SKIP="cp27-* cp33-* cp34-* cp35-*"
+    - CIBW_TEST_REQUIRES="pytest"
+    - CIBW_TEST_COMMAND="python3 -m pytest"
     - PIP=pip3
     - PYTHON=python3
 
@@ -40,6 +43,7 @@ before_install:
   fi
 - "$PYTHON --version"
 - "$PIP install -r requirements.txt"
+# These packages are used for linting
 - "$PIP install pep8>=1.7.1"
 - "$PIP install flake8>=3.5.0"
 
