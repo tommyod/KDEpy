@@ -1,35 +1,28 @@
+language: python
+
 notifications:
   email: false
 
-# This matrix expands to 2 builds: (1) linux with docker and (2) osx (mac).
-# KDEpy is run on both to build wheels on both operating systems.
-# Putting these wheels on pypi allows users to install without compiling .pyx
-# (cython) files to .c files. See: https://pythonwheels.com/
-# https://cython.readthedocs.io/en/latest/src/userguide/source_files_and_compilation.html
 matrix:
   include:
     - os: linux
       sudo: required
       services: docker
-      language: python
       env: PIP=pip
            PYTHON=python
 
     - os: osx
       language: generic
-      # OSX defaults to py2, so we explicitly set pip3 and python3
       env: PIP=pip3
            PYTHON=python3
 
-# This global variable is used by cibuildwheel, for docs of this package, see:
-# https://github.com/joerick/cibuildwheel
+
 env:
   global:
     CIBW_SKIP="cp27-* cp33-* cp34-* cp35-*"
 
 python:
 - '3.6'
-
 before_install:
 # The default version on OSX is 2.7 - this installs python 3.7 as python3
 - if [ "${TRAVIS_OS_NAME:-}" == "osx" ]; then
@@ -38,24 +31,19 @@ before_install:
   fi
 - "$PYTHON --version"
 - "$PIP install -r requirements.txt"
-# Need flake8 for linting
+- "$PIP install pep8>=1.7.1"
 - "$PIP install flake8>=3.5.0"
 
 install:
-# Install the package, create source distribution (for pypi) and run tests
 - "$PYTHON setup.py develop sdist"
-- "$PYTHON -m pytest KDEpy --doctest-modules --doctest-glob="*.rst" --capture=sys
-
+- "$PYTHON -m pytest KDEpy --doctest-modules --capture=sys"
 before_script:
-# Run linting
 - $PYTHON -m flake8 --show-source --ignore=F811,W293,W391,W292,W291 --max-line-length=79 --exclude="*examples.py,
   *kde.py" KDEpy
-
 script:
-# Install cibuildwheel and build wheels for py36 and py37 on this OS
+#- "$PIP install twine"
 - "$PIP install cibuildwheel"
 - "$PYTHON -m cibuildwheel --output-dir wheelhouse"
-# Upload the source distribution and the built wheels to pypi if they are not there
 - "$PIP install twine"
 - "$PYTHON -m twine upload dist/* -u tommyod -p $TWINE_PASSWORD --skip-existing"
 - "$PYTHON -m twine upload wheelhouse/* -u tommyod -p $TWINE_PASSWORD --skip-existing"
