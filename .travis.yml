@@ -3,8 +3,9 @@ language: python
 notifications:
   email: false
 
-# The matrix expands to 3 builds: OSX and linux to build wheels
-# and py36 and py37 for general testing
+# The matrix expands to 3 builds.
+# - OSX and linux to build wheels for these operating systems
+# - py36 and py37 for general testing (linux)
 # For more information about building wheels, see:
 # https://pythonwheels.com/
 # https://github.com/joerick/cibuildwheel
@@ -15,26 +16,22 @@ matrix:
       sudo: required
       services: docker
       python: '3.6'
-      env: PIP=pip
-           PYTHON=python
 
     - os: linux
       dist: xenial    # required for Python 3.7 (travis-ci/travis-ci#9069)
       sudo: required
       services: docker
       python: '3.7'
-      env: PIP=pip
-           PYTHON=python
 
     - os: osx
       language: generic
-      env: PIP=pip3
-           PYTHON=python3
 
 # The global environments are for the cibuildwheel python package
 env:
   global:
     CIBW_SKIP="cp27-* cp33-* cp34-* cp35-*"
+    PIP=pip3
+    PYTHON=python3
 
 before_install:
 # The default version on OSX is 2.7 - this installs python 3.7 as python3
