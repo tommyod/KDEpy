@@ -8,6 +8,14 @@ matrix:
     - os: linux
       sudo: required
       services: docker
+      python: '3.6'
+      env: PIP=pip
+           PYTHON=python
+
+    - os: linux
+      sudo: required
+      services: docker
+      python: '3.7'
       env: PIP=pip
            PYTHON=python
 
@@ -21,8 +29,6 @@ env:
   global:
     CIBW_SKIP="cp27-* cp33-* cp34-* cp35-*"
 
-python:
-- '3.6'
 before_install:
 # The default version on OSX is 2.7 - this installs python 3.7 as python3
 - if [ "${TRAVIS_OS_NAME:-}" == "osx" ]; then
