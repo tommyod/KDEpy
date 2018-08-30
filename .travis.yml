@@ -24,14 +24,13 @@ matrix:
       python: '3.7'
 
     - os: osx
-      language: generic
 
 # The global environments are for the cibuildwheel python package
 env:
   global:
-    CIBW_SKIP="cp27-* cp33-* cp34-* cp35-*"
-    PIP=pip3
-    PYTHON=python3
+    - CIBW_SKIP="cp27-* cp33-* cp34-* cp35-*"
+    - PIP=pip3
+    - PYTHON=python3
 
 before_install:
 # The default version on OSX is 2.7 - this installs python 3.7 as python3
