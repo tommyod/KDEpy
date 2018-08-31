@@ -25,7 +25,6 @@ build_script:
   - python setup.py develop
   - pip install wheel
   - pip install --upgrade cibuildwheel
-  - python -m cibuildwheel --output-dir wheelhouse
 
 test_script:
 - pytest KDEpy --doctest-modules --doctest-glob="*.rst" --capture=sys
@@ -45,5 +44,9 @@ after_test:
 
 
 on_success:
-- pip install twine
-- "twine upload wheelhouse\\*.whl --skip-existing"
+  - ps: |
+       if ($env:APPVEYOR_REPO_TAG -eq 'false' -or $env:APPVEYOR_REPO_TAG -eq 'False') {
+         pip install twine
+         python -m cibuildwheel --output-dir wheelhouse
+         "twine upload wheelhouse\\*.whl --skip-existing"
+          }
