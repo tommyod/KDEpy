@@ -3,13 +3,14 @@ clone_depth: 50
 # Needed to build Cython
 os: Visual Studio 2015
 
-
+# Expand to a single build - testing for several versions is done on Travs,
+# and cibuildwheel builds every windows wheel
 environment:
   matrix:
     - PY_MAJOR_VER: 3
       PYTHON_ARCH: "x86_64"
       CIBW_SKIP: cp27-* cp33-* cp34-* cp35-*
-      CIBW_TEST_REQUIRES: pytest
+      CIBW_TEST_REQUIRES: pytest matplotlib
       CIBW_TEST_COMMAND: python -m pytest {project} --doctest-modules
 
 
@@ -17,6 +18,7 @@ platform:
     - x64
 
 
+# Download Python via conda, update it, then install KDEpy, wheel & cibuildwheel
 build_script:
   - ps: Start-FileDownload "https://repo.continuum.io/miniconda/Miniconda$env:PY_MAJOR_VER-latest-Windows-$env:PYTHON_ARCH.exe" C:\Miniconda.exe; echo "Finished downloading miniconda"
   - cmd: C:\Miniconda.exe /S /D=C:\Py
@@ -32,17 +34,18 @@ build_script:
   - pip install --upgrade cibuildwheel
 
 
+# Run the tests (but linting is done on Travis)
 test_script:
 - pytest KDEpy --doctest-modules --doctest-glob="*.rst" --capture=sys
 
 
+# Store user and password for twine - in preparation for upload
 after_test:
   - cmd: "echo [pypi] > %USERPROFILE%\\.pypirc"
   - "echo username: tommyod >> %USERPROFILE%\\.pypirc"
-  - "echo password: %TWINE_PASSWORD% >> %USERPROFILE%\\.pypirc"
-  - python setup.py bdist_wheel
+  - "echo password: %TWINE_PASSWORD% >> %USERPROFILE%\\.pypirc"s
 
-
+# If
 on_success:
   - ps: |
        if ($env:APPVEYOR_REPO_TAG -eq 'false' -or $env:APPVEYOR_REPO_TAG -eq 'False') {
