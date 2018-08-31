@@ -57,10 +57,8 @@ before_script:
 
 # If a tag was used, build wheels and deply to pypi
 script:
-- echo ${TRAVIS_TAG:-}
-- echo "${TRAVIS_TAG:-}"
-- echo $TRAVIS_TAG
-- if [ "${TRAVIS_TAG:-}" != "" ]; then
+- echo "$TRAVIS_TAG"
+- if [ -n "$TRAVIS_TAG" ]; then
       $PIP install cibuildwheel;
       $PYTHON -m cibuildwheel --output-dir wheelhouse;
       $PIP install twine;
