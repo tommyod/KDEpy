@@ -16,26 +16,22 @@ matrix:
       sudo: required
       services: docker
       python: '3.6'
-      env: PIP=pip3
-           PYTHON=python3
 
     - os: linux
       dist: xenial    # required for Python 3.7 (travis-ci/travis-ci#9069)
       sudo: required
       services: docker
       python: '3.7'
-      env: PIP=pip3
-           PYTHON=python3
 
     - os: osx
       language: generic
-      env: PIP=pip3
-           PYTHON=python3
 
 # The global environments are for the cibuildwheel python package
 env:
   global:
-    CIBW_SKIP="cp27-* cp33-* cp34-* cp35-*"
+    - CIBW_SKIP="cp27-* cp33-* cp34-* cp35-*"
+    - PIP=pip3
+    - PYTHON=python3
 
 before_install:
 # The default version on OSX is 2.7 - this installs python 3.7 as python3
