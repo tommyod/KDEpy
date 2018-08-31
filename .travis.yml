@@ -30,6 +30,8 @@ matrix:
 env:
   global:
     - CIBW_SKIP="cp27-* cp33-* cp34-* cp35-*"
+    - CIBW_TEST_REQUIRES=pytest
+    - CIBW_TEST_COMMAND="python3 -m pytest KDEpy --doctest-modules"
     - PIP=pip3
     - PYTHON=python3
 
@@ -39,20 +41,20 @@ before_install:
     brew update;
     brew upgrade python;
   fi
-- "$PYTHON --version"
-- "$PIP install -r requirements.txt"
-- "$PIP install pep8>=1.7.1"
-- "$PIP install flake8>=3.5.0"
+- $PYTHON --version
+- $PIP install -r requirements.txt
+- $PIP install pep8>=1.7.1
+- $PIP install flake8>=3.5.0
 
 install:
-- "$PYTHON setup.py develop sdist"
-- "$PYTHON -m pytest KDEpy --doctest-modules --capture=sys"
+- $PYTHON setup.py develop sdist
+- $PYTHON -m pytest KDEpy --doctest-modules --capture=sys
 
 before_script:
 - $PYTHON -m flake8 --show-source --ignore=F811,W293,W391,W292,W291 --max-line-length=79 --exclude="*examples.py,
   *kde.py" KDEpy
 
-# If a tag was used, build wheels and deply to pypi
+# If a tag was used, build  wheels and deply to pypi
 script:
 - echo "$TRAVIS_TAG"
 - if [ -n "$TRAVIS_TAG" ]; then

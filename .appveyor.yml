@@ -25,7 +25,6 @@ build_script:
   - python setup.py develop
   - pip install wheel
   - pip install --upgrade cibuildwheel
-  - touch .cibuildwheel 
   - python -m cibuildwheel --output-dir wheelhouse
 
 test_script:
@@ -43,6 +42,7 @@ after_test:
   - cmd: "echo username: tommyod >> %USERPROFILE%\\.pypirc"
   - cmd: "echo password: %TWINE_PASSWORD% >> %USERPROFILE%\\.pypirc"
   - python setup.py bdist_wheel
+
 
 on_success:
 - pip install twine
