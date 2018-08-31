@@ -1,6 +1,6 @@
-skip_tags: true
 clone_depth: 50
 
+# Needed to build Cython
 os: Visual Studio 2015
 
 environment:
@@ -8,9 +8,13 @@ environment:
     - PY_MAJOR_VER: 3
       PYTHON_ARCH: "x86_64"
       CIBW_SKIP: cp27-* cp33-* cp34-* cp35-*
+      CIBW_TEST_REQUIRES: pytest
+     CIBW_TEST_COMMAND: "python3 -m pytest KDEpy --doctest-modules"
+
 
 platform:
     - x64
+
 
 build_script:
   - ps: Start-FileDownload "https://repo.continuum.io/miniconda/Miniconda$env:PY_MAJOR_VER-latest-Windows-$env:PYTHON_ARCH.exe" C:\Miniconda.exe; echo "Finished downloading miniconda"
@@ -26,20 +30,15 @@ build_script:
   - pip install wheel
   - pip install --upgrade cibuildwheel
 
+
 test_script:
 - pytest KDEpy --doctest-modules --doctest-glob="*.rst" --capture=sys
 
 
-artifacts:
-  # bdist_wheel puts your built wheel in the dist directory
-  # this directory is not deleted
-  - path: wheelhouse\*
-
-
 after_test:
   - cmd: "echo [pypi] > %USERPROFILE%\\.pypirc"
-  - cmd: "echo username: tommyod >> %USERPROFILE%\\.pypirc"
-  - cmd: "echo password: %TWINE_PASSWORD% >> %USERPROFILE%\\.pypirc"
+  - "echo username: tommyod >> %USERPROFILE%\\.pypirc"
+  - "echo password: %TWINE_PASSWORD% >> %USERPROFILE%\\.pypirc"
   - python setup.py bdist_wheel
 
 
@@ -48,5 +47,11 @@ on_success:
        if ($env:APPVEYOR_REPO_TAG -eq 'false' -or $env:APPVEYOR_REPO_TAG -eq 'False') {
          pip install twine
          python -m cibuildwheel --output-dir wheelhouse
-         "twine upload wheelhouse\\*.whl --skip-existing"
+         twine upload wheelhouse\\*.whl --skip-existing
           }
+
+
+artifacts:
+  # bdist_wheel puts your built wheel in the dist directory
+  # this directory is not deleted
+  - path: wheelhouse\*
