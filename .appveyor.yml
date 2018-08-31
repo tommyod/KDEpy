@@ -10,7 +10,7 @@ environment:
       PYTHON_ARCH: "x86_64"
       CIBW_SKIP: cp27-* cp33-* cp34-* cp35-*
       CIBW_TEST_REQUIRES: pytest
-     CIBW_TEST_COMMAND: "python3 -m pytest KDEpy --doctest-modules"
+      CIBW_TEST_COMMAND: python3 -m pytest {project} --doctest-modules
 
 
 platform:
