@@ -43,7 +43,7 @@ test_script:
 after_test:
   - cmd: "echo [pypi] > %USERPROFILE%\\.pypirc"
   - "echo username: tommyod >> %USERPROFILE%\\.pypirc"
-  - "echo password: %TWINE_PASSWORD% >> %USERPROFILE%\\.pypirc"s
+  - "echo password: %TWINE_PASSWORD% >> %USERPROFILE%\\.pypirc"
 
 # If
 on_success:
