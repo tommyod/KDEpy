@@ -3,6 +3,7 @@ clone_depth: 50
 # Needed to build Cython
 os: Visual Studio 2015
 
+
 environment:
   matrix:
     - PY_MAJOR_VER: 3
