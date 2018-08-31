@@ -8,6 +8,7 @@ notifications:
 # For more information about building wheels, see:
 # https://pythonwheels.com/
 # https://github.com/joerick/cibuildwheel
+# https://malramsay.com/post/perils_of_packaging/
 
 matrix:
   include:
@@ -15,16 +16,16 @@ matrix:
       sudo: required
       services: docker
       python: '3.6'
-      env: PIP=pip
-           PYTHON=python
+      env: PIP=pip3
+           PYTHON=python3
 
     - os: linux
       dist: xenial    # required for Python 3.7 (travis-ci/travis-ci#9069)
       sudo: required
       services: docker
       python: '3.7'
-      env: PIP=pip
-           PYTHON=python
+      env: PIP=pip3
+           PYTHON=python3
 
     - os: osx
       language: generic
