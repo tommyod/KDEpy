@@ -1,3 +1,4 @@
+.. _literature:
 
 Literature review
 =================
@@ -49,6 +50,13 @@ Papers
 
   - Introduces the improved Sheather-Jones algorithm for bandwidth selection, which does assume normality (ulike the Silverman rule of thumb).
 
+- Wang, Xianfu.
+  "*Volumes of Generalized Unit Balls.*"
+  Mathematics Magazine 78, no. 5 (2005): 390–95.
+  https://doi.org/10.2307/30044198.
+
+  - Gives a formula for unit balls in any dimension and any :math:`p`-norm.
+    This result is used to normalize kernels in any dimension and norm.
 
 Other resources
 ---------------

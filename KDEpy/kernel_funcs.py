@@ -9,7 +9,8 @@ Created on Sun Feb  4 20:52:43 2018
 import numpy as np
 import collections.abc
 import numbers
-from scipy.special import gamma, factorial, factorial2
+import functools
+from scipy.special import gamma, factorial2
 from scipy.stats import norm
 from scipy.optimize import brentq
 
@@ -126,29 +127,25 @@ def taxicab_norm(x):
     return np.abs(x).sum(axis=1)
 
 
-def volume_hypershpere(d):
+def volume_unit_ball(d, p=2):
     """
-    The volume of a d-dimensional hypersphere of radius 1.
+    Volume of d-dimensional unit ball under the p-norm. When p=1 this is called
+    a cross-polytype, when p=2 it's called a hypersphere, and when p=infty it's
+    called a hypercube. 
+    
+    Notes
+    -----
+    See the following paper for a very general result related to this:
+        
+    - Wang, Xianfu. “Volumes of Generalized Unit Balls.” 
+      Mathematics Magazine 78, no. 5 (2005): 390–95. 
+      https://doi.org/10.2307/30044198.
     """
-    return (np.pi**(d / 2.)) / gamma((d / 2.) + 1)
+    return 2.**d * gamma(1 + 1 / p) ** d / gamma(1 + d / p)
 
 
-def volume_hypercube(d):
-    """
-    The volume of a d-dimensional hypercube of radius 1.
-    """
-    return np.power(2., d)
-
-
-def volume_dual_hypercube(d):
-    """
-    The volume of a d-dimensional cross-polytope of radius 1.
-    """
-    return np.power(2., d) / factorial(d)
-
-
-def epanechnikov(x, dims=1, volume_func=volume_hypershpere):
-    normalization = volume_func(dims) * (2 / (dims + 2))
+def epanechnikov(x, dims=1):
+    normalization = (2 / (dims + 2))
     dist_sq = x**2 
     out = np.zeros_like(dist_sq)
     mask = dist_sq < 1
@@ -156,36 +153,35 @@ def epanechnikov(x, dims=1, volume_func=volume_hypershpere):
     return out
 
 
-def gaussian(x, dims=1, volume_func=volume_hypershpere):
-    normalization = volume_func(dims) * dims * gauss_integral(dims - 1)
+def gaussian(x, dims=1):
+    normalization = dims * gauss_integral(dims - 1)
     dist_sq = x**2
     return np.exp(-dist_sq / 2) / normalization
 
 
-def box(x, dims=1, volume_func=volume_hypershpere):
-    normalization = volume_func(dims)
+def box(x, dims=1):
+    normalization = 1
     out = np.zeros_like(x)
     mask = x < 1
     out[mask] = 1 / normalization
     return out
 
 
-def exponential(x, dims=1, volume_func=volume_hypershpere):
-    normalization = volume_func(dims) * gamma(dims) * dims
+def exponential(x, dims=1):
+    normalization = gamma(dims) * dims
     return np.exp(-x) / normalization
 
 
-def tri(x, dims=1, volume_func=volume_hypershpere):
-    normalization = volume_func(dims) * (1 / (dims + 1))
+def tri(x, dims=1):
+    normalization = (1 / (dims + 1))
     out = np.zeros_like(x)
     mask = x < 1
     out[mask] = np.maximum(0, 1 - x)[mask] / normalization 
     return out
 
 
-def biweight(x, dims=1, volume_func=volume_hypershpere):
-    normalization = (volume_func(dims) * 
-                     (8 / ((dims + 2) * (dims + 4))))
+def biweight(x, dims=1):
+    normalization = (8 / ((dims + 2) * (dims + 4)))
     dist_sq = x**2
     out = np.zeros_like(dist_sq)
     mask = dist_sq < 1
@@ -193,9 +189,8 @@ def biweight(x, dims=1, volume_func=volume_hypershpere):
     return out
 
 
-def triweight(x, dims=1, volume_func=volume_hypershpere):
-    normalization = (volume_func(dims) * 
-                     (48 / ((dims + 2) * (dims + 4) * (dims + 6))))
+def triweight(x, dims=1):
+    normalization = (48 / ((dims + 2) * (dims + 4) * (dims + 6)))
     dist_sq = x**2
     out = np.zeros_like(dist_sq)
     mask = dist_sq < 1
@@ -203,29 +198,28 @@ def triweight(x, dims=1, volume_func=volume_hypershpere):
     return out
 
 
-def tricube(x, dims=1, volume_func=volume_hypershpere):
-    normalization = (volume_func(dims) * 
-                     (162 / ((dims + 3) * (dims + 6) * (dims + 9))))
+def tricube(x, dims=1):
+    normalization = (162 / ((dims + 3) * (dims + 6) * (dims + 9)))
     out = np.zeros_like(x)
     mask = x < 1
     out[mask] = np.maximum(0, (1 - x**3)**3)[mask] / normalization
     return out
 
 
-def cosine(x, dims=1, volume_func=volume_hypershpere):
+def cosine(x, dims=1):
     Is, Ic = trig_integral(dims - 1)
-    normalization = volume_func(dims) * Ic
+    normalization = Ic
     out = np.zeros_like(x)
     mask = x < 1
     out[mask] = np.cos((np.pi * x) / 2)[mask] / (normalization * dims)
     return out
 
 
-def logistic(x, dims=1, volume_func=volume_hypershpere):
+def logistic(x, dims=1):
     return 1 / (2 + 2 * np.cosh(x))
 
 
-def sigmoid(x, dims=1, volume_func=volume_hypershpere):
+def sigmoid(x, dims=1):
     return (1 / (np.pi * np.cosh(x)))
 
 
@@ -296,21 +290,16 @@ class Kernel(collections.abc.Callable):
         real_bw = bw / np.sqrt(self.var)
         obs, dims = x.shape
         
-        # Set the volume function for common norm values
-        if norm == np.infty:
-            volume_func = volume_hypercube
-        elif norm == 1:
-            volume_func = volume_dual_hypercube
-        else:
-            volume_func = volume_hypershpere
+        # Set the volume function
+        volume_func = functools.partial(volume_unit_ball, p=norm)
             
         if dims > 1:
             distances = p_norm(x, norm).ravel()
         else:
             distances = np.abs(x).ravel()
             
-        return (self.function(distances / real_bw, dims, volume_func) / 
-                (real_bw**dims))
+        return (self.function(distances / real_bw, dims) / 
+                ((real_bw**dims) * volume_func(dims)))
             
     __call__ = evaluate
     

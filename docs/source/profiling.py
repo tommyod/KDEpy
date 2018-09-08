@@ -20,7 +20,7 @@ def main():
     from KDEpy.utils import cartesian
     
     here = os.path.abspath(os.path.dirname(__file__))
-    save_path = os.path.join(here, r'../docs/source/_static/img/')
+    save_path = os.path.join(here, r'_static/img/')
     
     def timed(n=20, max_time=1, use_data_size=True):
         """

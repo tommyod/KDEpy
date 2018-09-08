@@ -3,13 +3,11 @@ KDEpy
 
 .. currentmodule:: KDEpy
 
-This Python 3.6 package implements various Kernel Density Estimators (KDE).
-The long-term goal is to support state-of-the-art KDE algorithms, and eventually have the most complete implementation in the scientific Python universe.
-As of now, three algorithms are implemented through the same API: :class:`~KDEpy.NaiveKDE.NaiveKDE`, :class:`~KDEpy.TreeKDE.TreeKDE` and :class:`~KDEpy.FFTKDE.FFTKDE`.
+This Python 3.6/3.7 package implements various Kernel Density Estimators (KDE).
+Three algorithms are implemented through the same API: :class:`~KDEpy.NaiveKDE.NaiveKDE`, :class:`~KDEpy.TreeKDE.TreeKDE` and :class:`~KDEpy.FFTKDE.FFTKDE`.
 The :class:`~KDEpy.FFTKDE.FFTKDE` outperforms other popular implementations, see the `comparison page <comparison.rst>`_.
 
 .. note:: KDEpy is relatively stable, and the plan is to finish active development by the end of 2018.
-   C code must be built via Cython.
    If you have feedback, please report an `Issue <https://github.com/tommyod/KDEpy/issues>`_ on GitHub.
    Contributions to code and documentation is welcome too.
 
@@ -32,7 +30,7 @@ Example
 
 Here's an example showing the usage of :class:`~KDEpy.FFTKDE.FFTKDE`, the fastest algorithm implemented.
 Notice how the *kernel* and *bandwidth* are set, and how the *weights* argument is used.
-The other classes share this common API of instantiating, fitting and then evaluating.
+The other classes share this common API of instantiating, fitting and finally evaluating.
 
 .. plot::
    :include-source:
@@ -67,6 +65,7 @@ Table of contents
    introduction.ipynb
    comparison.rst
    bandwidth.rst
+   kernels.rst
    examples.rst
    literature.rst
    API.rst

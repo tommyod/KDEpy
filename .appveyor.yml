@@ -45,10 +45,11 @@ after_test:
   - "echo username: tommyod >> %USERPROFILE%\\.pypirc"
   - "echo password: %TWINE_PASSWORD% >> %USERPROFILE%\\.pypirc"
 
-# If
+# If a tag was associated with the commit, push to pypi
 on_success:
+  - cmd: "echo $env:APPVEYOR_REPO_TAG"
   - ps: |
-       if ($env:APPVEYOR_REPO_TAG -eq 'false' -or $env:APPVEYOR_REPO_TAG -eq 'False') {
+       if ($env:APPVEYOR_REPO_TAG -eq 'true' -or $env:APPVEYOR_REPO_TAG -eq 'True') {
          pip install twine
          python -m cibuildwheel --output-dir wheelhouse
          twine upload wheelhouse\\*.whl --skip-existing
@@ -56,6 +57,5 @@ on_success:
 
 
 artifacts:
-  # bdist_wheel puts your built wheel in the dist directory
   # this directory is not deleted
   - path: wheelhouse\*

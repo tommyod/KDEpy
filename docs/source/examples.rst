@@ -4,6 +4,8 @@ Examples
 Minimal working example with options
 ------------------------------------
 
+This *minimal working example* shows how to compute a KDE in one line.
+
 .. plot::
    :include-source:
 
@@ -17,6 +19,8 @@ Minimal working example with options
 
 Three kernels in 1D
 -------------------
+
+This example shows the effect of different kernel functions :math:`K`.
 
 .. plot::
    :include-source:
@@ -39,6 +43,8 @@ Three kernels in 1D
 Weighted data
 -------------
 
+A *weight* :math:`w_i` may be associated with every data point :math:`x_i`.
+
 .. plot::
    :include-source:
 
@@ -59,8 +65,8 @@ Weighted data
 Multimodal distributions
 ------------------------
 
-The Improved Sheather Jones (ISJ) algorithm for automatic bandwidth selection is implemented in KDEpy.
-It does not assume normality, and is robust to multimodal distributions.
+The *Improved Sheather Jones* (ISJ) algorithm for automatic bandwidth selection is implemented in KDEpy.
+It does not assume normality, and is **robust to multimodal distributions**.
 The disadvantage is that it requires more data to make accurate assessments, and that the running time is slower.
 
 .. plot::
@@ -90,7 +96,7 @@ The disadvantage is that it requires more data to make accurate assessments, and
 Boundary correction using mirroring
 -----------------------------------
 
-If the domain is bounded and you expect observations to fall near the boundary, a KDE might put density outside of the domain.
+If the domain is bounded (e.g. :math:`\mathbb{R}_+`) and you expect observations to fall near the boundary, a KDE might put density outside of the domain.
 Mirroring the data about the boundary is an elementary way to reduce this unfortunate effect.
 If :math:`\hat{g}(x)` is the original KDE, then :math:`\hat{g}_*(x)=\hat{g}(x-2a)` is the KDE obtained when mirroring the data about :math:`x=a`.
 Note that at the boundary :math:`a`, the derivative of the final estimate :math:`\hat{f}(x)` is zero, since
@@ -204,3 +210,35 @@ Below a non-smooth kernel is chosen to reveal the effect of the choice of norm m
         ax.plot(data[:, 0], data[:, 1], 'ok', ms=3)
 
     plt.tight_layout()
+
+.. comment:
+  Kernel regression via KDE
+  -------------------------
+
+  Here's how a weighted KDE can be used for 1D kernel regression.
+  Beware of boundary effects--the estimate will fall to zero.
+
+
+  .. plot::
+     :include-source:
+
+      from scipy.integrate import trapz
+      from KDEpy import FFTKDE
+
+      N = 2**6
+      # Sampe the function on equidistant points
+      x = np.linspace(0, 25, num=N)
+      y = np.sin(x/3) + np.random.randn(N) / 6
+
+      # Compute the area (integral), used to normalize later on
+      area = trapz(y, x)
+
+      plt.scatter(x, y, marker='x', alpha=0.5, label='Noisy samples')
+      plt.plot(x, np.sin(x/3), label='True function')
+
+      # Weight data by y-values, normalize using the area
+      x, y = FFTKDE(bw=0.5).fit(x, weights=y).evaluate()
+      plt.plot(x, y * area, label='Kernel regression')
+
+      plt.title('Kernel regression via KDE')
+      plt.tight_layout(); plt.legend(loc='best');

@@ -14,13 +14,13 @@ This page is inspired by `Kernel Density Estimation in Python <https://jakevdp.g
 .. note::
 
    Times will vary from computer to computer, and should only be used to compare the relative speed of the algorithms.
-   The processor used here is an Intel Core i5-6400 CPU.
+   The processor used here was an Intel Core i5-6400 CPU.
 
 .. image:: _static/img/profiling_1D_epa.png
    :scale: 100 %
    :align: center
 
-The graph above shows the difference in speed when using an Epanechnikov kernel.
+The graph above shows the speed when using an Epanechnikov kernel, for various data sizes.
 
 Feature summary
 ---------------
@@ -50,9 +50,10 @@ Being able to weight each data point individually *and* use a fast algorithm is 
 
 Automatic bandwidth selection is not available out-of-the-box in ``sklearn``, but every other implementation has one or more options.
 Normal reference rules (NR) assume a normal distribution when selecting the optimal bandwidth, cross valiation (CV) minimizes an error function and the improved Sheather-Jones (ISJ) algorithm provides an asymptotically optimal bandwidth as the number of data points :math:`N \to \infty`.
+The ISJ algorithm is also very robust to multimodal distributions, which NR is not.
 
 The times for the one-dimensional :math:`N = 10^6` data points were computed taking the median of 5 runs.
-The kernel was Gaussian and the number of grid points were :math:`n=2^{10}`.
+The kernel was Gaussian and the number of grid points were chosen to be :math:`n=2^{10}`.
 The times for the 2D :math:`N=10^2 \times 10^2` data points are also based on the median of 5 runs using a Gaussian kernel.
 
 

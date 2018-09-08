@@ -55,6 +55,46 @@ class TestKernelFunctions():
         integral, abserr = quad(function, a=a, b=b)
         assert np.isclose(integral, 1)
         
+    @pytest.mark.parametrize("p", [0.5, 1, 1.5, 2, 10, 50, np.inf])
+    def test_integral_unity_2D_many_p_norms(self, p):
+        """
+        Verify that the triweight (random choice) has area 1 under 
+        several p-norms when p >= 1.
+        """
+        
+        function = BaseKDE._available_kernels['triweight']
+        a, b = -function.support, function.support
+
+        # Perform integration 2D
+        def int2D(x1, x2):
+            return function([[x1, x2]], norm=p)
+        
+        ans, err = scipy.integrate.nquad(int2D, [[a, b], [a, b]],
+                                         opts={'epsabs': 10e-1, 
+                                               'epsrel': 10e-1})
+
+        assert np.allclose(ans, 1, rtol=10e-4, atol=10e-4)
+        
+    @pytest.mark.skip(reason="Slow test.")
+    @pytest.mark.parametrize("p", [0.5, 1, 1.5, 2, 10, 50, np.inf])
+    def test_integral_unity_3D_many_p_norms(self, p):
+        """
+        Verify that the triweight (random choice) has area 1 under 
+        several p-norms when p >= 1.
+        """
+        function = BaseKDE._available_kernels['triweight']
+        a, b = -function.support, function.support
+        
+        # Perform integration 2D
+        def int2D(x1, x2, x3):
+            return function([[x1, x2, x3]], norm=p)
+        
+        ans, err = scipy.integrate.nquad(int2D, [[a, b], [a, b], [a, b]],
+                                         opts={'epsabs': 10e-1, 
+                                               'epsrel': 10e-1})
+
+        assert np.allclose(ans, 1, rtol=10e-2, atol=10e-2)
+        
     @pytest.mark.parametrize("fname, function, p", 
                              [(a[0], a[1], b) for (a, b) in 
                               list(itertools.product(
