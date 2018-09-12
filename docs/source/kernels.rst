@@ -47,7 +47,7 @@ In other words, it is the composition of a norm :math:`\left\| \cdot \right\| _p
 Kernels may have finite support, or not
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A given kernel may or may not have have finite support.
+A given kernel may or may not have finite support.
 A kernel with finite (or compact) support is defined on a domain such as :math:`[-1, 1]`,
 while a kernel without finite support is defined on :math:`[-\infty, \infty]`.
 
