@@ -11,7 +11,7 @@ We require that :math:`\sum_i w_i = 1`.
    \widehat{f}(x) = \sum_{i=1}^{N} w_i K \left( \left \| x - x_i \right \|_p \right)
 
 To extend the equation above we divide by a scaling factor :math:`h` called the *bandwidth*.
-When diving with :math:`h`, every dimension :math:`d` is stretched, so we must
+When dividing with :math:`h`, every dimension :math:`d` is stretched, so we must
 re-scale with :math:`h^d` to ensure that :math:`\int \widehat{f}(x) \, dx`
 evaluates to unity.
 
@@ -23,7 +23,7 @@ We will now briefly explain two ways to find a good :math:`h`.
 
 .. note::
    In KDEpy, the bandwidth :math:`h` is the standard deviation of the kernel function.
-   This is because many kernels are implemented, some with bounded support and some without, and using the standard deviation to quantify the bandwidth allows easy comparison.
+   This is because the implementation contains many kernels, some with bounded support and some without, and using the standard deviation to quantify the bandwidth allows easy comparison.
 
 .. image:: _static/img/KDE_bw_animation.gif
    :target: #
