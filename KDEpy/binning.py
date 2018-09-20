@@ -34,17 +34,10 @@ import itertools
 import functools
 import operator
 from KDEpy.utils import cartesian
+import cutils
 
-# Modulenotfounderror does not exist in pyton 3.5, fails on linter
-import sys
-if sys.version_info.minor == 6:
-    ModuleNotFoundError = None
 
-try:
-    import cutils
-    _use_Cython = True
-except ModuleNotFoundError:
-    _use_Cython = False
+_use_Cython = True
 
 
 def linbin_cython(data, grid_points, weights=None):
