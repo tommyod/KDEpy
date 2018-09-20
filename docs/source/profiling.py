@@ -236,7 +236,7 @@ def main():
                 break
             
         plt.semilogy(dims_list, [t[1] for t in agg_times], 
-                     zorder=15, label=f'$N = 10^{data_size}$')
+                     zorder=15, label='$N = 10^{}$'.format(data_size))
         plt.fill_between(dims_list, [t[0] for t in agg_times], 
                          [t[2] for t in agg_times], alpha=0.5, zorder=-15)  
          

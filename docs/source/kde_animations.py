@@ -56,7 +56,7 @@ def main():
         y = FFTKDE(bw=bw).fit(data)(x)
         line.set_ydata(y)
         bw_formatted = str(round(bw, 3)).ljust(5, '0')
-        ax.set_xlabel(f'Bandwidth $h$: {bw_formatted}', fontsize=14)
+        ax.set_xlabel('Bandwidth $h$: {}'.format(bw_formatted), fontsize=14)
         print(label, bw)
         return line, ax
     
