@@ -58,3 +58,4 @@ Please follow these guidelines:
 - Unless it's a bottleneck computation, readability trumps speed.
 - Employ object orientation, but resist the temptation to implement many methods -- stick to the basics.
 - Follow PEP8.
+
