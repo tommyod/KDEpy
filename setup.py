@@ -105,6 +105,7 @@ setup(
     install_requires=[
     'numpy>=1.14.2',
     'scipy>=1.0.1',
+    'matplotlib>=2.2.0',
     'setuptools>=39.2.0'],
 
     # List additional groups of dependencies here (e.g. development
