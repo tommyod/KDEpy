@@ -12,27 +12,17 @@ notifications:
 
 matrix:
   include:
-    - os: linux
-      sudo: required
-      services: docker
-      python: '3.5'
       
     - os: linux
       sudo: required
       services: docker
       python: '3.6'
-      global:
-        - CIBW_TEST_REQUIRES=pytest
-        - CIBW_TEST_COMMAND="python3 -m pytest {project} --doctest-modules"
 
     - os: linux
       dist: xenial    # required for Python 3.7 (travis-ci/travis-ci#9069)
       sudo: required
       services: docker
       python: '3.7'
-      global:
-        - CIBW_TEST_REQUIRES=pytest
-        - CIBW_TEST_COMMAND="python3 -m pytest {project} --doctest-modules"
 
     - os: osx
       language: generic
@@ -42,6 +32,8 @@ matrix:
 env:
   global:
     - CIBW_SKIP="cp27-* cp33-* cp34-*"
+    - CIBW_TEST_REQUIRES=pytest
+    - CIBW_TEST_COMMAND="python3 -m pytest {project} --doctest-modules"
     - PIP=pip3
     - PYTHON=python3
 
