@@ -130,7 +130,7 @@ def test_api_2D_data(estimator):
     
     for ax, norm in zip(axes, [1, 2, np.inf]):
         
-        ax.set_title(f'Norm $p={norm}$')
+        ax.set_title('Norm $p={}$'.format(norm))
         
         # Compute
         kde = estimator(kernel='gaussian', norm=norm)

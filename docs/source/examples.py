@@ -178,23 +178,43 @@ def main():
     plt.tight_layout()
     
 if __name__ == '__main__':
-    #main()
+    # main()
     
     
+    np.random.seed(123)
     
-    x = np.linspace(0, 25)
-    y = np.sin(x/3) + np.random.randn(50) / 10
+    x = [0, 0.1, 0.2, 0.3, 0.4, 1, 2, 3, 4, 5, 7, 9, 14, 19]
+    x = np.array(x)
+    x = np.linspace(0, 5)**2
+    y = np.sin(x)
     
-    dx = x[1] - x[0]
-    area = np.sum(y * dx)
-    
-    plt.scatter(x, y)
     plt.plot(x, y)
     
+    y += np.random.randn(len(y)) / 2
     
-    x, y = FFTKDE(bw=0.5).fit(x, y)()
+    plt.scatter(x, y, label='Points')
     
-    plt.plot(x, y*area)
+    x_interpol = np.linspace(min(x) - 1, max(x) + 1, num=2**6)
+    y_interpol = np.interp(x_interpol, x, y)
+    
+    plt.plot(x_interpol, y_interpol, '--', label='Interpol')
+    
+    kernel = FFTKDE._available_kernels['box']
+    kernel_grid = np.linspace(-kernel.support, kernel.support, num=2**6)
+    bw = 0.02
+    kernel_weights = kernel(kernel_grid, bw=bw)
+    kernel_weights /= np.sum(kernel_weights)
+    print(kernel_weights)
+    from scipy.signal import convolve
+    evaluated = convolve(y_interpol, kernel_weights, mode='same').reshape(-1, 1)
+    
+    plt.plot(x_interpol, evaluated)
+    
+    plt.legend()
+    
+    
+    
+
     
     
     

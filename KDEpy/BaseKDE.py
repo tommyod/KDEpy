@@ -47,7 +47,7 @@ class BaseKDE(ABC):
         
         # Verify that the choice of kernel is valid, and set the function
         akernels = sorted(list(self._available_kernels.keys()))
-        msg = f'Kernel must be a string or callable. Options: {akernels}'
+        msg = 'Kernel must be a string or callable. Opts: {}'.format(akernels)
         if isinstance(kernel, str):
             kernel = kernel.strip().lower()
             if kernel not in akernels:
@@ -66,13 +66,13 @@ class BaseKDE(ABC):
         elif isinstance(bw, str):
             amethods = sorted(list(self._bw_methods.keys()))
             if bw.lower() not in set(m.lower() for m in amethods):
-                msg = f'Kernel not recognized. Options are: {amethods}'
+                msg = 'bw not recognized. Options are: {}'.format(amethods)
                 raise ValueError(msg)
             self.bw = self._bw_methods[bw]
         elif isinstance(bw, (np.ndarray, Sequence)):
             self.bw = bw
         else:
-            raise ValueError(f'Bandwidth must be > 0, array-like or a string.')
+            raise ValueError('Bandwidth must be > 0, array-like or a string.')
             
         # Test quickly that the method has done what is was supposed to do
         assert callable(self.kernel)

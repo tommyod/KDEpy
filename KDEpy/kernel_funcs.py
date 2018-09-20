@@ -380,7 +380,7 @@ if __name__ == "__main__" and False:
                 return func(x1)
             
             ans, err = scipy.integrate.nquad(int1D, [[-4, 4]])
-            print(f'1D integration result: {ans}')
+            print('1D integration result: {}'.format(ans))
             assert np.allclose(ans, 1, rtol=10e-3, atol=10e-3)
             
             # Perform integration 2D
@@ -390,7 +390,7 @@ if __name__ == "__main__" and False:
             ans, err = scipy.integrate.nquad(int2D, [[-4, 4], [-4, 4]],
                                              opts={'epsabs': 10e-3, 
                                                    'epsrel': 10e-3})
-            print(f'2D integration result: {ans}')
+            print('2D integration result: {}'.format(ans))
             assert np.allclose(ans, 1, rtol=10e-3, atol=10e-3)
         
 if __name__ == "__main__" and False:

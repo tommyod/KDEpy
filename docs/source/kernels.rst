@@ -171,6 +171,8 @@ The equation above reduces to more well-known cases when :math:`p` takes common 
 Example - normalization
 ^^^^^^^^^^^^^^^^^^^^^^^
 
+.. note: https://en.wikipedia.org/wiki/N-sphere#Recurrences
+
 We would like to normalize the kernel functions in higher dimensions any norm.
 To accomplish this, we start with the equation for the volume of a :math:`d`-dimensional volume.
 The equation is
