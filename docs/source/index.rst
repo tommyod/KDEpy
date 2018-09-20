@@ -3,7 +3,7 @@ KDEpy
 
 .. currentmodule:: KDEpy
 
-This Python 3.6/3.7 package implements various Kernel Density Estimators (KDE).
+This Python 3.5+ package implements various Kernel Density Estimators (KDE).
 Three algorithms are implemented through the same API: :class:`~KDEpy.NaiveKDE.NaiveKDE`, :class:`~KDEpy.TreeKDE.TreeKDE` and :class:`~KDEpy.FFTKDE.FFTKDE`.
 The :class:`~KDEpy.FFTKDE.FFTKDE` outperforms other popular implementations, see the `comparison page <comparison.rst>`_.
 

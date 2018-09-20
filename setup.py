@@ -13,7 +13,7 @@ from setuptools import setup, find_packages, Extension
 from codecs import open
 from os import path
 # from KDEpy import __version__
-VERSION = '0.5.6' # __version__
+VERSION = '0.6' # __version__
 
 
 def read(fname):
@@ -84,7 +84,9 @@ setup(
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
+        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
 
     # You can just specify the packages manually here if your project is
