@@ -4,7 +4,7 @@ Kernels
 Available kernels
 -----------------
 
-You are likely reading this because you wonder wonder what kernels are available.
+You are likely reading this because you wonder which kernels are available.
 Every available kernel is shown in the figure below.
 Kernels with finite support are annotated with **F**.
 A listing of every available option is found in ``_available_kernels.items()``.
@@ -32,9 +32,9 @@ The kernels implemented in KDEpy obey some properties.
 Kernels are radial basis functions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Symmetry follows from a more general property, namely the fact that every kernel implemented is radial basis function.
+Symmetry follows from a more general property, namely the fact that every kernel implemented is a radial basis function.
 A *radial basis function* is a function which evaluates to the same value whenever the distance from the origin is the same.
-In other words, it's the composition of a norm :math:`\left\| \cdot \right\| _p: \mathbb{R}^d \to \mathbb{R}_+` and a function :math:`\kappa: \mathbb{R}_+ \to \mathbb{R}_+`.
+In other words, it is the composition of a norm :math:`\left\| \cdot \right\| _p: \mathbb{R}^d \to \mathbb{R}_+` and a function :math:`\kappa: \mathbb{R}_+ \to \mathbb{R}_+`.
 
 .. math::
 
@@ -47,7 +47,7 @@ In other words, it's the composition of a norm :math:`\left\| \cdot \right\| _p:
 Kernels may have finite support, or not
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A given kernel may have have finite support or not.
+A given kernel may or may not have finite support.
 A kernel with finite (or compact) support is defined on a domain such as :math:`[-1, 1]`,
 while a kernel without finite support is defined on :math:`[-\infty, \infty]`.
 
@@ -56,8 +56,8 @@ Below we plot the *Guassian kernel* and the *Epanechnikov kernel*.
 * The Gaussian kernel is not bounded.
 * The Epanechnikov is bounded.
 
-The reason why kernels are normalized to unit variance is so bounded and non-bounded
-kernel functions are more easy compared.
+The reason why kernels are normalized to unit variance is so that bounded and non-bounded
+kernel functions are more easily compared.
 
 .. plot::
    :include-source:

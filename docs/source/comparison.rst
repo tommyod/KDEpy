@@ -49,12 +49,12 @@ Being able to weight each data point individually *and* use a fast algorithm is 
 ``statsmodels`` implements a fast algorithm for unweighed data using the Gaussian kernel in 1D, but everything else runs using a naive algorithm, which is many orders of magnitude slower.
 
 Automatic bandwidth selection is not available out-of-the-box in ``sklearn``, but every other implementation has one or more options.
-Normal reference rules (NR) assume a normal distribution when selecting the optimal bandwidth, cross valiation (CV) minimizes an error function and the improved Sheather-Jones (ISJ) algorithm provides an asymptotically optimal bandwidth as the number of data points :math:`N \to \infty`.
+Normal reference rules (NR) assume a normal distribution when selecting the optimal bandwidth, cross validation (CV) minimizes an error function and the improved Sheather-Jones (ISJ) algorithm provides an asymptotically optimal bandwidth as the number of data points :math:`N \to \infty`.
 The ISJ algorithm is also very robust to multimodal distributions, which NR is not.
 
 The times for the one-dimensional :math:`N = 10^6` data points were computed taking the median of 5 runs.
 The kernel was Gaussian and the number of grid points were chosen to be :math:`n=2^{10}`.
-The times for the 2D :math:`N=10^2 \times 10^2` data points are also based on the median of 5 runs using a Gaussian kernel.
+The times for the 2D :math:`N=10^2 \times 10^2` data points were also based on the median of 5 runs using a Gaussian kernel.
 
 
 Speed in 1D
@@ -64,14 +64,14 @@ We run the algorithms 20 times on normally distributed data and compare the medi
 The plot below compares the speed of the implementations with a **Gaussian kernel**.
 The 1D ``statsmodels`` implementation uses a similar algorithm when the kernel is Gaussian, and the performance is therefore somewhat comparable.
 
-:class:`~KDEpy.FFTKDE.FFTKDE` is slower initially because it solves a non-linear equation to obtain a support threshold for the Gaussian kernel (which does not have finite support).
-This is a constant cost, and as :math:`N \to \infty` it the algorithm is orders of magnitude faster than the competitors.
+:class:`~KDEpy.FFTKDE.FFTKDE` is initially slower because it solves a non-linear equation to obtain a support threshold for the Gaussian kernel (which does not have finite support).
+This is a constant cost, and as :math:`N \to \infty` the algorithm is orders of magnitude faster than the competitors.
 
 .. image:: _static/img/profiling_1D_gauss.png
    :scale: 100 %
    :align: center
 
-Switching to the **Epanechnikov kernel** (scipy falls back to Gaussian, since it only implements this kernel) the picture is very different.
+Switching to the **Epanechnikov kernel** (scipy falls back to Gaussian, the only kernel implemented) the picture is very different.
 :class:`~KDEpy.FFTKDE.FFTKDE` knows the support and does not solve an equation, while ``statsmodels`` is now forced to use a naive algorithm.
 The difference is tremendous.
 
@@ -84,7 +84,7 @@ Speed in 2D
 -----------
 
 We run the 2D algorithms 20 times on normally distributed data and compare medians of the running times.
-:class:`~KDEpy.FFTKDE.FFTKDE` is fast because of the underlying algorithm -- it implements a :math:`d`- dimensional linear binning routine and uses :math:`d`-dimensional convolution.
+:class:`~KDEpy.FFTKDE.FFTKDE` is fast because of the underlying algorithm -- it implements a :math:`d`-dimensional linear binning routine and uses :math:`d`-dimensional convolution.
 
 
 .. image:: _static/img/profiling_2D_gauss.png
