@@ -24,9 +24,9 @@ C ------------------------------ C
 
 References
 ----------
-- Fan, Jianqing, and James S. Marron. 
-  “Fast Implementations of Nonparametric Curve Estimators.” 
-  Journal of Computational and Graphical Statistics 3, no. 1 (March 1, 1994). 
+- Fan, Jianqing, and James S. Marron.
+  “Fast Implementations of Nonparametric Curve Estimators.”
+  Journal of Computational and Graphical Statistics 3, no. 1 (March 1, 1994).
   https://doi.org/10.1080/10618600.1994.10474629.
 """
 import numpy as np
@@ -43,9 +43,9 @@ _use_Cython = True
 def linbin_cython(data, grid_points, weights=None):
     """
     1D Linear binning using Cython. Assigns weights to grid points from data.
-    
+
     Runs in approx 10 ms on 1 million data points.
-    
+
     Parameters
     ----------
     data : array-like
@@ -54,7 +54,7 @@ def linbin_cython(data, grid_points, weights=None):
         Should be of shape (points,).
     weights : array-like
         Should be of shape (obs,).
-        
+
     Examples
     --------
     >>> data = np.array([2, 2.5, 3, 4])
@@ -72,6 +72,9 @@ def linbin_cython(data, grid_points, weights=None):
     # Convert the data and grid points
     data = np.asarray_chkfinite(data, dtype=np.float)
     grid_points = np.asarray_chkfinite(grid_points, dtype=np.float)
+
+    assert len(data.shape) == 1
+    assert len(grid_points.shape) == 1
 
     # Verify that the grid is equidistant
     diffs = np.diff(grid_points)
@@ -97,7 +100,7 @@ def linbin_cython(data, grid_points, weights=None):
         result = cutils.iterate_data_1D(transformed_data, result)
         return np.asfarray(result[:-1]) / transformed_data.shape[0]
     else:
-        res = cutils.iterate_data_1D_weighted(transformed_data, weights, 
+        res = cutils.iterate_data_1D_weighted(transformed_data, weights,
                                               result)
         return np.asfarray(res[:-1])
 
@@ -110,7 +113,7 @@ def linbin_numpy(data, grid_points, weights=None):
     it uses vectorized NumPy functions to perform linear binning. Takes around
     100 ms on 1 million data points, so not nearly as fast as the Cython
     implementation (10 ms).
-    
+
     Parameters
     ----------
     data : array-like
@@ -138,6 +141,7 @@ def linbin_numpy(data, grid_points, weights=None):
     data = np.asarray_chkfinite(data, dtype=np.float)
     grid_points = np.asarray_chkfinite(grid_points, dtype=np.float)
     assert len(data.shape) == 1
+    assert len(grid_points.shape) == 1
 
     # Verify that the grid is equidistant
     diffs = np.diff(grid_points)
@@ -155,7 +159,7 @@ def linbin_numpy(data, grid_points, weights=None):
     # Transform the data
     min_grid = np.min(grid_points)
     max_grid = np.max(grid_points)
-    num_intervals = len(grid_points) - 1  
+    num_intervals = len(grid_points) - 1
     dx = (max_grid - min_grid) / num_intervals
     transformed_data = (data - min_grid) / dx
 
@@ -200,12 +204,12 @@ def linbin_Ndim_python(data, grid_points, weights=None):
     """
     N-dimensional linear binning. This is a slow, pure-Python function.
     Mainly used for testing purposes.
-    
+
     With :math:`N` data points, and :math:`n` grid points in each dimension
     :math:`d`, the running time is :math:`O(N2^d)`. For each point the
     algorithm finds the nearest points, of which there are two in each
     dimension.
-   
+
     Parameters
     ----------
     data : array-like
@@ -214,7 +218,7 @@ def linbin_Ndim_python(data, grid_points, weights=None):
         Grid, where cartesian product is already performed.
     weights : array-like
         Must have shape (obs,).
-        
+
     Examples
     --------
     >>> from KDEpy.utils import autogrid
@@ -233,13 +237,13 @@ def linbin_Ndim_python(data, grid_points, weights=None):
 
     if (weights is not None) and (data.shape[0] != len(weights)):
         raise ValueError('Length of data must match length of weights.')
-    
+
     obs_tot, dims = grid_points.shape
-    
+
     # Compute the number of grid points for each dimension in the grid
     grid_num = (grid_points[:, i] for i in range(dims))
     grid_num = np.array(list(len(np.unique(g)) for g in grid_num))
-    
+
     # Scale the data to the grid
     min_grid = np.min(grid_points, axis=0)
     max_grid = np.max(grid_points, axis=0)
@@ -249,32 +253,32 @@ def linbin_Ndim_python(data, grid_points, weights=None):
 
     # Create results
     result = np.zeros(grid_points.shape[0], dtype=np.float)
-        
+
     # Go through every data point
     for observation, weight in zip(data, weights):
-        
+
         # Compute integer part and fractional part for every x_i
         # Compute relation to previous grid point, and next grid point
-        int_frac = (((int(coordinate), 1 - (coordinate % 1)), 
+        int_frac = (((int(coordinate), 1 - (coordinate % 1)),
                      (int(coordinate) + 1, (coordinate % 1)))
                     for coordinate in observation)
 
         # Go through every cartesian product, i.e. every corner in the
         # hypercube grid points surrounding the observation
         for cart_prod in itertools.product(*int_frac):
-            
+
             fractions = (frac for (integral, frac) in cart_prod)
-            integrals = list(integral for (integral, frac) in cart_prod) 
+            integrals = list(integral for (integral, frac) in cart_prod)
             # Find the index in the resulting array, compured by
             # x_1 * (g_2 * g_3 * g_4) + x_2 * (g_3 * g_4) + x_3 * (g_4) + x_4
-            
+
             index = integrals[0]
             for j in range(1, dims):
                 index = grid_num[j] * index + integrals[j]
-            
+
             value = functools.reduce(operator.mul, fractions)
             result[index % obs_tot] += value * weight
-        
+
     assert np.allclose(np.sum(result), 1)
     return result
 
@@ -282,14 +286,14 @@ def linbin_Ndim_python(data, grid_points, weights=None):
 def linbin_Ndim(data, grid_points, weights=None):
     """
     2 and 3-dimensional linear binning.
-    
+
     With :math:`N` data points, and :math:`n` grid points in each dimension
     :math:`d`, the running time is :math:`O(N2^d)`. For each point the
     algorithm finds the nearest points, of which there are two in each
     dimension.
-    
+
     Approximately 200 times faster than pure python implementation.
-    
+
     Parameters
     ----------
     data : array-like
@@ -298,7 +302,7 @@ def linbin_Ndim(data, grid_points, weights=None):
         Grid, where cartesian product is already performed.
     weights : array-like
         Must have shape (obs,).
-        
+
     Examples
     --------
     >>> 1 + 1
@@ -307,7 +311,7 @@ def linbin_Ndim(data, grid_points, weights=None):
     data_obs, data_dims = data.shape
     assert len(grid_points.shape) == 2
     assert data_dims >= 2
-    
+
     # Convert the data and grid points
     data = np.asarray_chkfinite(data, dtype=np.float)
     grid_points = np.asarray_chkfinite(grid_points, dtype=np.float)
@@ -317,13 +321,13 @@ def linbin_Ndim(data, grid_points, weights=None):
 
     if (weights is not None) and (data.shape[0] != len(weights)):
         raise ValueError('Length of data must match length of weights.')
-    
+
     obs_tot, dims = grid_points.shape
-    
+
     # Compute the number of grid points for each dimension in the grid
     grid_num = (grid_points[:, i] for i in range(dims))
     grid_num = np.array(list(len(np.unique(g)) for g in grid_num))
-    
+
     # Scale the data to the grid
     min_grid = np.min(grid_points, axis=0)
     max_grid = np.max(grid_points, axis=0)
@@ -333,22 +337,22 @@ def linbin_Ndim(data, grid_points, weights=None):
 
     # Create results
     result = np.zeros(grid_points.shape[0], dtype=np.float)
-    
+
     # Call the Cython implementation
     if weights is not None:
         if data_dims >= 3:
             binary_flgs = cartesian(([0, 1], ) * dims)
-            result = cutils.iterate_data_ND_weighted(data, weights, result, 
-                                                     grid_num, obs_tot, 
+            result = cutils.iterate_data_ND_weighted(data, weights, result,
+                                                     grid_num, obs_tot,
                                                      binary_flgs)
         else:
-            result = cutils.iterate_data_2D_weighted(data, weights, result, 
+            result = cutils.iterate_data_2D_weighted(data, weights, result,
                                                      grid_num, obs_tot)
         result = np.asarray_chkfinite(result, dtype=np.float)
     else:
         if data_dims >= 3:
             binary_flgs = cartesian(([0, 1], ) * dims)
-            result = cutils.iterate_data_ND(data, result, grid_num, obs_tot, 
+            result = cutils.iterate_data_ND(data, result, grid_num, obs_tot,
                                             binary_flgs)
         else:
             result = cutils.iterate_data_2D(data, result, grid_num, obs_tot)
@@ -394,16 +398,21 @@ def linear_binning(data, grid_points, weights=None):
 
     try:
         obs, dims = data.shape
-        
+
     except ValueError:
         dims = 1
-        
+
     if dims == 1:
         if _use_Cython:
-            return linbin_cython(data.ravel(), grid_points, weights=weights)   
+            return linbin_cython(data.ravel(), grid_points.ravel(),
+                                 weights=weights)
         else:
-            return linbin_numpy(data.ravel(), grid_points, weights=weights)
+            return linbin_numpy(data.ravel(), grid_points.ravel(),
+                                weights=weights)
     else:
+        # Ensure that the dimensionality and shape of the grids are the same
+        assert len(data.shape) == len(grid_points.shape)
+        assert data.shape[1] == grid_points.shape[1]
         return linbin_Ndim(data, grid_points, weights=weights)
 
 

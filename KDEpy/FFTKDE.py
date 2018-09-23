@@ -192,7 +192,6 @@ class FFTKDE(BaseKDE):
             warnings.simplefilter("ignore")
             ans = convolve(data, kernel_weights, mode='same').reshape(-1, 1)
             
-            
         return self._evalate_return_logic(ans, self.grid_points)
 
 
