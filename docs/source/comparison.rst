@@ -14,7 +14,7 @@ This page is inspired by `Kernel Density Estimation in Python <https://jakevdp.g
 .. note::
 
    Times will vary from computer to computer, and should only be used to compare the relative speed of the algorithms.
-   The processor used here was an Intel Core i5-6400 CPU.
+   The CPU used here was an Intel Core i5-6400.
 
 .. image:: _static/img/profiling_1D_epa.png
    :scale: 100 %

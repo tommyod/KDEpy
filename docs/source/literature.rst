@@ -10,12 +10,18 @@ Books
 
   - A general introduction to the subject.
     Hints to the use of k-d trees for computational efficiency in section 5.2.3, and adaptive kernel density estimators in section 5.3.
-    Does not discuss algorithmic considerations.
+    Does not discuss practical algorithmic considerations.
 
 - Wand, M. P., and M. C. Jones. "*Kernel Smoothing.*" Chapman and Hall, 1995.
 
   - Not as approachable as the book by Silverman.
     Appendix D contains computational hints, where linear binning and computation by means of convolution is explained.
+
+- Kroese, Dirk P., Thomas Taimre, and Zdravko I. Botev.
+  "*Handbook of Monte Carlo Methods.*" 1 edition. Hoboken, N.J: Wiley, 2011.
+
+  - Some of the ideas used in the paper by Botev et al. are explained in detail here.
+    In particular, see chapter 8.5 on Kernel Density Estimation.
 
 Papers
 ------
@@ -48,7 +54,7 @@ Papers
   Annals of Statistics, Volume 38, Number 5, pages 2916-2957. 2010.
   https://arxiv.org/pdf/1011.2602.pdf
 
-  - Introduces the improved Sheather-Jones algorithm for bandwidth selection, which does assume normality (ulike the Silverman rule of thumb).
+  - Introduces the improved Sheather-Jones (ISJ) algorithm for bandwidth selection, which does not assume normality (unlike the Silverman rule of thumb).
 
 - Wang, Xianfu.
   "*Volumes of Generalized Unit Balls.*"
@@ -56,7 +62,7 @@ Papers
   https://doi.org/10.2307/30044198.
 
   - Gives a formula for unit balls in any dimension and any :math:`p`-norm.
-    This result is used to normalize kernels in any dimension and norm.
+    This result is used to normalize kernels in any dimension and norm in KDEpy.
 
 Other resources
 ---------------

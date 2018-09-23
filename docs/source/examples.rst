@@ -4,7 +4,7 @@ Examples
 Minimal working example with options
 ------------------------------------
 
-This *minimal working example* shows how to compute a KDE in one line.
+This *minimal working example* shows how to compute a KDE in one line of code.
 
 .. plot::
    :include-source:
@@ -32,7 +32,6 @@ This example shows the effect of different kernel functions :math:`K`.
 
         ax = fig.add_subplot(1, 3, plt_num)
         ax.set_title(f'Kernel: "{kernel}"')
-
         x, y = FFTKDE(kernel=kernel, bw='silverman').fit(data).evaluate()
         ax.plot(x, y)
 

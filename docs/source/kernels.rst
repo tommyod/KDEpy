@@ -4,10 +4,10 @@ Kernels
 Available kernels
 -----------------
 
-You are likely reading this because you wonder which kernels are available.
+You are likely reading this because you wonder which kernel functions :math:`K` are available.
 Every available kernel is shown in the figure below.
-Kernels with finite support are annotated with **F**.
-A listing of every available option is found in ``_available_kernels.items()``.
+Kernels with finite support (synonymous with *bounded support* in these docs) are annotated with an **F**.
+A listing of every available option is found in ``NaiveKDE._available_kernels.keys()``.
 
 .. plot::
    :include-source:
@@ -23,7 +23,7 @@ A listing of every available option is found in ``_available_kernels.items()``.
 Kernel properties
 -----------------
 
-The kernels implemented in KDEpy obey some properties.
+The kernels implemented in KDEpy obey some common properties.
 
 * Normalization: :math:`\int K(x) \, dx = 1`.
 * Unit variance: :math:`\operatorname{Var}[K(x)] = 1` when the bandwidth :math:`h` is 1.
@@ -42,22 +42,23 @@ In other words, it is the composition of a norm :math:`\left\| \cdot \right\| _p
 
 .. note::
 
-   If you have high dimensional data with vastly different scales, consider standardizing the data before feeding it to a KDE.
+   If you have high dimensional data with different scales, consider standardizing the data before feeding it to a KDE.
 
 Kernels may have finite support, or not
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A given kernel may or may not have finite support.
-A kernel with finite (or compact) support is defined on a domain such as :math:`[-1, 1]`,
-while a kernel without finite support is defined on :math:`[-\infty, \infty]`.
+A kernel with finite (or *bounded*) support is defined on a domain such as :math:`[-1, 1]`,
+while a kernel without finite support is defined on :math:`(-\infty, \infty)`.
 
 Below we plot the *Guassian kernel* and the *Epanechnikov kernel*.
 
-* The Gaussian kernel is not bounded.
-* The Epanechnikov is bounded.
+* The Gaussian kernel does not have finite support.
+* The Epanechnikov kernel has finite support.
 
 The reason why kernels are normalized to unit variance is so that bounded and non-bounded
 kernel functions are more easily compared.
+In other words, setting ``bw=1`` in the software ensures that the standard deviation :math:`\sigma = 1`.
 
 .. plot::
    :include-source:
@@ -75,7 +76,8 @@ Higher dimensional kernels
 --------------------------
 
 The one-dimensional example is deceptively simple, since in one dimension every
-:math:`p`-norm is equivalent. In higher dimensions, this is not true.
+:math:`p`-norm is equivalent.
+In higher dimensions, this is not true.
 The general :math:`p`-norm is a measure of distance in :math:`\mathbb{R}^d`,
 defined by
 
@@ -91,8 +93,8 @@ The three most common :math:`p`-norms are
 
 In higher dimensions, a norm must be chosen in addition to a kernel.
 Let :math:`r := \left\| x \right\| _p` be a measure of distance (:math:`r` stands for radius here).
-Normalization is necessary, but symmetry is guaranteed since
-:math:`\left\| -x \right\| _p = \left\| x \right\| _p`.
+The normalization necessary to ensure :math:`\int \kappa ( \left\| x \right\| _p ) \, dx = 1` depends on the value of :math:`p`,
+but symmetry is guaranteed since :math:`\left\| -x \right\| _p = \left\| x \right\| _p`.
 The figure below shows the effect of choosing different norms with the same kernel.
 
 
@@ -130,29 +132,32 @@ Let :math:`r := \left\| x \right\| _p` be the distance from the origin, as measu
 The :math:`d`-dimensional volume :math:`V_d(r)` is proportional to :math:`r^d`.
 We will now examine the unit :math:`d`-dimensional volume :math:`V_d := V_d(1)`.
 
-We integrate over :math:`V_{d-1}(r)` to obtain :math:`V_{d}` using
+We integrate over a :math:`d-1` dimensional surface :math:`S_{d-1}(r)` to obtain :math:`V_{d}` using
 
 .. math::
 
-   V_d = \int_0^1 V_{d-1}(r) \, dr.
+   V_d = \int_0^1 S_{d-1}(r) \, dr.
 
-Since :math:`V_{d-1}(r) \propto r^{d-1}`, we write it as :math:`V_{d-1}(r) = K_{d-1} r^{d-1}`,
-where :math:`K_{d-1}` is a constant. Pulling this out of the integral, we are left with
+Since a :math:`d-1` dimensional surface is proportional to :math:`r^{d-1}`,
+we write it as :math:`S_{d-1}(r) = K_{d-1} r^{d-1}`,
+where :math:`K_{d-1}` is a constant.
+Pulling this out of the integral, we are left with
 
 .. math::
 
-   V_d = K_{d-1} \int_0^1 r^{d-1} \, dr = K_{d-1} / d = V_{d-1} / d,
+   V_d = K_{d-1} \int_0^1 r^{d-1} \, dr = K_{d-1} / d.
 
-where the last equality follows from :math:`V_{d-1}(1) = K_{d-1} (1)^{d-1}`.
+From this we observe that :math:`K_{d-1} = V_d \cdot d`, a fact we'll use later.
 
 What is the volume of a unit ball :math:`V_d` in the :math:`p` norm in :math:`d` dimensions?
 Fortunately an analytical expression exists, it's given by
 
 .. math::
 
-   2^d \frac{\Gamma \left( 1 + \frac{1}{p} \right)^d}{\Gamma \left(1 + \frac{d}{p} \right)}.
+   V_d(r=1; p) = 2^d \frac{\Gamma \left( 1 + \frac{1}{p} \right)^d}{\Gamma \left(1 + \frac{d}{p} \right)}.
 
-For more information about this, see for instance the paper by Wang in :ref:`literature`.
+For more information about this, see for instance the paper by Wang in :ref:`literature`,
+where we have used :math:`K_{d-1} = V_d \cdot d`.
 The equation above reduces to more well-known cases when :math:`p` takes common values, as shown in the table below.
 
 .. table:: High dimensional volumes
@@ -173,13 +178,13 @@ Example - normalization
 
 .. note: https://en.wikipedia.org/wiki/N-sphere#Recurrences
 
-We would like to normalize the kernel functions in higher dimensions any norm.
+We would like to normalize kernel functions in higher dimensions for any norm.
 To accomplish this, we start with the equation for the volume of a :math:`d`-dimensional volume.
 The equation is
 
 .. math::
 
-   V_d = V_{d-1} \int_0^1 r^{d-1} \, dr = V_{d} \cdot d \int_0^1 r^{d-1} \, dr.
+   V_d = K_{d-1} \int_0^1 r^{d-1} \, dr = V_{d} \cdot d \int_0^1 r^{d-1} \, dr.
 
 The integral of the kernel :math:`\kappa: \mathbb{R}_+ \to \mathbb{R}_+` over the :math:`d`-dimensional space is then given by
 

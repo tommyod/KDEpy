@@ -22,8 +22,11 @@ evaluates to unity.
 We will now briefly explain two ways to find a good :math:`h`.
 
 .. note::
-   In KDEpy, the bandwidth :math:`h` is the standard deviation of the kernel function.
-   This is because the implementation contains many kernels, some with bounded support and some without, and using the standard deviation to quantify the bandwidth allows easy comparison.
+   In KDEpy, the bandwidth :math:`h` is the standard deviation :math:`\sigma` of the kernel function.
+   This is because the implementation contains many kernels, some with finite support and some without,
+   and using :math:`\sigma` to quantify the bandwidth allows easy comparison.
+
+The animation below shows kernel density estimation for various choices of :math:`h`.
 
 .. image:: _static/img/KDE_bw_animation.gif
    :target: #
@@ -70,6 +73,9 @@ The ISJ algorithm attempts to find :math:`h` to minimize the asymptotic mean
 integrated square error (AMISE), which depends on the unknown quantity :math:`\left \| f''(x) \right \|^2`.
 Using a recursive formula, this is accomplished by computing a sequence of estimates.
 See the paper by Botev et al in the :ref:`literature` for details.
+
+An example using ``bw='ISJ'`` is shown in the code snippet below.
+With multimodal data, it dramatically outperforms ``bw='silverman'``.
 
 .. plot::
    :include-source:

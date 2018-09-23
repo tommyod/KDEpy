@@ -4,6 +4,7 @@
 Module for the FFTKDE.
 """
 import numbers
+import warnings
 import numpy as np
 from KDEpy.BaseKDE import BaseKDE
 from KDEpy.binning import linear_binning
@@ -178,8 +179,21 @@ class FFTKDE(BaseKDE):
         data = data.reshape(*tuple(num_grid_points))
 
         # Step 3 - Performing the convolution
-        evaluated = convolve(data, kernel_weights, mode='same').reshape(-1, 1)
-        return self._evalate_return_logic(evaluated, self.grid_points)
+        
+        # The following code block surpressed the warning:
+#        anaconda3/lib/python3.6/site-packages/mkl_fft/_numpy_fft.py: 
+#            FutureWarning: Using a non-tuple sequence for multidimensional 
+#            indexing is deprecated; use `arr[tuple(seq)]` instead of 
+#            `arr[seq]`. In the future this will be interpreted as an array 
+#            index, `arr[np.array(seq)]`, which will result either in an error 
+#            or a different result.
+#        output = mkl_fft.rfftn_numpy(a, s, axes)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            ans = convolve(data, kernel_weights, mode='same').reshape(-1, 1)
+            
+            
+        return self._evalate_return_logic(ans, self.grid_points)
 
 
 if __name__ == "__main__":

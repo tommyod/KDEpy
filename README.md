@@ -6,8 +6,8 @@
 ## About
 
 This Python 3.5+ package implements various kernel density estimators (KDE).
-The long-term goal is to support state-of-the-art KDE algorithms, and eventually have the most complete implementation in the scientific Python universe.
-As of now, three algorithms are implemented through the same API: [`NaiveKDE`](https://kdepy.readthedocs.io/en/latest/API.html#naivekde), [`TreeKDE`](https://kdepy.readthedocs.io/en/latest/API.html#treekde) and [`FFTKDE`](https://kdepy.readthedocs.io/en/latest/API.html#fftkde).
+Three algorithms are implemented through the same API: [`NaiveKDE`](https://kdepy.readthedocs.io/en/latest/API.html#naivekde), [`TreeKDE`](https://kdepy.readthedocs.io/en/latest/API.html#treekde) and [`FFTKDE`](https://kdepy.readthedocs.io/en/latest/API.html#fftkde).
+The class [`FFTKDE`](https://kdepy.readthedocs.io/en/latest/API.html#fftkde) outperforms other popular implementations, see the [comparison page](https://kdepy.readthedocs.io/en/latest/comparison.html).
 
 ![Plot](./docs/source/_static/img/showcase.png)
 
@@ -37,9 +37,9 @@ plt.plot(x, y, label='KDE estimate')
 ![Plot](./docs/source/_static/img/mwe.png)
 
 The package consists of three algorithms. Here's a brief explanation:
-- [`NaiveKDE`](https://kdepy.readthedocs.io/en/latest/API.html#naivekde) - A naive computation. Supports N-dimensional data, variable bandwidth, weighted data and many kernel functions. Very slow on large data sets.
-- [`TreeKDE`](https://kdepy.readthedocs.io/en/latest/API.html#treekde) - A tree-based computation.    Supports the same features as the naive algorithm, but is faster at the expense of small inaccuracy when using a kernel without finite support.
-- [`FFTKDE`](https://kdepy.readthedocs.io/en/latest/API.html#fftkde) - A fast FFT-based computation. Supports weighted data and many kernels, but not variable bandwidth. Must be evaluated on an equidistant grid, the finer the grid the higher the accuracy.
+- [`NaiveKDE`](https://kdepy.readthedocs.io/en/latest/API.html#naivekde) - A naive computation. Supports d-dimensional data, variable bandwidth, weighted data and many kernel functions. Very slow on large data sets.
+- [`TreeKDE`](https://kdepy.readthedocs.io/en/latest/API.html#treekde) - A tree-based computation. Supports the same features as the naive algorithm, but is faster at the expense of small inaccuracy when using a kernel without finite support. Good for evaluation on non-uniform, arbitrary grids.
+- [`FFTKDE`](https://kdepy.readthedocs.io/en/latest/API.html#fftkde) - A very fast convolution-based computation. Supports weighted d-dimensional data and many kernels, but not variable bandwidth. Must be evaluated on an equidistant grid, the finer the grid the higher the accuracy. Data points may not be outside of the grid.
 
 ## Issues and contributing
 
@@ -58,4 +58,3 @@ Please follow these guidelines:
 - Unless it's a bottleneck computation, readability trumps speed.
 - Employ object orientation, but resist the temptation to implement many methods -- stick to the basics.
 - Follow PEP8.
-
