@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sun Feb  4 10:52:17 2018
-
-@author: tommy
+Module for utility functions.
 """
 import numpy as np
 import numbers
@@ -12,23 +10,23 @@ import numbers
 def cartesian(arrays):
     """
     Generate a cartesian product of input arrays.
-    Adapted from: 
+    Adapted from:
         https://github.com/scikit-learn/scikit-learn/blob/
         master/sklearn/utils/extmath.py#L489
-        
+
     Parameters
     ----------
     arrays : list of array-like
         1-D arrays to form the cartesian product of.
     out : ndarray
         Array to place the cartesian product in.
-        
+
     Returns
     -------
     out : ndarray
         2-D array of shape (M, len(arrays)) containing cartesian products
         formed of input arrays.
-        
+
     Examples
     --------
     >>> cartesian(([1, 2, 3], [4, 5], [6, 7]))
@@ -64,10 +62,10 @@ def autogrid(data, boundary_abs=3, num_points=None, boundary_rel=0.05):
     """
     Automatically select a grid if the user did not supply one.
     Input is (obs, dims), and so is ouput.
-    
+
     number of grid : should be a power of two
     percentile : is how far out we go out
-    
+
     Parameters
     ----------
     data : array-like
@@ -79,12 +77,12 @@ def autogrid(data, boundary_abs=3, num_points=None, boundary_rel=0.05):
         Should be a number such that k**dims = `num_points`.
     boundary_rel: float
         How far out to go, relatively to max - min.
-        
+
     Returns
     -------
     grid : array-like
         A grid of shape (obs, dims).
-        
+
     Examples
     --------
     >>> autogrid(np.array([[0, 0]]), boundary_abs=1, num_points=3)
@@ -108,7 +106,7 @@ def autogrid(data, boundary_abs=3, num_points=None, boundary_rel=0.05):
     obs, dims = data.shape
     minimums, maximums = data.min(axis=0), data.max(axis=0)
     ranges = maximums - minimums
-    
+
     if num_points is None:
         num_points = [int(np.power(1024, 1 / dims))] * dims
     elif isinstance(num_points, (numbers.Number,)):
@@ -118,10 +116,10 @@ def autogrid(data, boundary_abs=3, num_points=None, boundary_rel=0.05):
     else:
         msg = '`num_points` must be None, a number, or list/tuple for dims'
         raise TypeError(msg)
-        
+
     if not len(num_points) == dims:
         raise ValueError('Number of points must be sequence matching dims.')
-    
+
     list_of_grids = []
 
     generator = enumerate(zip(minimums, maximums, ranges, num_points))
@@ -133,7 +131,7 @@ def autogrid(data, boundary_abs=3, num_points=None, boundary_rel=0.05):
                                          num=points))
 
     return cartesian(list_of_grids)
-    
+
 
 if __name__ == "__main__":
     import pytest

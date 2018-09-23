@@ -12,8 +12,9 @@ from setuptools import setup, find_packages, Extension
 # To use a consistent encoding
 from codecs import open
 from os import path
-# from KDEpy import __version__
-VERSION = '0.6' # __version__
+
+# If this is incremented, also increment in __init__.py
+VERSION = '0.6.0' # __version__
 
 
 def read(fname):
@@ -36,14 +37,13 @@ else:
     use_numpy = True
 
 cmdclass = {}
-ext_modules = []
 
 if use_cython and use_numpy:
-    ext_modules += [Extension("cutils", [path.join('KDEpy', 'cutils.pyx')]),]
+    ext_modules = [Extension("cutils", [path.join('KDEpy', 'cutils.pyx')]),]
     cmdclass.update({ 'build_ext': build_ext })
     include_dirs = [np.get_include()]
 else:
-    ext_modules += [Extension("cutils", [path.join('KDEpy', 'cutils.c')]),]
+    ext_modules = [Extension("cutils", [path.join('KDEpy', 'cutils.c')]),]
     include_dirs = []
 
 
@@ -73,7 +73,7 @@ setup(
         #   3 - Alpha
         #   4 - Beta
         #   5 - Production/Stable
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
 
         # Indicate who your project is intended for
         # 'Intended Audience :: End Users/Desktop',

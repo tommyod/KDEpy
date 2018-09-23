@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Module for functions related to linear binning. These functions employ
-linear binning to weighted data. This is typically a preprocessing step
+Module for functions related to linear binning. These functions perform
+linear binning on weighted data. This is typically a preprocessing step
 before convolving with a kernel in the FFTKDE, but may also be used to
 reduce the effective number of data points in any algorithm.
 
 The idea behind linear binning is the following: (1) go through every
-data point and (2) assign weight to the 2^dims nearest grid points.
+data point and (2) assign a weight to the 2^dims nearest grid points.
 In `dims` dimensions, there are 2 points on the grid to consider in
-each direction, so a total of 2^dims grid points to assign weights to
+each dimension, so a total of 2^dims grid points must be assigned weights to
 for every data point. The weights are determined by the proportion of
 the volume of this hypercube that is enclosed by the data point.
 
@@ -36,7 +36,8 @@ import operator
 from KDEpy.utils import cartesian
 import cutils
 
-
+# This parameter was in use when a NumPy implementation and a Cython
+# implementation were both used. Now only Cython is used.
 _use_Cython = True
 
 
@@ -49,11 +50,13 @@ def linbin_cython(data, grid_points, weights=None):
     Parameters
     ----------
     data : array-like
-        Should be of shape (obs,).
+        The data to bin. Must be of shape (obs,).
     grid_points : array-like
-        Should be of shape (points,).
+        Equidistant grid points to assign weights to.
+        Must be of shape (points,).
     weights : array-like
-        Should be of shape (obs,).
+        The weights of the data points.
+        Must be of shape (obs,).
 
     Examples
     --------
@@ -81,6 +84,7 @@ def linbin_cython(data, grid_points, weights=None):
     assert np.allclose(np.ones_like(diffs) * diffs[0], diffs)
 
     if weights is not None:
+        assert len(weights.shape) == 1
         weights = np.asarray_chkfinite(weights, dtype=np.float)
         weights = weights / np.sum(weights)
 
@@ -96,13 +100,15 @@ def linbin_cython(data, grid_points, weights=None):
 
     result = np.asfarray(np.zeros(num_intervals + 2))
 
+    # Two Cython functions are implemented, one for weighted data and one
+    # for unweighted data, since creating equal weights is costly w.r.t time
     if weights is None:
         result = cutils.iterate_data_1D(transformed_data, result)
         return np.asfarray(result[:-1]) / transformed_data.shape[0]
     else:
         res = cutils.iterate_data_1D_weighted(transformed_data, weights,
                                               result)
-        return np.asfarray(res[:-1])
+        return np.asfarray(res[:-1])  # Remove last, outside of grid
 
 
 def linbin_numpy(data, grid_points, weights=None):
@@ -117,11 +123,11 @@ def linbin_numpy(data, grid_points, weights=None):
     Parameters
     ----------
     data : array-like
-        Should be of shape (obs,).
+        Must be of shape (obs,).
     grid_points : array-like
-        Should be of shape (points,).
+        Must be of shape (points,).
     weights : array-like
-        Should be of shape (obs,).
+        Must be of shape (obs,).
 
     Examples
     --------
@@ -202,7 +208,7 @@ def linbin_numpy(data, grid_points, weights=None):
 
 def linbin_Ndim_python(data, grid_points, weights=None):
     """
-    N-dimensional linear binning. This is a slow, pure-Python function.
+    d-dimensional linear binning. This is a slow, pure-Python function.
     Mainly used for testing purposes.
 
     With :math:`N` data points, and :math:`n` grid points in each dimension
@@ -223,7 +229,7 @@ def linbin_Ndim_python(data, grid_points, weights=None):
     --------
     >>> from KDEpy.utils import autogrid
     >>> grid_points = autogrid(np.array([[0, 0, 0]]), num_points=(3, 3, 3))
-    >>> d = linear_binning(np.array([[1.0, 0, 0]]), grid_points, weights=None)
+    >>> d = linbin_Ndim_python(np.array([[1.0, 0, 0]]), grid_points, None)
     """
     # Convert the data and grid points
     data = np.asarray_chkfinite(data, dtype=np.float)
@@ -232,6 +238,7 @@ def linbin_Ndim_python(data, grid_points, weights=None):
         weights = np.asarray_chkfinite(weights, dtype=np.float)
     else:
         # This is not efficient, but this function should just be correct
+        # The faster algorithm is implemented in Cython
         weights = np.ones(data.shape[0])
     weights = weights / np.sum(weights)
 
@@ -285,14 +292,12 @@ def linbin_Ndim_python(data, grid_points, weights=None):
 
 def linbin_Ndim(data, grid_points, weights=None):
     """
-    2 and 3-dimensional linear binning.
+    d-dimensional linear binning, when d >= 2.
 
     With :math:`N` data points, and :math:`n` grid points in each dimension
     :math:`d`, the running time is :math:`O(N2^d)`. For each point the
     algorithm finds the nearest points, of which there are two in each
-    dimension.
-
-    Approximately 200 times faster than pure python implementation.
+    dimension. Approximately 200 times faster than pure Python implementation.
 
     Parameters
     ----------
@@ -305,8 +310,9 @@ def linbin_Ndim(data, grid_points, weights=None):
 
     Examples
     --------
-    >>> 1 + 1
-    2
+    >>> from KDEpy.utils import autogrid
+    >>> grid_points = autogrid(np.array([[0, 0, 0]]), num_points=(3, 3, 3))
+    >>> d = linbin_Ndim(np.array([[1.0, 0, 0]]), grid_points, None)
     """
     data_obs, data_dims = data.shape
     assert len(grid_points.shape) == 2
@@ -338,7 +344,11 @@ def linbin_Ndim(data, grid_points, weights=None):
     # Create results
     result = np.zeros(grid_points.shape[0], dtype=np.float)
 
-    # Call the Cython implementation
+    # Call the Cython implementation. Loops are unrolled if d=1 or d=2,
+    # and if d >= 3 a more general routine is called. It's a bit slower since
+    # the loops are not unrolled.
+
+    # Weighted data has two specific routines
     if weights is not None:
         if data_dims >= 3:
             binary_flgs = cartesian(([0, 1], ) * dims)
@@ -349,6 +359,10 @@ def linbin_Ndim(data, grid_points, weights=None):
             result = cutils.iterate_data_2D_weighted(data, weights, result,
                                                      grid_num, obs_tot)
         result = np.asarray_chkfinite(result, dtype=np.float)
+
+    # Unweighted data has two specific routines too. This is because creating
+    # uniform weights takes relatively long time. It's faster to have a
+    # specialize routine for this case.
     else:
         if data_dims >= 3:
             binary_flgs = cartesian(([0, 1], ) * dims)
@@ -365,15 +379,19 @@ def linbin_Ndim(data, grid_points, weights=None):
 
 def linear_binning(data, grid_points, weights=None):
     """
-    Compute binning by setting a linear grid and weighting points linearily
+    This wrapper function computes d-dimensional binning, very quickly.
+
+    Computes binning by setting a linear grid and weighting points linearily
     by their distance to the grid points. In addition, weight asssociated with
-    data points may be passed.
+    data points may be passed. Depending on whether or not weights are passed
+    and the dimensionality of the data, specific sub-routines are called for
+    fast evaluation.
 
     Parameters
     ----------
     data
         The data points.
-    num_points
+    grid_points
         The number of points in the grid.
     weights
         The weights.
@@ -396,13 +414,21 @@ def linear_binning(data, grid_points, weights=None):
     if weights is not None:
         weights = np.asarray_chkfinite(weights, dtype=np.float)
 
+    # Make sure the dimensionality makes sense
     try:
-        obs, dims = data.shape
-
+        data_obs, data_dims = data.shape
     except ValueError:
-        dims = 1
+        data_dims = 1
 
-    if dims == 1:
+    try:
+        grid_obs, grid_dims = grid_points.shape
+    except ValueError:
+        grid_dims = 1
+
+    if not data_dims == grid_dims:
+        raise ValueError('Shape of data and grid points must be the same.')
+
+    if data_dims == 1:
         if _use_Cython:
             return linbin_cython(data.ravel(), grid_points.ravel(),
                                  weights=weights)
@@ -410,9 +436,6 @@ def linear_binning(data, grid_points, weights=None):
             return linbin_numpy(data.ravel(), grid_points.ravel(),
                                 weights=weights)
     else:
-        # Ensure that the dimensionality and shape of the grids are the same
-        assert len(data.shape) == len(grid_points.shape)
-        assert data.shape[1] == grid_points.shape[1]
         return linbin_Ndim(data, grid_points, weights=weights)
 
 
@@ -420,4 +443,3 @@ if __name__ == "__main__":
     import pytest
     # --durations=10  <- May be used to show potentially slow tests
     pytest.main(args=['.', '--doctest-modules', '-v', '--capture=sys'])
-    # pytest.main(args=[__file__, '--doctest-modules', '-v', '--capture=sys'])

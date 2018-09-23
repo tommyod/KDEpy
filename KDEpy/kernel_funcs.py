@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sun Feb  4 20:52:43 2018
-
-@author: tommy
+Module for kernel functions. A kernel function is a radial basis function which
+is everywhere non-negative and whose integral evalutes to unity. Every kernel
+function takes an `x` of shape (obs, dims) and returns a y of shape (obs, 1).
 """
 
 import numpy as np
@@ -15,7 +15,7 @@ from scipy.stats import norm
 from scipy.optimize import brentq
 
 # In R, the following are implemented:
-# "gaussian", "rectangular", "triangular", "epanechnikov", 
+# "gaussian", "rectangular", "triangular", "epanechnikov",
 # "biweight", "cosine" or "optcosine"
 
 # Wikipedia
@@ -30,10 +30,10 @@ def gauss_integral(n):
     """
     Solve the integral
     \int_0^1 exp(-0.5 * x * x) x^n dx
-    
+
     See
     https://en.wikipedia.org/wiki/List_of_integrals_of_Gaussian_functions
-    
+
     Examples
     --------
     >>> ans = gauss_integral(3)
@@ -58,7 +58,7 @@ def trig_integral(k):
     Is(k) = int_0^1 sin(pi * x / 2) x^k dx
     Ic(k) = int_0^1 cos(pi * x / 2) x^k dx
     using a recursive formula. Returns a tuple (Is, Ic).
-    
+
     Examples
     --------
     >>> import numpy as np
@@ -69,20 +69,20 @@ def trig_integral(k):
 
     Ic = 2 / np.pi
     Is = 2 / np.pi
-    
+
     if k <= 0:
         return Is, Ic
 
     for i in range(1, k + 1):
         Ic, Is = (2 / np.pi) * (1 - i * Is), (2 / np.pi) * i * Ic
-        
+
     return Is, Ic
 
 
 def p_norm(x, p):
     """
     The p-norm of an array of shape (obs, dims)
-    
+
     Examples
     --------
     >>> x = np.arange(9).reshape((3, 3))
@@ -131,14 +131,14 @@ def volume_unit_ball(d, p=2):
     """
     Volume of d-dimensional unit ball under the p-norm. When p=1 this is called
     a cross-polytype, when p=2 it's called a hypersphere, and when p=infty it's
-    called a hypercube. 
-    
+    called a hypercube.
+
     Notes
     -----
     See the following paper for a very general result related to this:
-        
-    - Wang, Xianfu. “Volumes of Generalized Unit Balls.” 
-      Mathematics Magazine 78, no. 5 (2005): 390–95. 
+
+    - Wang, Xianfu. “Volumes of Generalized Unit Balls.”
+      Mathematics Magazine 78, no. 5 (2005): 390–95.
       https://doi.org/10.2307/30044198.
     """
     return 2.**d * gamma(1 + 1 / p) ** d / gamma(1 + d / p)
@@ -146,7 +146,7 @@ def volume_unit_ball(d, p=2):
 
 def epanechnikov(x, dims=1):
     normalization = (2 / (dims + 2))
-    dist_sq = x**2 
+    dist_sq = x**2
     out = np.zeros_like(dist_sq)
     mask = dist_sq < 1
     out[mask] = (1 - dist_sq)[mask] / normalization
@@ -176,7 +176,7 @@ def tri(x, dims=1):
     normalization = (1 / (dims + 1))
     out = np.zeros_like(x)
     mask = x < 1
-    out[mask] = np.maximum(0, 1 - x)[mask] / normalization 
+    out[mask] = np.maximum(0, 1 - x)[mask] / normalization
     return out
 
 
@@ -224,33 +224,52 @@ def sigmoid(x, dims=1):
 
 
 class Kernel(collections.abc.Callable):
-    
+
     def __init__(self, function, var=1, support=3):
         """
         Initialize a new kernel function.
-        
+
         function: callable, numpy.arr -> numpy.arr, should integrate to 1
         expected_value : peak, typically 0
         support: support of the function.
+
+        Example
+        -------
+        >>> from scipy.special import gamma
+        >>> # Normalized function of x
+        >>> def exp(x, dims=1):
+        ...     normalization = gamma(dims) * dims
+        ...     return np.exp(-x) / normalization
+        >>> kernel = Kernel(exp, var=4, support=np.inf)
+        >>> # The function is scaled so that the standard deviation (bw) = 1
+        >>> kernel(0, bw=1, norm=2)[0] > kernel(1, bw=1, norm=2)[0]
+        True
+        >>> np.allclose(kernel(np.array([0, 1, 2])), kernel([0, 1, 2]))
+        True
+        >>> np.allclose(kernel(0), kernel([0]))
+        True
+        >>> np.allclose(kernel(0), kernel.evaluate(0))
+        True
         """
         self.function = function
         self.var = var
         self.finite_support = np.isfinite(support)
-        
+
         # If the function has finite support, scale the support so that it
         # corresponds to the support of the function when it is scaled to have
         # unit variance.
         self.support = support / np.sqrt(self.var)
-        
+
     def practical_support(self, bw, atol=10e-5):
         """
-        Return the support for practical purposes.
+        Return the support for practical purposes. Used to find a support value
+        for computations for kernel functions without finite (bounded) support.
         """
         # If the kernel has finite support, return the support accounting for
         # the bw
         if self.finite_support:
             return self.support * bw
-        
+
         # If the function does not have finite support, find a practical value
         else:
             def f(x):
@@ -263,47 +282,47 @@ class Kernel(collections.abc.Callable):
                 msg = 'Unable to solve for support numerically. Use a ' + \
                       'kernel with finite support or scale data to smaller bw.'
                 raise ValueError(msg)
-    
+
     def evaluate(self, x, bw=1, norm=2):
         """
         Evaluate the kernel.
-        
+
         Parameters
         ----------
         x : array-like
-            Must have shape (obs, dims).
+            Should have shape (obs, dims).
         bw : array-like
             Must have shape (obs, ), or float.
         """
-        
+
         # If x is a number, convert it to a length-1 NumPy vector
         if isinstance(x, numbers.Number):
             x = np.asarray_chkfinite([x])
         else:
             x = np.asarray_chkfinite(x)
-            
+
         if len(x.shape) == 1:
             x = x.reshape(-1, 1)
-            
+
         # Scale the function, such that bw=1 corresponds to the function having
         # a standard deviation (or variance) equal to 1
         real_bw = bw / np.sqrt(self.var)
         obs, dims = x.shape
-        
+
         # Set the volume function
         volume_func = functools.partial(volume_unit_ball, p=norm)
-            
+
         if dims > 1:
             distances = p_norm(x, norm).ravel()
         else:
             distances = np.abs(x).ravel()
-            
-        return (self.function(distances / real_bw, dims) / 
+
+        return (self.function(distances / real_bw, dims) /
                 ((real_bw**dims) * volume_func(dims)))
-            
+
     __call__ = evaluate
-    
-    
+
+
 gaussian = Kernel(gaussian, var=1, support=np.inf)
 exp = Kernel(exponential, var=4, support=np.inf)
 box = Kernel(box, var=1 / 3, support=1)
@@ -334,78 +353,3 @@ if __name__ == "__main__" and False:
     import pytest
     # --durations=10  <- May be used to show potentially slow tests
     pytest.main(args=['.', '--doctest-modules', '-v'])
-    
-    plot = False
-    if plot:
-        import matplotlib.pyplot as plt
-        from mpl_toolkits.mplot3d import Axes3D
-        a = Axes3D
-        import scipy
-        for name, func in _kernel_functions.items():
-    
-            print('-' * 2**7)
-            print(name)
-            print(func([-1, 0, 1]))
-            print(func(np.array([[0, -1], [0, 0], [0, 1]])))
-            print(func(np.array([[0, -1, 0], [0, 0, 0], [0, 1, 0]])))
-            
-            # Plot in 1D
-            n = 50
-            x = np.linspace(-3, 3, num=n * 3)
-            plt.plot(x, func(x))
-            plt.show()
-            
-            # Plot in 2D
-            n = 50
-            linspace = np.linspace(-3, 3, num=n)
-    
-            x, y = linspace, linspace
-            k = np.array(np.meshgrid(x, y)).T.reshape(-1, 2)
-            z = func(k).reshape((n, n))
-            
-            x, y = np.meshgrid(x, y)
-            
-            fig, ax = plt.subplots(subplot_kw=dict(projection='3d'))
-            
-            surf = ax.plot_surface(x, y, z, rstride=1, cstride=1,
-                                   linewidth=1, antialiased=True, shade=True)
-            
-            angle = 90
-            ax.view_init(30, angle)
-    
-            plt.show()
-            
-            # Perform integration 1D
-            def int1D(x1):
-                return func(x1)
-            
-            ans, err = scipy.integrate.nquad(int1D, [[-4, 4]])
-            print('1D integration result: {}'.format(ans))
-            assert np.allclose(ans, 1, rtol=10e-3, atol=10e-3)
-            
-            # Perform integration 2D
-            def int2D(x1, x2):
-                return func([[x1, x2]])
-            
-            ans, err = scipy.integrate.nquad(int2D, [[-4, 4], [-4, 4]],
-                                             opts={'epsabs': 10e-3, 
-                                                   'epsrel': 10e-3})
-            print('2D integration result: {}'.format(ans))
-            assert np.allclose(ans, 1, rtol=10e-3, atol=10e-3)
-        
-if __name__ == "__main__" and False:
-    
-    bw = 2
-    print(gaussian.practical_support(bw))
-    print(epa.practical_support(bw))
-    import matplotlib.pyplot as plt
-    x = np.linspace(-10, 10, num=2**8)
-    y = gaussian(x, bw=bw)
-    plt.plot(x, y)
-    plt.scatter([-gaussian.practical_support(bw), 
-                 gaussian.practical_support(bw)], [0, 0])
-    
-    y = epa(x, bw=bw)
-    plt.plot(x, y)
-    plt.scatter([-epa.practical_support(bw), 
-                 epa.practical_support(bw)], [0, 0])

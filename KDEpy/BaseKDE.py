@@ -3,10 +3,10 @@
 """
 Module for the BaseKDE class.
 """
-from abc import ABC, abstractmethod
-from collections.abc import Sequence
 import numbers
 import numpy as np
+from abc import ABC, abstractmethod
+from collections.abc import Sequence
 from KDEpy.kernel_funcs import _kernel_functions
 from KDEpy.bw_selection import _bw_methods
 from KDEpy.utils import autogrid
@@ -14,29 +14,29 @@ from KDEpy.utils import autogrid
 
 class BaseKDE(ABC):
     """
-    Abstract Base Class for every kernel density estimator.
-    
+    Abstract Base Class for every Kernel Density Estimator.
+
     This class is never instantiated, it merely defines some common methods
     which every subclass must implement. In summary, it facilitates:
-        
-        - The `_available_kernels` parameter
+
+        - The `_available_kernels` and `_bw_methods` parameter
         - Correct handling of `kernel` and `bw` in __init__
-        - Forces subclasses to implement `fit(data)`, converts `data` to 
+        - Forces subclasses to implement `fit(data)`, converts `data` to
           correct shape (obs, dims) and converts `weights` to correct shape
           (obs,)
         - Forces subclasses to implement `evaluate(grid_points)`, with handling
     """
-    
+
     _available_kernels = _kernel_functions
     _bw_methods = _bw_methods
-    
+
     @abstractmethod
     def __init__(self, kernel: str, bw: float):
         """Initialize the kernel density estimator.
 
         The return type must be duplicated in the docstring to comply
         with the NumPy docstring style.
-    
+
         Parameters
         ----------
         kernel
@@ -44,7 +44,7 @@ class BaseKDE(ABC):
         bw
             The bandwidth, either a number, a string or an array-like.
         """
-        
+
         # Verify that the choice of kernel is valid, and set the function
         akernels = sorted(list(self._available_kernels.keys()))
         msg = 'Kernel must be a string or callable. Opts: {}'.format(akernels)
@@ -58,8 +58,8 @@ class BaseKDE(ABC):
             self.kernel = kernel
         else:
             raise ValueError(msg)
-        
-        # The `bw` paramter may either be a positive number, a string, or 
+
+        # The `bw` paramter may either be a positive number, a string, or
         # array-like such that each point in the data has a uniue bw
         if (isinstance(bw, numbers.Number) and bw > 0):
             self.bw = bw
@@ -73,12 +73,12 @@ class BaseKDE(ABC):
             self.bw = bw
         else:
             raise ValueError('Bandwidth must be > 0, array-like or a string.')
-            
+
         # Test quickly that the method has done what is was supposed to do
         assert callable(self.kernel)
-        assert (isinstance(self.bw, (np.ndarray, Sequence, numbers.Number)) or 
+        assert (isinstance(self.bw, (np.ndarray, Sequence, numbers.Number)) or
                 callable(self.bw))
-            
+
     @abstractmethod
     def fit(self, data, weights=None):
         """
@@ -92,21 +92,21 @@ class BaseKDE(ABC):
             May be array-like of shape (obs,), shape (obs, dims) or a
             Python Sequence, e.g. a list or tuple.
         weights : array-like, Sequence or None
-            May be array-like of shape (obs,), shape (obs, dims), a 
+            May be array-like of shape (obs,), shape (obs, dims), a
             Python Sequence, e.g. a list or tuple, or None.
         """
-        
+
         # -------------- Set up the data depending on input -------------------
         # In the end, the data should be an ndarray of shape (obs, dims)
         data = self._process_sequence(data)
-            
+
         obs, dims = data.shape
 
         if not obs > 0:
             raise ValueError('Data must contain at least one data point.')
         assert dims > 0
         self.data = data
-        
+
         # -------------- Set up the weights depending on input ----------------
         if weights is not None:
             self.weights = self._process_sequence(weights).ravel()
@@ -115,18 +115,20 @@ class BaseKDE(ABC):
                 raise ValueError('Number of data obs must match weights')
         else:
             self.weights = weights
-                
+
+        # TODO: Move bandwidth selection from evaluate to fit
+
         # Test quickly that the method has done what is was supposed to do
         assert len(self.data.shape) == 2
         if self.weights is not None:
             assert len(self.weights.shape) == 1
             assert self.data.shape[0] == len(self.weights)
-    
+
     @abstractmethod
     def evaluate(self, grid_points=None, bw_to_scalar=True):
         """
         Evaluate the kernel density estimator on the grid points.
-        
+
         Parameters
         ----------
         grid_points : integer, tuple or array-like
@@ -136,7 +138,7 @@ class BaseKDE(ABC):
         """
         if not hasattr(self, 'data'):
             raise ValueError('Must call fit before evaluating.')
-            
+
         # -------------- Set up the bandwidth depending on inputs -------------
         if isinstance(self.bw, (np.ndarray, Sequence)):
             if bw_to_scalar:
@@ -148,7 +150,7 @@ class BaseKDE(ABC):
         else:
             bw = self.bw
         self.bw = bw
-            
+
         # -------------- Set up the grid depending on input -------------------
         # If the grid None or an integer, use that in the autogrid method
         types_for_autogrid = (numbers.Integral, tuple)
@@ -161,18 +163,18 @@ class BaseKDE(ABC):
         else:
             self._user_supplied_grid = True
             grid_points = self._process_sequence(grid_points)
-                
+
         obs, dims = grid_points.shape
         if not obs > 0:
-            raise ValueError('Grid must contain at least one data point.') 
+            raise ValueError('Grid must contain at least one data point.')
         self.grid_points = grid_points
-    
+
         # Test quickly that the method has done what is was supposed to do
         if bw_to_scalar:
             assert isinstance(self.bw, numbers.Number)
             assert self.bw > 0
         assert len(self.grid_points.shape) == 2
-           
+
     @staticmethod
     def _process_sequence(sequence_array_like):
         """
@@ -185,7 +187,7 @@ class BaseKDE(ABC):
 
         Examples
         --------
-        >>> res = BaseKDE._process_sequence([1, 2, 3]) 
+        >>> res = BaseKDE._process_sequence([1, 2, 3])
         >>> (res == np.array([[1], [2], [3]])).all()
         True
         """
@@ -202,7 +204,7 @@ class BaseKDE(ABC):
         else:
             raise TypeError('Must be of shape (obs, dims)')
         return np.asarray_chkfinite(out, dtype=np.float)
-        
+
     def _evalate_return_logic(self, evaluated, grid_points):
         """
         Return either evaluation points y, or tuple (x, y) based on inputs.
@@ -216,7 +218,7 @@ class BaseKDE(ABC):
             if dims == 1:
                 return grid_points.ravel(), evaluated
             return grid_points, evaluated
-  
+
     def __call__(self, *args, **kwargs):
         return self.evaluate(*args, **kwargs)
 

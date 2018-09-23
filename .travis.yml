@@ -12,7 +12,7 @@ notifications:
 
 matrix:
   include:
-      
+
     - os: linux
       sudo: required
       services: docker
@@ -57,8 +57,8 @@ install:
 
 # Linting
 before_script:
-- $PYTHON -m flake8 --show-source --ignore=F811,W293,W391,W292,W291 --max-line-length=79 --exclude="*examples.py,
-  *kde.py" KDEpy
+- $PYTHON -m flake8 --show-source --ignore=F811,W293,W391,W292,W291
+  --max-line-length=79 --exclude="*examples.py,testing.py,*kde.py" KDEpy
 
 # If a tag was used, build wheels and deply to pypi
 script:
