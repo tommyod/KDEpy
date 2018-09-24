@@ -1,0 +1,1311 @@
+% -------------------------------------------------------------------------
+% Setup
+% -------------------------------------------------------------------------
+\documentclass[11pt, aspectratio=149]{beamer}
+% Options for aspectratio: 1610, 149, 54, 43 and 32, 169
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}% Alternative: 'norsk'
+\usepackage[expansion=false]{microtype}% Fixes to make typography better
+\usecolortheme{beaver} % Decent options: beaver, rose, crane
+\usepackage{listings}% To include source-code
+\usepackage{booktabs}% Professional tables
+\usefonttheme{serif}
+\usepackage{mathptmx}
+\usepackage[scaled=0.9]{helvet}
+\usepackage{courier}
+
+\title{Introduction to Kernel Density Estimation}
+\subtitle{A graphical tutorial}
+%\institute{PåVei 2018, UiB }
+\date{\today}
+\author{tommyod @ GitHub}
+
+% -------------------------------------------------------------------------
+% Package imports
+% -------------------------------------------------------------------------
+\usepackage{etoolbox}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage[sharp]{easylist}
+\usepackage{multicol}
+\usepackage{tikz-cd}
+
+\usefonttheme{professionalfonts}
+\usepackage{fontspec}
+\setmainfont{Open Sans}
+\setsansfont{Open Sans}
+\setmonofont{Ubuntu Mono}
+\usefonttheme{serif}
+
+%gets rid of bottom navigation bars
+\setbeamertemplate{footline}[frame number]{}
+
+%gets rid of bottom navigation symbols
+\setbeamertemplate{navigation symbols}{}
+
+% Set up colors to be used
+\definecolor{purered}{RGB}{31,119,180}
+\definecolor{titlered}{RGB}{31,119,180}
+\definecolor{bggray}{RGB}{242,242,242}
+\definecolor{bggraydark}{RGB}{217,217,217}
+
+% Change the default colors
+
+\setbeamercolor*{title}{bg=bggray,fg=titlered}
+\AtBeginEnvironment{theorem}{%
+	\setbeamercolor{block title}{fg=titlered, bg=bggraydark}
+	\setbeamercolor{block body}{fg=black,bg=bggray}
+}
+\AtBeginEnvironment{proof}{%
+	\setbeamercolor{block title}{bg=bggraydark}
+	\setbeamercolor{block body}{fg=black,bg=bggray}
+}
+\AtBeginEnvironment{example}{%
+	\setbeamercolor{block title example}{bg=bggraydark}
+	\setbeamercolor{block body example}{fg=black,bg=bggray}
+}
+\AtBeginEnvironment{definition}{%
+	\setbeamercolor{block title}{bg=bggraydark}
+	\setbeamercolor{block body}{fg=black,bg=bggray}
+}
+
+\setbeamercolor{block title example}{bg=bggraydark}
+\setbeamercolor{block body example}{fg=black,bg=bggray}
+\setbeamercolor{block title}{bg=bggraydark}
+\setbeamercolor{block body}{fg=black,bg=bggray}
+
+\setbeamercolor{frametitle}{fg=titlered,bg=bggray}
+\setbeamercolor{section in head/foot}{bg=black}
+\setbeamercolor{author in head/foot}{bg=black}
+\setbeamercolor{date in head/foot}{fg=titlered}
+
+
+% Spacing for lsits
+\newcommand{\listSpace}{0.4em}
+
+% Theorems, equations, definitions setup
+\theoremstyle{plain}
+
+\usepackage{etoolbox}
+\usepackage{lipsum}
+
+\makeatletter
+\patchcmd{\beamer@sectionintoc}
+{\vfill}
+{\vskip\itemsep}
+{}
+{}
+\makeatother  
+
+\AtBeginSection[]{
+	\begin{frame}
+		\vfill
+		\centering
+		\begin{beamercolorbox}[sep=8pt,center,shadow=false,rounded=false]{title}
+			\usebeamerfont{title}\insertsectionhead\par%
+		\end{beamercolorbox}
+		\vfill
+	\end{frame}
+}
+
+% -------------------------------------------------------------------------
+% Document start
+% -------------------------------------------------------------------------
+\begin{document}
+\maketitle
+
+% -------------------------------------------------------------------------
+
+\section{Introduction}
+
+% -------------------------------------------------------------------------
+\begin{frame}[fragile, t]{What is a kernel density estimate?}
+	On every data point $x_i$, we place a kernel function $K$.
+	The kernel density estimate is 
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{N} \sum_{i=1}^{N} K(x - x_i).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_gaussian_1}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{What is a kernel density estimate?}
+	On every data point $x_i$, we place a kernel function $K$.
+	The kernel density estimate is 
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{N} \sum_{i=1}^{N} K(x - x_i).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_gaussian_2}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{What is a kernel density estimate?}
+	On every data point $x_i$, we place a kernel function $K$.
+	The kernel density estimate is 
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{N} \sum_{i=1}^{N} K(x - x_i).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_gaussian_3}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{What is a kernel density estimate?}
+	On every data point $x_i$, we place a kernel function $K$.
+	The kernel density estimate is 
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{N} \sum_{i=1}^{N} K(x - x_i).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_gaussian_4}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{What is a kernel density estimate?}
+	On every data point $x_i$, we place a kernel function $K$.
+	The kernel density estimate is 
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{N} \sum_{i=1}^{N} K(x - x_i).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_gaussian_5}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{What is a kernel density estimate?}
+	On every data point $x_i$, we place a kernel function $K$.
+	The kernel density estimate is 
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{N} \sum_{i=1}^{N} K(x - x_i).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_gaussian_6}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{What is a kernel density estimate?}
+	On every data point $x_i$, we place a kernel function $K$.
+	The kernel density estimate is 
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{N} \sum_{i=1}^{N} K(x - x_i).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_gaussian_7}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{What is a kernel density estimate?}
+	On every data point $x_i$, we place a kernel function $K$.
+	The kernel density estimate is 
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{N} \sum_{i=1}^{N} K(x - x_i).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_gaussian_8}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{What is a kernel density estimate?}
+	On every data point $x_i$, we place a kernel function $K$.
+	The kernel density estimate is 
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{N} \sum_{i=1}^{N} K(x - x_i).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_gaussian_9}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{What is a kernel density estimate?}
+	On every data point $x_i$, we place a kernel function $K$.
+	The kernel density estimate is 
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{N} \sum_{i=1}^{N} K(x - x_i).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_gaussian_10}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{What is a kernel density estimate?}
+	On every data point $x_i$, we place a kernel function $K$.
+	The kernel density estimate is 
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{N} \sum_{i=1}^{N} K(x - x_i).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_gaussian_11}
+	\end{figure}
+\end{frame}
+
+
+% -------------------------------------------------------------------------
+\begin{frame}[fragile, t]{Choice of kernel}
+	The kernel function $K$ is typically
+	\vspace{1em}
+	\begin{easylist}[itemize]
+		\ListProperties(Space=\listSpace, Space*=\listSpace)
+		# everywhere non-negative: $K(x) \geq 0$ for every $x$
+		# symmetric: $K(x) = K(-x)$  for every $x$
+		# decreasing: $K'(x) \leq 0$  for every $x > 0$.
+	\end{easylist}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/kde_intro_kernels}
+	\end{figure}
+\end{frame}
+
+
+% -------------------------------------------------------------------------
+\begin{frame}[fragile, t]{Choice of kernel}
+	The \emph{triangular} kernel (or \emph{linear} kernel) is given by
+	\begin{equation*}
+	f(x) \propto \max(1 - |x|, 0).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_tri_1}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Choice of kernel}
+	The \emph{triangular} kernel (or \emph{linear} kernel) is given by
+	\begin{equation*}
+	f(x) \propto \max(1 - |x|, 0).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_tri_2}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Choice of kernel}
+	The \emph{triangular} kernel (or \emph{linear} kernel) is given by
+	\begin{equation*}
+	f(x) \propto \max(1 - |x|, 0).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_tri_3}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Choice of kernel}
+	The \emph{triangular} kernel (or \emph{linear} kernel) is given by
+	\begin{equation*}
+	f(x) \propto \max(1 - |x|, 0).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_tri_4}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Choice of kernel}
+	The \emph{triangular} kernel (or \emph{linear} kernel) is given by
+	\begin{equation*}
+	f(x) \propto \max(1 - |x|, 0).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_tri_5}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Choice of kernel}
+	The \emph{triangular} kernel (or \emph{linear} kernel) is given by
+	\begin{equation*}
+	f(x) \propto \max(1 - |x|, 0).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_tri_6}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Choice of kernel}
+	The \emph{triangular} kernel (or \emph{linear} kernel) is given by
+	\begin{equation*}
+	f(x) \propto \max(1 - |x|, 0).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_tri_7}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Choice of kernel}
+	The \emph{triangular} kernel (or \emph{linear} kernel) is given by
+	\begin{equation*}
+	f(x) \propto \max(1 - |x|, 0).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_tri_8}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Choice of kernel}
+	The \emph{triangular} kernel (or \emph{linear} kernel) is given by
+	\begin{equation*}
+	f(x) \propto \max(1 - |x|, 0).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_tri_9}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Choice of kernel}
+	The \emph{triangular} kernel (or \emph{linear} kernel) is given by
+	\begin{equation*}
+	f(x) \propto \max(1 - |x|, 0).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_tri_10}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Choice of kernel}
+	The \emph{triangular} kernel (or \emph{linear} kernel) is given by
+	\begin{equation*}
+	f(x) \propto \max(1 - |x|, 0).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_tri_11}
+	\end{figure}
+\end{frame}
+
+
+
+
+
+% -------------------------------------------------------------------------
+\begin{frame}[fragile, t]{Choice of bandwidth}
+	We use $h$ to control for the \emph{bandwidth} of $\hat{f}(x)$ by writing
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{Nh} \sum_{i=1}^{N} K\left(\frac{x - x_i}{h}\right).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_bw_1}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Choice of bandwidth}
+	We use $h$ to control for the \emph{bandwidth} of $\hat{f}(x)$ by writing
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{Nh} \sum_{i=1}^{N} K\left(\frac{x - x_i}{h}\right).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_bw_2}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Choice of bandwidth}
+	We use $h$ to control for the \emph{bandwidth} of $\hat{f}(x)$ by writing
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{Nh} \sum_{i=1}^{N} K\left(\frac{x - x_i}{h}\right).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_bw_3}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Choice of bandwidth}
+	We use $h$ to control for the \emph{bandwidth} of $\hat{f}(x)$ by writing
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{Nh} \sum_{i=1}^{N} K\left(\frac{x - x_i}{h}\right).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_bw_4}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Choice of bandwidth}
+	We use $h$ to control for the \emph{bandwidth} of $\hat{f}(x)$ by writing
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{Nh} \sum_{i=1}^{N} K\left(\frac{x - x_i}{h}\right).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_bw_5}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Choice of bandwidth}
+	We use $h$ to control for the \emph{bandwidth} of $\hat{f}(x)$ by writing
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{Nh} \sum_{i=1}^{N} K\left(\frac{x - x_i}{h}\right).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_bw_6}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Choice of bandwidth}
+	We use $h$ to control for the \emph{bandwidth} of $\hat{f}(x)$ by writing
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{Nh} \sum_{i=1}^{N} K\left(\frac{x - x_i}{h}\right).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_bw_7}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Choice of bandwidth}
+	We use $h$ to control for the \emph{bandwidth} of $\hat{f}(x)$ by writing
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{Nh} \sum_{i=1}^{N} K\left(\frac{x - x_i}{h}\right).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_bw_8}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Choice of bandwidth}
+	We use $h$ to control for the \emph{bandwidth} of $\hat{f}(x)$ by writing
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{Nh} \sum_{i=1}^{N} K\left(\frac{x - x_i}{h}\right).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_bw_9}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Choice of bandwidth}
+	We use $h$ to control for the \emph{bandwidth} of $\hat{f}(x)$ by writing
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{Nh} \sum_{i=1}^{N} K\left(\frac{x - x_i}{h}\right).
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_bw_10}
+	\end{figure}
+\end{frame}
+
+
+
+
+
+% -------------------------------------------------------------------------
+\begin{frame}[fragile, t]{Choice of bandwidth - Silverman}
+	\emph{Silverman's rule of thumb} computes an optimal $h$ by assuming that the data is normally distributed. Good starting point in many cases.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_silverman_1}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile, t]{Choice of bandwidth - Silverman}
+	\emph{Silverman's rule of thumb} computes an optimal $h$ by assuming that the data is normally distributed. Good starting point in many cases.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_silverman_2}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile, t]{Choice of bandwidth - Silverman}
+	\emph{Silverman's rule of thumb} computes an optimal $h$ by assuming that the data is normally distributed. Good starting point in many cases.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_silverman_3}
+	\end{figure}
+\end{frame}
+
+
+% -------------------------------------------------------------------------
+\begin{frame}[fragile, t]{Choice of bandwidth - ISJ}
+	The \emph{Improved Sheather Jones} (ISJ) algorithm is more robust with respect to \emph{multimodality}.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_ISJ_1}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile, t]{Choice of bandwidth - ISJ}
+	The \emph{Improved Sheather Jones} (ISJ) algorithm is more robust with respect to \emph{multimodality}.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_ISJ_2}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile, t]{Choice of bandwidth - ISJ}
+	The \emph{Improved Sheather Jones} (ISJ) algorithm is more robust with respect to \emph{multimodality}.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_ISJ_3}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile, t]{Choice of bandwidth - ISJ}
+	The \emph{Improved Sheather Jones} (ISJ) algorithm is more robust with respect to \emph{multimodality}.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_ISJ_4}
+	\end{figure}
+\end{frame}
+
+
+% -------------------------------------------------------------------------
+\begin{frame}[fragile, t]{Weighting data}
+	It's possible to add weights $w_i$ to data points $x_i$ by writing
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{h} \sum_{i=1}^{N} w_i K\left(\frac{x - x_i}{h}\right), \text{ where } \sum_{i=1}^{N} w_i = 1.
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_w_gaussian_1}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Weighting data}
+	It's possible to add weights $w_i$ to data points $x_i$ by writing
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{h} \sum_{i=1}^{N} w_i K\left(\frac{x - x_i}{h}\right), \text{ where } \sum_{i=1}^{N} w_i = 1.
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_w_gaussian_2}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Weighting data}
+	It's possible to add weights $w_i$ to data points $x_i$ by writing
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{h} \sum_{i=1}^{N} w_i K\left(\frac{x - x_i}{h}\right), \text{ where } \sum_{i=1}^{N} w_i = 1.
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_w_gaussian_3}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Weighting data}
+	It's possible to add weights $w_i$ to data points $x_i$ by writing
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{h} \sum_{i=1}^{N} w_i K\left(\frac{x - x_i}{h}\right), \text{ where } \sum_{i=1}^{N} w_i = 1.
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_w_gaussian_4}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Weighting data}
+	It's possible to add weights $w_i$ to data points $x_i$ by writing
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{h} \sum_{i=1}^{N} w_i K\left(\frac{x - x_i}{h}\right), \text{ where } \sum_{i=1}^{N} w_i = 1.
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_w_gaussian_5}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Weighting data}
+	It's possible to add weights $w_i$ to data points $x_i$ by writing
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{h} \sum_{i=1}^{N} w_i K\left(\frac{x - x_i}{h}\right), \text{ where } \sum_{i=1}^{N} w_i = 1.
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_w_gaussian_6}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Weighting data}
+	It's possible to add weights $w_i$ to data points $x_i$ by writing
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{h} \sum_{i=1}^{N} w_i K\left(\frac{x - x_i}{h}\right), \text{ where } \sum_{i=1}^{N} w_i = 1.
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_w_gaussian_7}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Weighting data}
+	It's possible to add weights $w_i$ to data points $x_i$ by writing
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{h} \sum_{i=1}^{N} w_i K\left(\frac{x - x_i}{h}\right), \text{ where } \sum_{i=1}^{N} w_i = 1.
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_w_gaussian_8}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Weighting data}
+	It's possible to add weights $w_i$ to data points $x_i$ by writing
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{h} \sum_{i=1}^{N} w_i K\left(\frac{x - x_i}{h}\right), \text{ where } \sum_{i=1}^{N} w_i = 1.
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_w_gaussian_9}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Weighting data}
+	It's possible to add weights $w_i$ to data points $x_i$ by writing
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{h} \sum_{i=1}^{N} w_i K\left(\frac{x - x_i}{h}\right), \text{ where } \sum_{i=1}^{N} w_i = 1.
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_w_gaussian_10}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Weighting data}
+	It's possible to add weights $w_i$ to data points $x_i$ by writing
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{h} \sum_{i=1}^{N} w_i K\left(\frac{x - x_i}{h}\right), \text{ where } \sum_{i=1}^{N} w_i = 1.
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_w_gaussian_11}
+	\end{figure}
+\end{frame}
+
+
+% -------------------------------------------------------------------------
+\begin{frame}[fragile, t]{Bounded domains}
+	A simple trick to overcome bias at boundaries is to mirror the data.
+	This ensures that $\hat{f}'(x) = 0$ at the boundary.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_mirror_1}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile, t]{Bounded domains}
+	A simple trick to overcome bias at boundaries is to mirror the data.
+	This ensures that $\hat{f}'(x) = 0$ at the boundary.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_mirror_2}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile, t]{Bounded domains}
+	A simple trick to overcome bias at boundaries is to mirror the data.
+	This ensures that $\hat{f}'(x) = 0$ at the boundary.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_mirror_3}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile, t]{Bounded domains}
+	A simple trick to overcome bias at boundaries is to mirror the data.
+	This ensures that $\hat{f}'(x) = 0$ at the boundary.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_mirror_4}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile, t]{Bounded domains}
+	A simple trick to overcome bias at boundaries is to mirror the data.
+	This ensures that $\hat{f}'(x) = 0$ at the boundary.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_mirror_5}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile, t]{Bounded domains}
+	A simple trick to overcome bias at boundaries is to mirror the data.
+	This ensures that $\hat{f}'(x) = 0$ at the boundary.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/intro_kde_mirror_6}
+	\end{figure}
+\end{frame}
+
+
+\section{Extension to $d$ dimensions}
+
+
+% -------------------------------------------------------------------------
+\begin{frame}[fragile, t]{Kernels in 2D}
+	An approach to $d$-dimensional estimates is to  write
+	\begin{equation*}
+	\hat{f}(x) = \frac{1}{h^d} \sum_{i=1}^{N} w_i K \left(\frac{\left \| x - x_i \right \|_p}{h}\right), \text{ where } \sum_{i=1}^{N} w_i = 1.
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/2D_intro}
+	\end{figure}
+\end{frame}
+
+
+% -------------------------------------------------------------------------
+\begin{frame}[fragile, t]{The effect of norms}
+	The choice of norm comes in to play when $d \geq 2$, the $p$-norm is 
+	\begin{equation*}
+		\left\| x \right\| _p := \bigg( \sum_{i=1} \left| x_i \right| ^p \bigg) ^{1/p}.
+	\end{equation*}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/2D_effect_of_norms_tri}
+	\end{figure}
+\end{frame}
+
+
+% -------------------------------------------------------------------------
+\begin{frame}[fragile, t]{The effect of norms}
+	The shape of kernel functions in higher dimensions depend on the value of $p$ in the $p$ norm.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/2D_intro_norms_box}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile, t]{The effect of norms}
+	The shape of kernel functions in higher dimensions depend on the value of $p$ in the $p$ norm.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/2D_intro_norms_tri}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile, t]{The effect of norms}
+	The shape of kernel functions in higher dimensions depend on the value of $p$ in the $p$ norm.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figs/2D_intro_norms_gaussian}
+	\end{figure}
+\end{frame}
+
+
+% -------------------------------------------------------------------------
+\begin{frame}[fragile, t]{Example with data}
+	As the number of samples grow, the choice of both kernel $K$ and norm $p$ becomes unimportant. The bandwidth $H$ is still important.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/2D_effect_of_norms_tri_data_1}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Example with data}
+	As the number of samples grow, the choice of both kernel $K$ and norm $p$ becomes unimportant. The bandwidth $H$ is still important.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/2D_effect_of_norms_tri_data_2}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Example with data}
+	As the number of samples grow, the choice of both kernel $K$ and norm $p$ becomes unimportant. The bandwidth $H$ is still important.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/2D_effect_of_norms_tri_data_3}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Example with data}
+	As the number of samples grow, the choice of both kernel $K$ and norm $p$ becomes unimportant. The bandwidth $H$ is still important.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/2D_effect_of_norms_tri_data_4}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Example with data}
+	As the number of samples grow, the choice of both kernel $K$ and norm $p$ becomes unimportant. The bandwidth $H$ is still important.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/2D_effect_of_norms_tri_data_5}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Example with data}
+	As the number of samples grow, the choice of both kernel $K$ and norm $p$ becomes unimportant. The bandwidth $H$ is still important.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/2D_effect_of_norms_tri_data_6}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Example with data}
+	As the number of samples grow, the choice of both kernel $K$ and norm $p$ becomes unimportant. The bandwidth $H$ is still important.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/2D_effect_of_norms_tri_data_7}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Example with data}
+	As the number of samples grow, the choice of both kernel $K$ and norm $p$ becomes unimportant. The bandwidth $H$ is still important.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/2D_effect_of_norms_tri_data_8}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Example with data}
+	As the number of samples grow, the choice of both kernel $K$ and norm $p$ becomes unimportant. The bandwidth $H$ is still important.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/2D_effect_of_norms_tri_data_9}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Example with data}
+	As the number of samples grow, the choice of both kernel $K$ and norm $p$ becomes unimportant. The bandwidth $H$ is still important.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/2D_effect_of_norms_tri_data_10}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Example with data}
+	As the number of samples grow, the choice of both kernel $K$ and norm $p$ becomes unimportant. The bandwidth $H$ is still important.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/2D_effect_of_norms_tri_data_11}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Example with data}
+	As the number of samples grow, the choice of both kernel $K$ and norm $p$ becomes unimportant. The bandwidth $H$ is still important.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/2D_effect_of_norms_tri_data_12}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Example with data}
+	As the number of samples grow, the choice of both kernel $K$ and norm $p$ becomes unimportant. The bandwidth $H$ is still important.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/2D_effect_of_norms_tri_data_13}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Example with data}
+	As the number of samples grow, the choice of both kernel $K$ and norm $p$ becomes unimportant. The bandwidth $H$ is still important.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/2D_effect_of_norms_tri_data_14}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Example with data}
+	As the number of samples grow, the choice of both kernel $K$ and norm $p$ becomes unimportant. The bandwidth $H$ is still important.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/2D_effect_of_norms_tri_data_15}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Example with data}
+	As the number of samples grow, the choice of both kernel $K$ and norm $p$ becomes unimportant. The bandwidth $H$ is still important.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/2D_effect_of_norms_tri_data_16}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Example with data}
+	As the number of samples grow, the choice of both kernel $K$ and norm $p$ becomes unimportant. The bandwidth $H$ is still important.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/2D_effect_of_norms_tri_data_17}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Example with data}
+	As the number of samples grow, the choice of both kernel $K$ and norm $p$ becomes unimportant. The bandwidth $H$ is still important.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/2D_effect_of_norms_tri_data_18}
+	\end{figure}
+\end{frame}
+
+
+
+\section{A fast algorithm}
+
+
+% -------------------------------------------------------------------------
+\begin{frame}[fragile, t]{Linear binning}
+	Go through $N$ data points and assign weights to $n$ equidistant grid points. The algorithm runs in $\mathcal{O}(N2^d)$ time in $d$ dimensions.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/linbin_0}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Linear binning}
+	Go through $N$ data points and assign weights to $n$ equidistant grid points. The algorithm runs in $\mathcal{O}(N2^d)$ time in $d$ dimensions.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/linbin_1}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Linear binning}
+	Go through $N$ data points and assign weights to $n$ equidistant grid points. The algorithm runs in $\mathcal{O}(N2^d)$ time in $d$ dimensions.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/linbin_2}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Linear binning}
+	Go through $N$ data points and assign weights to $n$ equidistant grid points. The algorithm runs in $\mathcal{O}(N2^d)$ time in $d$ dimensions.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/linbin_3}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Linear binning}
+	Go through $N$ data points and assign weights to $n$ equidistant grid points. The algorithm runs in $\mathcal{O}(N2^d)$ time in $d$ dimensions.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/linbin_4}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Linear binning}
+	Go through $N$ data points and assign weights to $n$ equidistant grid points. The algorithm runs in $\mathcal{O}(N2^d)$ time in $d$ dimensions.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/linbin_5}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Linear binning}
+	Go through $N$ data points and assign weights to $n$ equidistant grid points. The algorithm runs in $\mathcal{O}(N2^d)$ time in $d$ dimensions.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/linbin_6}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Linear binning}
+	Go through $N$ data points and assign weights to $n$ equidistant grid points. The algorithm runs in $\mathcal{O}(N2^d)$ time in $d$ dimensions.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/linbin_7}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile, t]{Linear binning}
+	Go through $N$ data points and assign weights to $n$ equidistant grid points. The algorithm runs in $\mathcal{O}(N2^d)$ time in $d$ dimensions.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/linbin_8}
+	\end{figure}
+\end{frame}
+
+
+% -------------------------------------------------------------------------
+\begin{frame}[fragile, t]{Sample the kernel}
+	Sample the kernel function $K$ at equidistant points.
+	The $n$ binned data points and the kernel are then convolved, this runs in $\mathcal{O}(n \log n)$ time, for a total time of $\mathcal{O}(N2^d + n \log n)$.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/linbin_sample_1}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile, t]{Sample the kernel}
+	Sample the kernel function $K$ at equidistant points.
+	The $n$ binned data points and the kernel are then convolved, this runs in $\mathcal{O}(n \log n)$ time, for a total time of $\mathcal{O}(N2^d + n \log n)$.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/linbin_sample_2}
+	\end{figure}
+\end{frame}
+
+
+
+% -------------------------------------------------------------------------
+\begin{frame}[fragile, t]{Linear binning in higher dimensions}
+	The extension to $d$ dimensions is relatively straightforward.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/linbin_2D_1}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile, t]{Linear binning in higher dimensions}
+	The extension to $d$ dimensions is relatively straightforward.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/linbin_2D_2}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile, t]{Linear binning in higher dimensions}
+	The extension to $d$ dimensions is relatively straightforward.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/linbin_2D_3}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile, t]{Linear binning in higher dimensions}
+	The extension to $d$ dimensions is relatively straightforward.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/linbin_2D_4}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile, t]{Linear binning in higher dimensions}
+	The extension to $d$ dimensions is relatively straightforward.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/linbin_2D_5}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile, t]{Linear binning in higher dimensions}
+	The extension to $d$ dimensions is relatively straightforward.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/linbin_2D_6}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile, t]{Linear binning in higher dimensions}
+	The extension to $d$ dimensions is relatively straightforward.
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{figs/linbin_2D_7}
+	\end{figure}
+\end{frame}
+
+
+\section{KDEpy}
+
+
+% -------------------------------------------------------------------------
+\begin{frame}[fragile, t]{KDEpy}
+	If you're interested in KDE in Python, I've written a library.
+	\vspace{1em}
+	\begin{easylist}[itemize]
+		\ListProperties(Space=\listSpace, Space*=\listSpace)
+		# GitHub: \url{https://github.com/tommyod/KDEpy}
+	\end{easylist}
+	\vfill
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.9\linewidth]{figs/profiling_epa}
+	\end{figure}
+\end{frame}
+
+
+% -------------------------------------------------------------------------
+\begin{frame}[fragile, t]{References}
+	References for further reading.
+	\vspace{1em}
+	\begin{easylist}[itemize]
+		\ListProperties(Space=\listSpace, Space*=\listSpace)
+		# Silverman, B. W. \emph{Density Estimation for Statistics and Data Analysis}. Chapman and Hall, 1986.
+		# Wand, M. P., and M. C. Jones. \emph{Kernel Smoothing.} Chapman and Hall, 1995.
+		# Jake VanderPlas. \emph{Kernel Density Estimation in Python.} 2013 \\ \url{https://jakevdp.github.io/blog/2013/12/01/kernel-density-estimation/}
+	\end{easylist}
+\end{frame}
+
+\end{document}
