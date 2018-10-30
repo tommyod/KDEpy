@@ -50,7 +50,7 @@ extensions = [
     'sphinx.ext.extlinks',
     'numpydoc',
     'nbsphinx',
-    'matplotlib.sphinxext.only_directives',
+    #'matplotlib.sphinxext.only_directives',
     'matplotlib.sphinxext.plot_directive',
     'IPython.sphinxext.ipython_directive',
     'IPython.sphinxext.ipython_console_highlighting',
