@@ -13,7 +13,7 @@ from KDEpy.utils import cartesian
 
 
 class FFTKDE(BaseKDE):
-    """
+    r"""
     This class implements a convolution (FFT) based computation of a KDE.
     While this implementation is very fast, there are some limitations: (1) the
     bandwidth must be constant, (2) the KDE must be evaluated on an
@@ -64,6 +64,7 @@ class FFTKDE(BaseKDE):
       London ; New York: Chapman and Hall/CRC, 1995. Pages 182-192.
     - Statsmodels implementation, at
       ``statsmodels.nonparametric.kde.KDEUnivariate``.
+      
     """
 
     def __init__(self, kernel='gaussian', bw=1, norm=2):

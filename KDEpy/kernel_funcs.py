@@ -27,7 +27,7 @@ from scipy.optimize import brentq
 
 
 def gauss_integral(n):
-    """
+    r"""
     Solve the integral
     \int_0^1 exp(-0.5 * x * x) x^n dx
 
