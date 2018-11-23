@@ -19,7 +19,7 @@ else:
 
 
 # If this is incremented, also increment in __init__.py
-VERSION = '0.6.1'
+VERSION = '0.6.9'
 
 cmdclass = {}
 ext_modules = []
