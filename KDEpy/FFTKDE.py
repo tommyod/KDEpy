@@ -140,6 +140,15 @@ class FFTKDE(BaseKDE):
         else:
             raise ValueError('The bw must be a callable or a number.')
         self.bw = bw
+        
+        # Step 0 - Make sure data points are inside of the grid
+        min_grid = np.min(self.grid_points, axis=0)
+        max_grid = np.max(self.grid_points, axis=0)
+        
+        min_data = np.min(self.data, axis=0)
+        max_data = np.max(self.data, axis=0)
+        if not ((min_grid < min_data).all() and (max_grid > max_data).all()):
+            raise ValueError('Every data point must be inside of the grid.')
 
         # Step 1 - Obtaining the grid counts
         # TODO: Consider moving this to the fitting phase instead
@@ -151,8 +160,6 @@ class FFTKDE(BaseKDE):
         num_grid_points = np.array(list(len(np.unique(self.grid_points[:, i]))
                                         for i in range(g_shape)))
 
-        min_grid = np.min(self.grid_points, axis=0)
-        max_grid = np.max(self.grid_points, axis=0)
         num_intervals = (num_grid_points - 1)
         dx = (max_grid - min_grid) / num_intervals
 

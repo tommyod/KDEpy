@@ -21,7 +21,7 @@ def test_additivity(data, split_index):
 
     TODO: Parameterize this test w.r.t implementation.
     """
-    x = np.linspace(-10, 10)
+    x = np.linspace(-10, 12)
 
     # Fit to add data
     y = FFTKDE('epa').fit(data).evaluate(x)
@@ -108,6 +108,53 @@ def test_against_naive_KDE_w_weights(data, bw):
     y2 = FFTKDE('epa', bw=bw).fit(data, weights=weights).evaluate(x)
 
     assert np.allclose(y1, y2, atol=10e-4)
+    
+    
+def FFTKDE_test_grid_inside_data_1D():
+    """
+    When using a custom grid, an error should be raised if the data is not
+    contained in the grid. The linear binning routine will crash if this
+    is not the case. See Issue:
+    https://github.com/tommyod/KDEpy/issues/7
+    """
+    data = np.array([0, 1, 2, 3, 4, 5])
+    grid = np.linspace(-1, 6, num=2**6)
+    FFTKDE().fit(data).evaluate(grid)  # This should cause no problem
+    
+    with pytest.raises(ValueError):
+        bad_grid = np.linspace(2, 6, num=2**6)
+        FFTKDE().fit(data).evaluate(bad_grid)
+        
+    with pytest.raises(ValueError):
+        bad_grid = np.linspace(-2, 4, num=2**6)
+        FFTKDE().fit(data).evaluate(bad_grid)
+        
+    with pytest.raises(ValueError):
+        bad_grid = np.linspace(0, 5, num=2**6)
+        FFTKDE().fit(data).evaluate(bad_grid)
+        
+        
+def FFTKDE_test_grid_inside_data_2D():
+    """
+    When using a custom grid, an error should be raised if the data is not
+    contained in the grid. The linear binning routine will crash if this
+    is not the case. See Issue:
+    https://github.com/tommyod/KDEpy/issues/7
+    """
+    data = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+    grid, y = FFTKDE().fit(data).evaluate()  # To get a grid
+    
+    with pytest.raises(ValueError):
+        data = np.array([[0, 0], [0, 1], [1, 0], [1, 1], [0, 6]])
+        FFTKDE().fit(data).evaluate(grid)
+        
+    with pytest.raises(ValueError):
+        data = np.array([[0, 0], [0, 1], [1, 0], [1, 1], [0, -4]])
+        FFTKDE().fit(data).evaluate(grid)
+        
+    with pytest.raises(ValueError):
+        data = np.array([[0, 0], [0, 1], [1, 0], [1, 1], [0, 100]])
+        FFTKDE().fit(data).evaluate(grid)
 
 
 if __name__ == "__main__":
