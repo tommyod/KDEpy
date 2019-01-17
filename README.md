@@ -21,6 +21,8 @@ KDEpy is available through [PyPI](https://pypi.org/project/KDEpy/), and may be i
 pip install KDEpy
 ```
 
+If you have [trouble on Ubuntu](https://github.com/tommyod/KDEpy/issues/11), try running `sudo apt install libpython3.X-dev`, where `3.X` is your Python version. 
+
 ## Example code and documentation
 
 Below is an example using NumPy as `np` and `scipy.stats.norm` to plot a density estimate.
