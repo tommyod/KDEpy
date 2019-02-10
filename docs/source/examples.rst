@@ -209,6 +209,60 @@ Below a non-smooth kernel is chosen to reveal the effect of the choice of norm m
         ax.plot(data[:, 0], data[:, 1], 'ok', ms=3)
 
     plt.tight_layout()
+    
+   
+One dimensional kernel regression
+---------------------------------
+
+One dimensional kernel regression seeks to find :math:`\hat{y} = \mathbb{E}[y | x]`.
+This can be elegantly computed by first modeling the full distribution :math:`p(x, y)`.
+We have that
+
+.. math::
+
+   \hat{y} = \mathbb{E}[y | x] = \int p(y | x) y \, dy = \sum_i p(y_i | x) y_i =  \sum_i \frac{p(y_i, x)}{\sum_j p(y_j, x)} y_i 
+
+Modelling the distribution :math:`p(y | x)` only to infer :math:`\mathbb{E}[y | x]` is generally wasteful,
+but the speed of the :class:`~KDEpy.FFTKDE.FFTKDE` implementation makes the approach tractable.
+A million points should pose no problem.
+Extensions to model the conditional variance :math:`\operatorname{var}[y | x]` are possible too.
+
+.. plot::
+   :include-source:
+
+    from KDEpy import FFTKDE
+    func = lambda x : np.sin(x * 2 * np.pi) + (x + 1)**2
+
+    # Generate random data
+    num_data_points = 2**6
+    data_x = np.sort(np.random.rand(num_data_points))
+    data_y = func(data_x) + np.random.randn(num_data_points) / 5
+    
+    # Plot the true function and the sampled values
+    x_smooth = np.linspace(0, 1, num=2**10)
+    plt.plot(x_smooth, func(x_smooth), label='True function')
+    plt.scatter(data_x, data_y, label='Function samples', s=10)
+    
+    # Grid points in the x and y direction
+    grid_points_x, grid_points_y = 2**10, 2**4
+    
+    # Stack the data for 2D input, compute the KDE
+    data = np.vstack((data_x, data_y)).T
+    kde = FFTKDE(bw=0.025).fit(data)
+    grid, points = kde.evaluate((grid_points_x, grid_points_y))
+    
+    # Retrieve grid values, reshape output and plot boundaries
+    x, y = np.unique(grid[:, 0]), np.unique(grid[:, 1])
+    z = points.reshape(grid_points_x, grid_points_y)
+    plt.axvline(np.min(data_x), ls='--', c='k', label='Domain lower bound')
+    plt.axvline(np.max(data_x), ls='--', c='k', label='Domain lower bound')
+    
+    # Compute y_pred = E[y | x] = sum_y p(y | x) * y
+    y_pred =  np.sum((z.T / np.sum(z, axis=1)).T  * y , axis=1) 
+    plt.plot(x, y_pred, zorder=25, label='Kernel regression esimate')
+    
+    plt.legend(); plt.tight_layout()
+    
 
 .. comment:
   Kernel regression via KDE
