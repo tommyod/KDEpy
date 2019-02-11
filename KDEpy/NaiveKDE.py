@@ -49,7 +49,7 @@ class NaiveKDE(BaseKDE):
     - Scipy implementation, at ``scipy.stats.gaussian_kde``.
     """
 
-    def __init__(self, kernel='gaussian', bw=1, norm=2):
+    def __init__(self, kernel="gaussian", bw=1, norm=2):
         super().__init__(kernel, bw)
         self.norm = norm
 
@@ -127,8 +127,11 @@ class NaiveKDE(BaseKDE):
 
         # TODO: Implementation w.r.t grid points for faster evaluation
         # See the SciPy evaluation for how this can be done
-        weights = (itertools.repeat(1 / self.data.shape[0]) if self.weights
-                   is None else self.weights)
+        weights = (
+            itertools.repeat(1 / self.data.shape[0])
+            if self.weights is None
+            else self.weights
+        )
 
         for weight, data_point, bw in zip(weights, self.data, bw):
             x = self.grid_points - data_point
@@ -139,5 +142,6 @@ class NaiveKDE(BaseKDE):
 
 if __name__ == "__main__":
     import pytest
+
     # --durations=10  <- May be used to show potentially slow tests
-    pytest.main(args=['.', '--doctest-modules', '-v'])
+    pytest.main(args=[".", "--doctest-modules", "-v"])

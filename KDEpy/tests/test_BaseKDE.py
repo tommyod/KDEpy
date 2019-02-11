@@ -82,7 +82,7 @@ def test_data_must_have_length():
     """
 
     input_data = np.array([])
-    k = NaiveKDE(kernel='gaussian', bw=1)
+    k = NaiveKDE(kernel="gaussian", bw=1)
 
     with pytest.raises(ValueError):
         k.fit(np.array(input_data))
@@ -94,7 +94,7 @@ def test_grid_must_have_length():
     """
 
     input_data = np.array([3, 4])
-    k = NaiveKDE(kernel='gaussian', bw=1)
+    k = NaiveKDE(kernel="gaussian", bw=1)
 
     with pytest.raises(ValueError):
         k.fit(np.array(input_data))
@@ -103,4 +103,4 @@ def test_grid_must_have_length():
 
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
-    pytest.main(args=['.', '--doctest-modules', '-v'])
+    pytest.main(args=[".", "--doctest-modules", "-v"])
