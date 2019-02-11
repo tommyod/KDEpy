@@ -12,18 +12,21 @@ from KDEpy.TreeKDE import TreeKDE
 import itertools
 import pytest
 import matplotlib
-matplotlib.use('Agg')  # For testing on servers
+
+matplotlib.use("Agg")  # For testing on servers
 
 kernels = list(NaiveKDE._available_kernels.keys())
 kdes = [NaiveKDE, TreeKDE, FFTKDE]
 kde_pairs = list(itertools.combinations(kdes, 2))
 
 
-@pytest.mark.parametrize("kde1, kde2, bw, kernel",
-                         [(k[0], k[1], bw, ker) for (k, bw, ker) in
-                          itertools.product(kde_pairs,
-                                            [0.1, 'silverman', 1],
-                                            kernels)])
+@pytest.mark.parametrize(
+    "kde1, kde2, bw, kernel",
+    [
+        (k[0], k[1], bw, ker)
+        for (k, bw, ker) in itertools.product(kde_pairs, [0.1, "silverman", 1], kernels)
+    ],
+)
 def test_api_models_kernels_bandwidths(kde1, kde2, bw, kernel):
     """
     Test the API. More specifically the chained version and the non-chained
@@ -43,23 +46,21 @@ def test_api_models_kernels_bandwidths(kde1, kde2, bw, kernel):
 
     # Mean error
     err = np.sqrt(np.mean((y1 - y2) ** 2))
-    if kernel == 'box':
+    if kernel == "box":
         assert err < 0.025
     else:
         assert err < 0.002
 
 
-type_functions = [tuple,
-                  np.array,
-                  np.asfarray,
-                  lambda x:np.asfarray(x).reshape(-1, 1)]
+type_functions = [tuple, np.array, np.asfarray, lambda x: np.asfarray(x).reshape(-1, 1)]
 
 
-@pytest.mark.parametrize("kde, bw, kernel, type_func",
-                         itertools.product(kdes,
-                                           ['silverman', 'scott', 'ISJ', 0.5],
-                                           ['epa', 'gaussian'],
-                                           type_functions))
+@pytest.mark.parametrize(
+    "kde, bw, kernel, type_func",
+    itertools.product(
+        kdes, ["silverman", "scott", "ISJ", 0.5], ["epa", "gaussian"], type_functions
+    ),
+)
 def test_api_types(kde, bw, kernel, type_func):
     """
     Test the API. Data and weights may be passed as tuples, arrays, lists, etc.
@@ -78,23 +79,22 @@ def test_api_types(kde, bw, kernel, type_func):
     assert np.allclose(y, y1)
 
 
-@pytest.mark.parametrize("kde1, kde2, bw, kernel",
-                         [(k[0], k[1], bw, ker) for (k, bw, ker) in
-                          itertools.product(kde_pairs,
-                                            [0.5, 1],
-                                            kernels)])
+@pytest.mark.parametrize(
+    "kde1, kde2, bw, kernel",
+    [
+        (k[0], k[1], bw, ker)
+        for (k, bw, ker) in itertools.product(kde_pairs, [0.5, 1], kernels)
+    ],
+)
 def test_api_models_kernels_bandwidths_2D(kde1, kde2, bw, kernel):
     """
     Test the API on 2D data.
     """
 
-    data = np.array([[0, 0],
-                     [0, 1],
-                     [0, 0.5],
-                     [-1, 1]])
+    data = np.array([[0, 0], [0, 1], [0, 0.5], [-1, 1]])
     weights = [1, 2, 1, 0.8]
 
-    points = 2**5
+    points = 2 ** 5
 
     # Chained expression
     x1, y1 = kde1(kernel=kernel, bw=bw).fit(data, weights).evaluate(points)
@@ -106,7 +106,7 @@ def test_api_models_kernels_bandwidths_2D(kde1, kde2, bw, kernel):
 
     # Mean error
     err = np.sqrt(np.mean((y1 - y2) ** 2))
-    if kernel in ('box', 'logistic', 'sigmoid'):
+    if kernel in ("box", "logistic", "sigmoid"):
         assert True
     else:
         assert err < 0.0025
@@ -125,20 +125,21 @@ def test_api_2D_data(estimator):
     # Create 2D data of shape (obs, dims)
     np.random.seed(123)
     n = 16
-    data = np.concatenate((np.random.randn(n).reshape(-1, 1),
-                           np.random.randn(n).reshape(-1, 1)), axis=1)
+    data = np.concatenate(
+        (np.random.randn(n).reshape(-1, 1), np.random.randn(n).reshape(-1, 1)), axis=1
+    )
 
-    grid_points = 2**5  # Grid points in each dimension
+    grid_points = 2 ** 5  # Grid points in each dimension
     N = 16  # Number of contours
 
     fig, axes = plt.subplots(ncols=3, figsize=(10, 3))
 
     for ax, norm in zip(axes, [1, 2, np.inf]):
 
-        ax.set_title('Norm $p={}$'.format(norm))
+        ax.set_title("Norm $p={}$".format(norm))
 
         # Compute
-        kde = estimator(kernel='gaussian', norm=norm)
+        kde = estimator(kernel="gaussian", norm=norm)
         grid, points = kde.fit(data).evaluate(grid_points)
 
         # The grid is of shape (obs, dims), points are of shape (obs, 1)
@@ -146,9 +147,9 @@ def test_api_2D_data(estimator):
         z = points.reshape(grid_points, grid_points).T
 
         # Plot the kernel density estimate
-        ax.contour(x, y, z, N, linewidths=0.8, colors='k')
+        ax.contour(x, y, z, N, linewidths=0.8, colors="k")
         ax.contourf(x, y, z, N, cmap="RdBu_r")
-        ax.plot(data[:, 0], data[:, 1], 'ok', ms=3)
+        ax.plot(data[:, 0], data[:, 1], "ok", ms=3)
 
     plt.tight_layout()
     plt.close()
@@ -194,6 +195,4 @@ def test_api_2D_data_which_is_1D(estimator):
 if __name__ == "__main__":
     if True:
         # --durations=10  <- May be used to show potentially slow tests
-        pytest.main(args=['.', '--doctest-modules', '-v', '--capture=sys',
-                          '-k 2D'
-                          ])
+        pytest.main(args=[".", "--doctest-modules", "-v", "--capture=sys", "-k 2D"])

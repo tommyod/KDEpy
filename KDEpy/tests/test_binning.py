@@ -6,7 +6,7 @@ Tests for binning functions.
 import pytest
 import numpy as np
 from KDEpy.utils import autogrid
-from KDEpy.binning import (linbin_numpy, linear_binning, linbin_Ndim_python)
+from KDEpy.binning import linbin_numpy, linear_binning, linbin_Ndim_python
 import itertools
 import random
 
@@ -65,22 +65,25 @@ def naivebinning(data, grid_points, weights=None):
     return result
 
 
-class TestBinningFunctions():
-
-    @pytest.mark.parametrize("data, func",
-                             itertools.product([[1, 2, 3, 4, 5, 6],
-                                                [0.04, 0.54, 0.33, 0.85, 0.16],
-                                                [-4.12, 0.98, -4.3, -1.85],
-                                                [0, 0, 1]],
-                                               [linear_binning,
-                                                linbin_Ndim_python]))
+class TestBinningFunctions:
+    @pytest.mark.parametrize(
+        "data, func",
+        itertools.product(
+            [
+                [1, 2, 3, 4, 5, 6],
+                [0.04, 0.54, 0.33, 0.85, 0.16],
+                [-4.12, 0.98, -4.3, -1.85],
+                [0, 0, 1],
+            ],
+            [linear_binning, linbin_Ndim_python],
+        ),
+    )
     def test_invariance_under_permutations(self, data, func):
         """
         Every binning functions should be invariance under permutation of data.
         """
         data = np.array(data).reshape(-1, 1)
-        grid = (np.linspace(np.min(data) - 1, np.max(data), num=5)
-                .reshape(-1, 1))
+        grid = np.linspace(np.min(data) - 1, np.max(data), num=5).reshape(-1, 1)
         y1 = func(data, grid, weights=None)
         np.random.seed(123)
         p = np.random.permutation(len(data))
@@ -88,11 +91,13 @@ class TestBinningFunctions():
 
         assert np.allclose(y1, y2)
 
-    @pytest.mark.parametrize("data, weights, ans",
-                             [([1, 2, 2.5, 3], None,
-                               np.array([1., 1.5, 1.5]) / 4),
-                              ([1, 2, 2.5, 3], [2, 1, 3, 2],
-                               np.array([2, 2.5, 3.5]) / 8)])
+    @pytest.mark.parametrize(
+        "data, weights, ans",
+        [
+            ([1, 2, 2.5, 3], None, np.array([1.0, 1.5, 1.5]) / 4),
+            ([1, 2, 2.5, 3], [2, 1, 3, 2], np.array([2, 2.5, 3.5]) / 8),
+        ],
+    )
     def test_binning_simple_examples(self, data, weights, ans):
         """
         Test on simple examples, originally computed by hand.
@@ -104,10 +109,10 @@ class TestBinningFunctions():
             y = func(data, grid, weights=weights)
             assert np.allclose(y, ans)
 
-    @pytest.mark.parametrize("dims, use_weights, eq_grid",
-                             itertools.product([1, 2, 3, 4],
-                                               [True, False],
-                                               [True, False]))
+    @pytest.mark.parametrize(
+        "dims, use_weights, eq_grid",
+        itertools.product([1, 2, 3, 4], [True, False], [True, False]),
+    )
     def test_cython_binning(self, dims, use_weights, eq_grid):
         """
         Test the fast N-dimensional binning up against the naive
@@ -148,19 +153,18 @@ class TestBinningFunctions():
             np.random.seed(subtest)
             data = np.random.randint(-2, 2, size=(1, dims)) - eps
             # Create grid points [-3, -2, -1, 0, 1, 2, 3]^dims
-            grid_points = autogrid(np.array([[0] * dims]),
-                                   num_points=(7,) * dims)
+            grid_points = autogrid(np.array([[0] * dims]), num_points=(7,) * dims)
             # Compute the linear binning
             answer = linear_binning(data, grid_points)
 
             # At the grid point where data point is placed,
             # a large weight should be placed by the linear binning
             for grid_point, a in zip(grid_points, answer):
-                diff = np.sum((grid_point - data.ravel())**2)
+                diff = np.sum((grid_point - data.ravel()) ** 2)
                 if diff < eps:
-                    assert np.allclose(a, (1 - eps)**dims)
+                    assert np.allclose(a, (1 - eps) ** dims)
 
 
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
-    pytest.main(args=['.', '--doctest-modules', '-v', '--durations=15'])
+    pytest.main(args=[".", "--doctest-modules", "-v", "--durations=15"])

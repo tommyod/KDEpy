@@ -59,8 +59,11 @@ def _fixed_point(t, N, I_sq, a2):
     ell = 7
 
     # Fast evaluation of |f^l|^2 using the DCT, see Plancherel theorem
-    f = 2 * np.pi**(2 * ell) * np.sum(np.power(I_sq, ell) * a2 *
-                                      np.exp(-I_sq * np.pi**2 * t))
+    f = (
+        2
+        * np.pi ** (2 * ell)
+        * np.sum(np.power(I_sq, ell) * a2 * np.exp(-I_sq * np.pi ** 2 * t))
+    )
 
     # Norm of a function, should never be negative
     if f <= 0:
@@ -73,15 +76,17 @@ def _fixed_point(t, N, I_sq, a2):
         odd_numbers_prod = np.product(np.arange(1, 2 * s + 1, 2, dtype=FLOAT))
         K0 = odd_numbers_prod / np.sqrt(2 * np.pi)
         const = (1 + (1 / 2) ** (s + 1 / 2)) / 3
-        time = np.power((2 * const * K0 / (N * f)),
-                        (2. / (3. + 2. * s)))
+        time = np.power((2 * const * K0 / (N * f)), (2.0 / (3.0 + 2.0 * s)))
 
         # Step two: estimate |f^s| from t_s
-        f = 2 * np.pi**(2 * s) * np.sum(np.power(I_sq, s) * a2 *
-                                        np.exp(-I_sq * np.pi**2 * time))
+        f = (
+            2
+            * np.pi ** (2 * s)
+            * np.sum(np.power(I_sq, s) * a2 * np.exp(-I_sq * np.pi ** 2 * time))
+        )
 
     # This is the minimizer of the AMISE
-    t_opt = np.power(2 * N * np.sqrt(np.pi) * f, -2. / 5)
+    t_opt = np.power(2 * N * np.sqrt(np.pi) * f, -2.0 / 5)
 
     # Return the difference between the original t and the optimal value
     return t - t_opt
@@ -106,22 +111,21 @@ def _root(function, N, args):
     while found == 0:
         try:
             # Other viable solvers include: [brentq, brenth, ridder, bisect]
-            x, res = brentq(function, 0, tol, args=args,
-                            full_output=True, disp=False)
+            x, res = brentq(function, 0, tol, args=args, full_output=True, disp=False)
             found = 1 if res.converged else 0
         except ValueError:
             x = 0
-            tol *= 2.
+            tol *= 2.0
             found = 0
         if x <= 0:
             found = 0
 
         # If the tolerance grows too large, minimize the function
         if tol >= 1:
-            raise ValueError('Root finding did not converge. Need more data.')
+            raise ValueError("Root finding did not converge. Need more data.")
 
     if not x > 0:
-        raise ValueError('Root finding failed to find positive solution.')
+        raise ValueError("Root finding failed to find positive solution.")
     return x
 
 
@@ -142,9 +146,9 @@ def improved_sheather_jones(data):
     """
     obs, dims = data.shape
     if not dims == 1:
-        raise ValueError('ISJ is only available for 1D data.')
+        raise ValueError("ISJ is only available for 1D data.")
 
-    n = 2**10
+    n = 2 ** 10
     # Setting `percentile` higher decreases the chance of overflow
     xmesh = autogrid(data, boundary_abs=6, num_points=n, boundary_rel=0.5)
     data = data.ravel()
@@ -166,7 +170,7 @@ def improved_sheather_jones(data):
 
     # Compute the bandwidth
     I_sq = np.power(np.arange(1, n, dtype=FLOAT), 2)
-    a2 = a[1:]**2 / 4
+    a2 = a[1:] ** 2 / 4
 
     # Solve for the optimal (in the AMISE sense) t
     t_star = _root(_fixed_point, N, args=(N, I_sq, a2))
@@ -205,18 +209,17 @@ def scotts_rule(data):
     >>> assert np.allclose(ans, 1.76474568962182)
     """
     if not len(data.shape) == 2:
-        raise ValueError('Data must be of shape (obs, dims).')
+        raise ValueError("Data must be of shape (obs, dims).")
 
     obs, dims = data.shape
     if not dims == 1:
-        raise ValueError('Scotts rule is only available for 1D data.')
+        raise ValueError("Scotts rule is only available for 1D data.")
     sigma = np.std(data, ddof=1)
     # scipy.norm.ppf(.75) - scipy.norm.ppf(.25) -> 1.3489795003921634
-    IQR = ((np.percentile(data, q=75) - np.percentile(data, q=25)) /
-           1.3489795003921634)
+    IQR = (np.percentile(data, q=75) - np.percentile(data, q=25)) / 1.3489795003921634
 
     sigma = min(sigma, IQR)
-    return sigma * np.power(obs, -1. / (dims + 4))
+    return sigma * np.power(obs, -1.0 / (dims + 4))
 
 
 def silvermans_rule(data):
@@ -235,7 +238,7 @@ def silvermans_rule(data):
     >>> assert np.allclose(ans, 1.8692607078355594)
     """
     if not len(data.shape) == 2:
-        raise ValueError('Data must be of shape (obs, dims).')
+        raise ValueError("Data must be of shape (obs, dims).")
     obs, dims = data.shape
     if not dims == 1:
         raise ValueError("Silverman's rule is only available for 1D data.")
@@ -243,17 +246,18 @@ def silvermans_rule(data):
     if obs == 1:
         return 1
     if obs < 1:
-        raise ValueError('Data must be of length > 0.')
+        raise ValueError("Data must be of length > 0.")
 
     sigma = np.std(data, ddof=1)
     # scipy.norm.ppf(.75) - scipy.norm.ppf(.25) -> 1.3489795003921634
-    IQR = ((np.percentile(data, q=75) - np.percentile(data, q=25)) /
-           1.3489795003921634)
+    IQR = (np.percentile(data, q=75) - np.percentile(data, q=25)) / 1.3489795003921634
 
     sigma = min(sigma, IQR)
-    return sigma * (obs * 3 / 4.) ** (-1 / 5)
+    return sigma * (obs * 3 / 4.0) ** (-1 / 5)
 
 
-_bw_methods = {'silverman': silvermans_rule,
-               'scott': scotts_rule,
-               'ISJ': improved_sheather_jones}
+_bw_methods = {
+    "silverman": silvermans_rule,
+    "scott": scotts_rule,
+    "ISJ": improved_sheather_jones,
+}
