@@ -114,11 +114,11 @@ def autogrid(data, boundary_abs=3, num_points=None, boundary_rel=0.05):
     elif isinstance(num_points, (list, tuple)):
         pass
     else:
-        msg = '`num_points` must be None, a number, or list/tuple for dims'
+        msg = "`num_points` must be None, a number, or list/tuple for dims"
         raise TypeError(msg)
 
     if not len(num_points) == dims:
-        raise ValueError('Number of points must be sequence matching dims.')
+        raise ValueError("Number of points must be sequence matching dims.")
 
     list_of_grids = []
 
@@ -126,14 +126,17 @@ def autogrid(data, boundary_abs=3, num_points=None, boundary_rel=0.05):
     for i, (minimum, maximum, rang, points) in generator:
         assert points >= 2
         outside_borders = max(boundary_rel * rang, boundary_abs)
-        list_of_grids.append(np.linspace(minimum - outside_borders,
-                                         maximum + outside_borders,
-                                         num=points))
+        list_of_grids.append(
+            np.linspace(
+                minimum - outside_borders, maximum + outside_borders, num=points
+            )
+        )
 
     return cartesian(list_of_grids)
 
 
 if __name__ == "__main__":
     import pytest
+
     # --durations=10  <- May be used to show potentially slow tests
-    pytest.main(args=['.', '--doctest-modules', '-v', '--capture=sys'])
+    pytest.main(args=[".", "--doctest-modules", "-v", "--capture=sys"])

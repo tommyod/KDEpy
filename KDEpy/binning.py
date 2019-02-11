@@ -89,7 +89,7 @@ def linbin_cython(data, grid_points, weights=None):
         weights = weights / np.sum(weights)
 
     if (weights is not None) and (len(data) != len(weights)):
-        raise ValueError('Length of data must match length of weights.')
+        raise ValueError("Length of data must match length of weights.")
 
     # Transform the data
     min_grid = np.min(grid_points)
@@ -106,8 +106,7 @@ def linbin_cython(data, grid_points, weights=None):
         result = cutils.iterate_data_1D(transformed_data, result)
         return np.asfarray(result[:-1]) / transformed_data.shape[0]
     else:
-        res = cutils.iterate_data_1D_weighted(transformed_data, weights,
-                                              result)
+        res = cutils.iterate_data_1D_weighted(transformed_data, weights, result)
         return np.asfarray(res[:-1])  # Remove last, outside of grid
 
 
@@ -160,7 +159,7 @@ def linbin_numpy(data, grid_points, weights=None):
     weights = weights / np.sum(weights)
 
     if not len(data) == len(weights):
-        raise ValueError('Length of data must match length of weights.')
+        raise ValueError("Length of data must match length of weights.")
 
     # Transform the data
     min_grid = np.min(grid_points)
@@ -190,16 +189,17 @@ def linbin_numpy(data, grid_points, weights=None):
     # If the data is not a subset of the grid, the integral values will be
     # outside of the grid. To solve the problem, we filter these values away
     unique_integrals = np.unique(integral)
-    unique_integrals = unique_integrals[(unique_integrals >= 0) &
-                                        (unique_integrals <= len(grid_points))]
+    unique_integrals = unique_integrals[
+        (unique_integrals >= 0) & (unique_integrals <= len(grid_points))
+    ]
 
     result = np.asfarray(np.zeros(len(grid_points) + 1))
     for grid_point in unique_integrals:
 
         # Use binary search to find indices for the grid point
         # Then sum the data assigned to that grid point
-        low_index = np.searchsorted(integral, grid_point, side='left')
-        high_index = np.searchsorted(integral, grid_point, side='right')
+        low_index = np.searchsorted(integral, grid_point, side="left")
+        high_index = np.searchsorted(integral, grid_point, side="right")
         result[grid_point] += neg_frac_weights[low_index:high_index].sum()
         result[grid_point + 1] += frac_weights[low_index:high_index].sum()
 
@@ -243,7 +243,7 @@ def linbin_Ndim_python(data, grid_points, weights=None):
     weights = weights / np.sum(weights)
 
     if (weights is not None) and (data.shape[0] != len(weights)):
-        raise ValueError('Length of data must match length of weights.')
+        raise ValueError("Length of data must match length of weights.")
 
     obs_tot, dims = grid_points.shape
 
@@ -254,7 +254,7 @@ def linbin_Ndim_python(data, grid_points, weights=None):
     # Scale the data to the grid
     min_grid = np.min(grid_points, axis=0)
     max_grid = np.max(grid_points, axis=0)
-    num_intervals = (grid_num - 1)  # Number of intervals
+    num_intervals = grid_num - 1  # Number of intervals
     dx = (max_grid - min_grid) / num_intervals
     data = (data - min_grid) / dx
 
@@ -266,9 +266,13 @@ def linbin_Ndim_python(data, grid_points, weights=None):
 
         # Compute integer part and fractional part for every x_i
         # Compute relation to previous grid point, and next grid point
-        int_frac = (((int(coordinate), 1 - (coordinate % 1)),
-                     (int(coordinate) + 1, (coordinate % 1)))
-                    for coordinate in observation)
+        int_frac = (
+            (
+                (int(coordinate), 1 - (coordinate % 1)),
+                (int(coordinate) + 1, (coordinate % 1)),
+            )
+            for coordinate in observation
+        )
 
         # Go through every cartesian product, i.e. every corner in the
         # hypercube grid points surrounding the observation
@@ -326,7 +330,7 @@ def linbin_Ndim(data, grid_points, weights=None):
         weights = weights / np.sum(weights)
 
     if (weights is not None) and (data.shape[0] != len(weights)):
-        raise ValueError('Length of data must match length of weights.')
+        raise ValueError("Length of data must match length of weights.")
 
     obs_tot, dims = grid_points.shape
 
@@ -337,7 +341,7 @@ def linbin_Ndim(data, grid_points, weights=None):
     # Scale the data to the grid
     min_grid = np.min(grid_points, axis=0)
     max_grid = np.max(grid_points, axis=0)
-    num_intervals = (grid_num - 1)
+    num_intervals = grid_num - 1
     dx = (max_grid - min_grid) / num_intervals
     data = (data - min_grid) / dx
 
@@ -351,13 +355,14 @@ def linbin_Ndim(data, grid_points, weights=None):
     # Weighted data has two specific routines
     if weights is not None:
         if data_dims >= 3:
-            binary_flgs = cartesian(([0, 1], ) * dims)
-            result = cutils.iterate_data_ND_weighted(data, weights, result,
-                                                     grid_num, obs_tot,
-                                                     binary_flgs)
+            binary_flgs = cartesian(([0, 1],) * dims)
+            result = cutils.iterate_data_ND_weighted(
+                data, weights, result, grid_num, obs_tot, binary_flgs
+            )
         else:
-            result = cutils.iterate_data_2D_weighted(data, weights, result,
-                                                     grid_num, obs_tot)
+            result = cutils.iterate_data_2D_weighted(
+                data, weights, result, grid_num, obs_tot
+            )
         result = np.asarray_chkfinite(result, dtype=np.float)
 
     # Unweighted data has two specific routines too. This is because creating
@@ -365,9 +370,10 @@ def linbin_Ndim(data, grid_points, weights=None):
     # specialize routine for this case.
     else:
         if data_dims >= 3:
-            binary_flgs = cartesian(([0, 1], ) * dims)
-            result = cutils.iterate_data_ND(data, result, grid_num, obs_tot,
-                                            binary_flgs)
+            binary_flgs = cartesian(([0, 1],) * dims)
+            result = cutils.iterate_data_ND(
+                data, result, grid_num, obs_tot, binary_flgs
+            )
         else:
             result = cutils.iterate_data_2D(data, result, grid_num, obs_tot)
         result = np.asarray_chkfinite(result, dtype=np.float)
@@ -426,20 +432,19 @@ def linear_binning(data, grid_points, weights=None):
         grid_dims = 1
 
     if not data_dims == grid_dims:
-        raise ValueError('Shape of data and grid points must be the same.')
+        raise ValueError("Shape of data and grid points must be the same.")
 
     if data_dims == 1:
         if _use_Cython:
-            return linbin_cython(data.ravel(), grid_points.ravel(),
-                                 weights=weights)
+            return linbin_cython(data.ravel(), grid_points.ravel(), weights=weights)
         else:
-            return linbin_numpy(data.ravel(), grid_points.ravel(),
-                                weights=weights)
+            return linbin_numpy(data.ravel(), grid_points.ravel(), weights=weights)
     else:
         return linbin_Ndim(data, grid_points, weights=weights)
 
 
 if __name__ == "__main__":
     import pytest
+
     # --durations=10  <- May be used to show potentially slow tests
-    pytest.main(args=['.', '--doctest-modules', '-v', '--capture=sys'])
+    pytest.main(args=[".", "--doctest-modules", "-v", "--capture=sys"])

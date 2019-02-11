@@ -59,7 +59,7 @@ class TreeKDE(BaseKDE):
     - Scipy implementation, at ``scipy.spatial.KDTree``.
     """
 
-    def __init__(self, kernel='gaussian', bw=1, norm=2.):
+    def __init__(self, kernel="gaussian", bw=1, norm=2.0):
         super().__init__(kernel, bw)
         self.norm = norm
 
@@ -146,7 +146,7 @@ class TreeKDE(BaseKDE):
         # Compute the kernel radius
         maximal_bw = np.max(bw)
         if not eps > 0:
-            raise ValueError('eps must be > 0.')
+            raise ValueError("eps must be > 0.")
         kernel_radius = self.kernel.practical_support(maximal_bw, eps)
 
         # Since we iterate through grid points, we need the maximum bw to
@@ -155,8 +155,9 @@ class TreeKDE(BaseKDE):
 
             # Query for data points that are close to this grid point
             # TODO: Is this epsilon value sensible?
-            indices = tree.query_ball_point(x=grid_point, r=kernel_radius,
-                                            p=self.norm, eps=eps * obs**0.5)
+            indices = tree.query_ball_point(
+                x=grid_point, r=kernel_radius, p=self.norm, eps=eps * obs ** 0.5
+            )
 
             # Use broadcasting to find x-values (distances)
             x = grid_point - self.data[indices]
@@ -178,5 +179,6 @@ class TreeKDE(BaseKDE):
 
 if __name__ == "__main__":
     import pytest
+
     # --durations=10  <- May be used to show potentially slow tests
-    pytest.main(args=['.', '--doctest-modules', '-v'])
+    pytest.main(args=[".", "--doctest-modules", "-v"])
