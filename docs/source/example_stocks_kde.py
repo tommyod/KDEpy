@@ -16,7 +16,7 @@ COLOR_CYCLE = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 DOWNLOAD = False
 
 if DOWNLOAD:
-    start = datetime.datetime(2018, 1, 1)
+    start = datetime.datetime(2017, 1, 1)
     end = datetime.datetime(2019, 1, 1)
     web.DataReader("F", "iex", start, end).to_csv("stocks.csv")
 
@@ -40,7 +40,9 @@ weights = weight_function(np.arange(0, len(stock_data)))
 # This is not computatationally efficient, but it's reasonably fast
 # The following UNIX command combines the images to a GIF
 # $ convert -delay 10 -loop 0 kde*.png stocks_animation.gif
-for num_points in range(1, len(stock_data), 3):
+points = (list(range(1, 20)) + list(range(20, 100, 2)) + list(range(100, 300, 3))
++ list(range(300, len(stock_data), 5)))
+for i, num_points in enumerate(points):
 
     fig, (ax1, ax2) = plt.subplots(
         1, 2, figsize=(10, 3), gridspec_kw={"width_ratios": [3, 1]}, sharey="row"
@@ -48,7 +50,7 @@ for num_points in range(1, len(stock_data), 3):
 
     # Create a kernel density estimate, the bandwidth is found by trial and error
     x, y = (
-        FFTKDE(bw=0.0012)
+        FFTKDE(bw=0.002)
         .fit(stock_data[:num_points], weights=weights[num_points - 1 :: -1])
         .evaluate()
     )
@@ -57,7 +59,6 @@ for num_points in range(1, len(stock_data), 3):
     ax1.set_title("Stock data (IEX)")
     ax1.plot(stock_data[:num_points], label="daily log returns")
     ax1.plot(np.arange(num_points), weights[num_points - 1 :: -1], label="weights")
-    ax1.axvline(x=num_points, color=COLOR_CYCLE[2], label="time")
     ax1.set_ylim([-0.05, 0.05])
     ax1.grid(True, zorder=5, alpha=0.5, ls="--")
     ax1.legend(loc="upper left")
@@ -89,7 +90,7 @@ for num_points in range(1, len(stock_data), 3):
 
     # Save the figure
     plt.tight_layout()
-    # plt.savefig("kde_" + str(num_points).rjust(3, "0") + ".png", dpi=120)
+    # plt.savefig("kde_" + str(i).rjust(3, "0") + ".png", dpi=120)
 
     plt.show()
     print()
