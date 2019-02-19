@@ -7,6 +7,10 @@ import numpy as np
 import numbers
 
 
+def verify_grid(grid):
+    pass
+
+
 def cartesian(arrays):
     """
     Generate a cartesian product of input arrays.
