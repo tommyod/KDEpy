@@ -5,6 +5,7 @@ Functions for bandwidth selection.
 """
 import numpy as np
 import scipy
+import warnings
 from KDEpy.binning import linear_binning
 from KDEpy.utils import autogrid
 from scipy import fftpack
@@ -249,11 +250,35 @@ def silvermans_rule(data):
         raise ValueError("Data must be of length > 0.")
 
     sigma = np.std(data, ddof=1)
-    # scipy.norm.ppf(.75) - scipy.norm.ppf(.25) -> 1.3489795003921634
+    # scipy.stats.norm.ppf(.75) - scipy.stats.norm.ppf(.25) -> 1.3489795003921634
     IQR = (np.percentile(data, q=75) - np.percentile(data, q=25)) / 1.3489795003921634
 
     sigma = min(sigma, IQR)
-    return sigma * (obs * 3 / 4.0) ** (-1 / 5)
+
+    # The logic below is not related to silverman's rule, but if the data is constant
+    # it's nice to return a value instead of getting an error. A warning will be raised.
+    if sigma > 0:
+        return sigma * (obs * 3 / 4.0) ** (-1 / 5)
+    else:
+        # stats.norm.ppf(.99) - stats.norm.ppf(.01) = 4.6526957480816815
+        IQR = (
+            np.percentile(data, q=99) - np.percentile(data, q=1)
+        ) / 4.6526957480816815
+        if IQR > 0:
+            bw = IQR * (obs * 3 / 4.0) ** (-1 / 5)
+            warnings.warn(
+                "Silverman's rule failed. Too many idential values. \
+Setting bw = {}".format(
+                    bw
+                )
+            )
+            return bw
+
+        # Here, all values are basically constant
+        warnings.warn(
+            "Silverman's rule failed. Too many idential values. Setting bw = 1.0"
+        )
+        return 1.0
 
 
 _bw_methods = {
