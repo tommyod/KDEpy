@@ -42,8 +42,12 @@ weights = weight_function(np.arange(0, len(stock_data)))
 # This is not computatationally efficient, but it's reasonably fast
 # The following UNIX command combines the images to a GIF
 # $ convert -delay 10 -loop 0 kde*.png stocks_animation.gif
-points = (list(range(1, 20)) + list(range(20, 100, 2)) + list(range(100, 300, 3))
-+ list(range(300, len(stock_data), 5)))
+points = (
+    list(range(1, 20))
+    + list(range(20, 100, 2))
+    + list(range(100, 300, 3))
+    + list(range(300, len(stock_data), 5))
+)
 for i, num_points in enumerate(points):
 
     fig, (ax1, ax2) = plt.subplots(

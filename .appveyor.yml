@@ -11,7 +11,7 @@ environment:
       PYTHON_ARCH: "x86_64"
       CIBW_SKIP: cp27-* cp33-* cp34-*
       CIBW_TEST_REQUIRES: pytest matplotlib
-      CIBW_TEST_COMMAND: python -m pytest {project} --doctest-modules
+      CIBW_TEST_COMMAND: python -m pytest {project}/KDEpy --doctest-modules
 
 
 platform:
