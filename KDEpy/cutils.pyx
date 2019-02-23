@@ -305,3 +305,111 @@ def iterate_data_ND_weighted(double[:, :] data, double[:] weights, double[:] res
             result[result_index % obs_tot] += corner_value  * weight
     
     return result
+
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.cdivision(True)
+def grid_is_sorted(double[:, :] grid):
+    """
+    Verify grid obeys the sorting properties.
+    
+    It's required that the grid has a specific structure to achieve fast linear binning. 
+    The linear binning algorithm must know where to place a data point in the grid in 
+    constant time, so it must be able to compute the index immediately. This requires 
+    the grid structure sketched below i.e. that the grid is sorted by column-by-column,
+    or dimension-by-dimension, as `x_1, x_2, ... ,x_D`.
+    
+    0 0
+    0 1
+    0 2
+    1 0
+    1 1
+    1 2
+    2 0
+    2 1
+    2 3
+    
+    This algorithm DOES NOT check if the grid is equidistant, so the grid above would
+    pass, even though the final row should read [2 2] for the grid to be fully valid
+    when used with FFTKDE. The algorithm runs in O(m * n) time, making one pass through
+    the data.
+    
+    Parameters
+    ----------
+    grid : 2D ndarray
+        The grid to check sorting property.
+        
+    Returns
+    -------
+    valid : bool
+        A True or False boolean, indicating if the grid is valid.
+    """
+    # Type definitions for Cython - important for speed
+    cdef int n_obs, n_dims, row_i, row_start_index
+    cdef double diff
+    
+    # Verify the user input
+    assert grid.ndim == 2
+    n_obs, n_dims = grid.shape[0], grid.shape[1]
+    assert n_obs > 0
+    assert n_dims >= 1
+    
+    # ----------------------------------------------------------------
+    # ----- Single column grid - check if it's sorted ----------------
+    # ----------------------------------------------------------------
+    
+    if n_dims == 1:
+        
+        for row_i in range(1, n_obs):
+            # If it's decreasing, it's not sorted correctly
+            if grid[row_i, 0] < grid[row_i - 1, 0]:
+                return False
+        return True
+    
+    # ----------------------------------------------------------------
+    # ----- Single column grid - check if it's sorted and recurse ----
+    # ----------------------------------------------------------------
+    
+    # As the first column is iterated over, the function will recurse on the
+    # columns to the right of it. In the following example, three recursive
+    # calls will be made for the sub grids [2, 3, 4], [0, 1, 2] and [5, 6, 8]
+    #     [0, 2]
+    #     [0, 3]
+    #     [0, 4]
+    #     [1, 0]
+    #     [1, 1]
+    #     [1, 2]
+    #     [2, 5]
+    #     [2, 6]
+    #     [2, 8]
+    # Notice that this function DOES NOT check if the grid is equidistant.
+    
+
+    # Start index for the recursive calls, initially zero, but will potentially change
+    row_start_index = 0
+    for row_i in range(1, n_obs):
+        
+        # Compute the difference between the elements
+        diff = grid[row_i, 0] - grid[row_i - 1, 0]
+        
+        # If it's decreasing, it's not sorted correctly and we immediately return False
+        if diff < 0:
+            return False
+        
+        # If it's increasing, we make a recursive call to verify that the top-right
+        # elements are sorted when the grid was constant
+        if diff > 0:
+            
+            # If the sub-grid is not correct, return false
+            if not grid_is_sorted(grid[row_start_index:row_i, 1:]):
+                return False
+            
+            row_start_index = row_i
+       
+    # If the final sub-grid is not correct, return false
+    if not grid_is_sorted(grid[row_start_index:, 1:]):
+        return False
+    
+    return True
