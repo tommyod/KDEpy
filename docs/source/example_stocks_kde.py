@@ -3,6 +3,8 @@
 """
 This example shows how a weighted KDE may be used to animate the distribution
 of log returns for stocks. Requires pandas_datareader and pandas.
+
+https://imgur.com/a/ZCf2wUG
 """
 
 import pandas_datareader.data as web
