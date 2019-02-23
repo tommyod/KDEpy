@@ -168,6 +168,29 @@ def test_against_scipy_density(bw, n, expected_result):
     assert np.allclose(y, expected_result)
 
 
+def test_constant_values_silverman():
+    """
+    Test that a data set with constant values does not fail when using silverman's rule.
+    Tests with "almost" constant values should also get a bw assigned automatically,
+    although silverman's rule technically does not do this.
+    
+    https://github.com/tommyod/KDEpy/issues/9
+    """
+
+    data = np.ones(100, dtype=float)
+    kde = NaiveKDE(bw="silverman").fit(data)
+    with pytest.warns(UserWarning):
+        kde.evaluate()
+    assert np.isclose(kde.bw, 1.0)
+
+    data = np.ones(1000, dtype=float)
+    data[0] = 0.0
+    data[999] = 2.0
+    kde = NaiveKDE(bw="silverman").fit(data)
+    with pytest.warns(UserWarning):
+        kde.evaluate()
+
+
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
     pytest.main(args=[".", "--doctest-modules", "-v"])
