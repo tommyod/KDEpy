@@ -132,10 +132,10 @@ class FFTKDE(BaseKDE):
 
         # This method sets self.grid_points and verifies it
         super().evaluate(grid_points)
-        
+
         # Extra verification for FFTKDE (checking the sorting property)
         if not grid_is_sorted(self.grid_points):
-            raise ValueError('The grid must be sorted.')
+            raise ValueError("The grid must be sorted.")
 
         if callable(self.bw):
             bw = self.bw(self.data)
