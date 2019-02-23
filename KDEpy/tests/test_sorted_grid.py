@@ -67,7 +67,7 @@ class TestGridSorted:
 
         # density estimates
         with pytest.raises(ValueError):
-            y1 = KDEpy.FFTKDE(bw=0.2).fit(data).evaluate(grid)
+            KDEpy.FFTKDE(bw=0.2).fit(data).evaluate(grid)
 
     def test_on_good_grids(self):
         """
