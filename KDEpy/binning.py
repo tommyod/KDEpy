@@ -36,6 +36,9 @@ import operator
 from KDEpy.utils import cartesian
 import cutils
 
+
+grid_is_sorted = cutils.grid_is_sorted
+
 # This parameter was in use when a NumPy implementation and a Cython
 # implementation were both used. Now only Cython is used.
 _use_Cython = True
