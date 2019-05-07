@@ -33,7 +33,7 @@ env:
   global:
     - CIBW_SKIP="cp27-* cp33-* cp34-*"
     - CIBW_TEST_REQUIRES=pytest
-    - CIBW_TEST_COMMAND="python3 -m pytest {project} --doctest-modules"
+    - CIBW_TEST_COMMAND="python3 -m pytest {project}/KDEpy --doctest-modules"
     - PIP=pip3
     - PYTHON=python3
 
