@@ -24,6 +24,12 @@ matrix:
       services: docker
       python: '3.7'
 
+    - os: linux
+      dist: xenial 
+      sudo: required
+      services: docker
+      python: '3.8-dev'
+
     - os: osx
       language: generic
 
