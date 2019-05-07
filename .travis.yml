@@ -50,7 +50,7 @@ before_install:
     brew update;
   fi
 - if [ "${TRAVIS_OS_NAME:-}" -ne "osx" ]; then
-    sudo apt install libpython3.6-dev gcc gfortran python-dev libopenblas-dev liblapack-dev cython
+    sudo apt install libpython3.6-dev gcc gfortran python-dev libopenblas-dev liblapack-dev cython;
   fi
 - $PYTHON --version
 - $PIP install -r requirements.txt
