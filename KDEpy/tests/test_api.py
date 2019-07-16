@@ -5,6 +5,8 @@ Test the API. The API should be considered fixed in future releases and should
 be equal for every implementation. Therefore it's important to have unit tests
 for the API.
 """
+from __future__ import absolute_import, division, print_function
+
 import numpy as np
 from KDEpy.FFTKDE import FFTKDE
 from KDEpy.NaiveKDE import NaiveKDE

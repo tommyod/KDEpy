@@ -3,6 +3,8 @@
 """
 Module for the NaiveKDE.
 """
+from __future__ import division, absolute_import, print_function
+
 import numbers
 import itertools
 import numpy as np
@@ -50,7 +52,7 @@ class NaiveKDE(BaseKDE):
     """
 
     def __init__(self, kernel="gaussian", bw=1, norm=2):
-        super().__init__(kernel, bw)
+        super(NaiveKDE, self).__init__(kernel, bw)
         self.norm = norm
 
     def fit(self, data, weights=None):
@@ -80,7 +82,7 @@ class NaiveKDE(BaseKDE):
         >>> x, y = kde()
         """
         # Sets self.data
-        super().fit(data, weights)
+        super(NaiveKDE, self).fit(data, weights)
         return self
 
     def evaluate(self, grid_points=None):
@@ -113,7 +115,7 @@ class NaiveKDE(BaseKDE):
         # This method sets self.grid points and verifies it
         # NaiveKDE does not convert the bw to a scalar, since a vector is
         # allowed too.
-        super().evaluate(grid_points, bw_to_scalar=False)
+        super(NaiveKDE, self).evaluate(grid_points, bw_to_scalar=False)
 
         # Create zeros on the grid points
         evaluated = np.zeros(self.grid_points.shape[0])

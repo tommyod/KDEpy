@@ -3,6 +3,8 @@
 """
 Module for the FFTKDE.
 """
+from __future__ import division, absolute_import, print_function
+
 import numbers
 import warnings
 import numpy as np
@@ -69,7 +71,7 @@ class FFTKDE(BaseKDE):
 
     def __init__(self, kernel="gaussian", bw=1, norm=2):
         self.norm = norm
-        super().__init__(kernel, bw)
+        super(FFTKDE, self).__init__(kernel, bw)
         assert isinstance(self.norm, numbers.Number) and self.norm > 0
 
     def fit(self, data, weights=None):
@@ -99,7 +101,7 @@ class FFTKDE(BaseKDE):
         """
 
         # Sets self.data
-        super().fit(data, weights)
+        super(FFTKDE, self).fit(data, weights)
         return self
 
     def evaluate(self, grid_points=None):
@@ -131,7 +133,7 @@ class FFTKDE(BaseKDE):
         """
 
         # This method sets self.grid_points and verifies it
-        super().evaluate(grid_points)
+        super(FFTKDE, self).evaluate(grid_points)
 
         # Extra verification for FFTKDE (checking the sorting property)
         if not grid_is_sorted(self.grid_points):
@@ -186,7 +188,9 @@ class FFTKDE(BaseKDE):
         assert (dx * L <= real_bw).all()
 
         # Evaluate the kernel once
-        grids = [np.linspace(-dx * L, dx * L, int(L * 2 + 1)) for (dx, L) in zip(dx, L)]
+        grids = [
+            np.linspace(-dx * Li, dx * Li, int(Li * 2 + 1)) for (dx, Li) in zip(dx, L)
+        ]
         kernel_grid = cartesian(grids)
         kernel_weights = self.kernel(kernel_grid, bw=self.bw, norm=self.norm)
 
