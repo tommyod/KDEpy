@@ -155,6 +155,8 @@ class TreeKDE(BaseKDE):
 
             # Query for data points that are close to this grid point
             # TODO: Is this epsilon value sensible?
+            # Scipy 1.3.0 introduced error: ValueError: ndarray is not C-contiguous
+            grid_point = np.ascontiguousarray(grid_point)
             indices = tree.query_ball_point(
                 x=grid_point, r=kernel_radius, p=self.norm, eps=eps * obs ** 0.5
             )
