@@ -8,12 +8,14 @@ https://github.com/pypa/sampleproject
 """
 
 from setuptools import Extension, setup
+import os
+import re
 
-HERE = path.abspath(path.dirname(__file__))
+HERE = os.path.abspath(os.path.dirname(__file__))
 
 
 def read(fname):
-    return open(path.join(HERE, fname)).read()
+    return open(os.path.join(HERE, fname)).read()
 
 
 try:
@@ -26,7 +28,7 @@ else:
 
 
 # Get version
-with open(path.join(HERE, "KDEpy/__init__.py"), encoding="utf-8") as file:
+with open(os.path.join(HERE, "KDEpy/__init__.py"), encoding="utf-8") as file:
     VERSION = re.search(r"__version__ = \"(.*?)\"", file.read()).group(1)
 
 cmdclass = {}
