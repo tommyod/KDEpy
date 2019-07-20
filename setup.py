@@ -9,6 +9,13 @@ https://github.com/pypa/sampleproject
 
 from setuptools import Extension, setup
 
+HERE = path.abspath(path.dirname(__file__))
+
+
+def read(fname):
+    return open(path.join(HERE, fname)).read()
+
+
 try:
     from Cython.Distutils import build_ext
     import numpy as np
@@ -18,8 +25,9 @@ else:
     can_build_ext = True
 
 
-# If this is incremented, also increment in __init__.py
-VERSION = "0.6.11"
+# Get version
+with open(path.join(HERE, "KDEpy/__init__.py"), encoding="utf-8") as file:
+    VERSION = re.search(r"__version__ = \"(.*?)\"", file.read()).group(1)
 
 cmdclass = {}
 ext_modules = []
@@ -38,14 +46,15 @@ setup(
     name="KDEpy",
     version=VERSION,
     description="Kernel Density Estimation in Python.",
-    long_description="Kernel Density Estimation in Python.",
+    long_description=read("README.md"),
+    long_description_content_type="text/markdown",
     url="https://github.com/tommyod/KDEpy",
     author="tommyod",
     author_email="tod001@uib.no",
     license="GNU GPLv3",
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",

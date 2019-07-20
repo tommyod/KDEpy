@@ -7,7 +7,7 @@ from KDEpy.TreeKDE import TreeKDE
 from KDEpy.FFTKDE import FFTKDE
 
 # If this is incremented, also increment in setup.py
-__version__ = "0.6.11"
+__version__ = "1.0.0"
 __author__ = "tommyod"
 
 TreeKDE = TreeKDE
