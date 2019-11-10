@@ -28,7 +28,7 @@ matrix:
       dist: xenial 
       sudo: required
       services: docker
-      python: '3.8-dev'
+      python: '3.8'
 
     - os: osx
       language: generic
