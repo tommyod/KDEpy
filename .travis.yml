@@ -28,7 +28,7 @@ matrix:
       dist: xenial    # required for Python 3.8 (travis-ci/travis-ci#9069)
       sudo: required
       services: docker
-      python: '3.r87'
+      python: '3.8'
 
     - os: osx
       language: generic
