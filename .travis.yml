@@ -24,6 +24,12 @@ matrix:
       services: docker
       python: '3.7'
 
+    - os: linux
+      dist: xenial    # required for Python 3.8 (travis-ci/travis-ci#9069)
+      sudo: required
+      services: docker
+      python: '3.r87'
+
     - os: osx
       language: generic
 
@@ -64,6 +70,6 @@ before_script:
   # -------------------- deploy: deploy to PyPI --------- 
 deploy:
   provider: script
-  script: bash deploy.sh
+  script: . deploy.sh
   on:
     branch: master
