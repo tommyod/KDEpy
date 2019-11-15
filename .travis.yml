@@ -60,13 +60,10 @@ install:
 # Linting
 before_script:
 - $PYTHON -m flake8 --show-source --ignore=F811,W293,W391,W292,W291,W504,W503 --max-line-length=88 --exclude="*examples.py,testing.py,*kde.py" KDEpy
-
-# If a tag was used, build wheels and deply to pypi
-script:
-- echo "$TRAVIS_TAG"
-- if [ -n "$TRAVIS_TAG" ]; then
-  $PIP install cibuildwheel;
-  $PYTHON -m cibuildwheel --output-dir wheelhouse;
-  $PIP install twine;
-  $PYTHON -m twine upload dist/* -u tommyod -p $TWINE_PASSWORD --skip-existing;
-  fi
+  
+  # -------------------- deploy: deploy to PyPI --------- 
+deploy:
+  provider: script
+  script: bash deploy.sh
+  on:
+    branch: master
