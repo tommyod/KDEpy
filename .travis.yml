@@ -70,6 +70,6 @@ script:
 # -------------------- deploy: deploy to PyPI --------- 
 deploy:
   provider: script
-  script: . deploy.sh
+  script: bash deploy.sh
   on:
     branch: master
