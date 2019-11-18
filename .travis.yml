@@ -24,6 +24,12 @@ matrix:
       services: docker
       python: '3.7'
 
+    - os: linux
+      dist: xenial    # required for Python 3.8 (travis-ci/travis-ci#9069)
+      sudo: required
+      services: docker
+      python: '3.8'
+
     - os: osx
       language: generic
 
@@ -58,15 +64,12 @@ install:
 - $PYTHON -m pytest KDEpy --doctest-modules --capture=sys
 
 # Linting
-before_script:
-- $PYTHON -m flake8 --show-source --ignore=F811,W293,W391,W292,W291,W504,W503 --max-line-length=88 --exclude="*examples.py,testing.py,*kde.py" KDEpy
-
-# If a tag was used, build wheels and deply to pypi
 script:
-- echo "$TRAVIS_TAG"
-- if [ -n "$TRAVIS_TAG" ]; then
-  $PIP install cibuildwheel;
-  $PYTHON -m cibuildwheel --output-dir wheelhouse;
-  $PIP install twine;
-  $PYTHON -m twine upload dist/* -u tommyod -p $TWINE_PASSWORD --skip-existing;
-  fi
+- $PYTHON -m flake8 --show-source --ignore=F811,W293,W391,W292,W291,W504,W503 --max-line-length=88 --exclude="*examples.py,testing.py,*kde.py" KDEpy
+  
+  # -------------------- deploy: deploy to PyPI --------- 
+deploy:
+  provider: script
+  script: . deploy.sh
+    on:
+      branch: master
