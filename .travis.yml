@@ -67,9 +67,9 @@ install:
 script:
 - $PYTHON -m flake8 --show-source --ignore=F811,W293,W391,W292,W291,W504,W503 --max-line-length=88 --exclude="*examples.py,testing.py,*kde.py" KDEpy
   
-  # -------------------- deploy: deploy to PyPI --------- 
+# -------------------- deploy: deploy to PyPI --------- 
 deploy:
   provider: script
-  script: . deploy.sh
+  script: deploy.sh
     on:
       branch: master
