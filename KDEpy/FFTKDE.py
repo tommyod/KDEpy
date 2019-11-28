@@ -151,7 +151,7 @@ class FFTKDE(BaseKDE):
 
         min_data = np.min(self.data, axis=0)
         max_data = np.max(self.data, axis=0)
-        if not ((min_grid < min_data).all() and (max_grid > max_data).all()):
+        if not ((min_grid <= min_data).all() and (max_grid => max_data).all()):
             raise ValueError("Every data point must be inside of the grid.")
 
         # Step 1 - Obtaining the grid counts
