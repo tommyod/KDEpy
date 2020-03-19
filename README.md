@@ -8,6 +8,7 @@
 This Python 3.6+ package implements various kernel density estimators (KDE).
 Three algorithms are implemented through the same API: [`NaiveKDE`](https://kdepy.readthedocs.io/en/latest/API.html#naivekde), [`TreeKDE`](https://kdepy.readthedocs.io/en/latest/API.html#treekde) and [`FFTKDE`](https://kdepy.readthedocs.io/en/latest/API.html#fftkde).
 The class [`FFTKDE`](https://kdepy.readthedocs.io/en/latest/API.html#fftkde) outperforms other popular implementations, see the [comparison page](https://kdepy.readthedocs.io/en/latest/comparison.html).
+**The code is stable and in widespread by practitioners and in other packages.**
 
 ![Plot](https://raw.githubusercontent.com/tommyod/KDEpy/master/docs/source/_static/img/showcase.png)
 
