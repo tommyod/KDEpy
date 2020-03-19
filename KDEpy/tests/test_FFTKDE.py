@@ -60,13 +60,9 @@ def test_additivity_with_weights(data, split_index):
     weights_second_split = weights[split_index:]
 
     # Fit to splits, and compensate for smaller data using weights
-    y_1 = FFTKDE("epa").fit(data_first_split, weights_first_split).evaluate(x) * sum(
-        weights_first_split
-    )
+    y_1 = FFTKDE("epa").fit(data_first_split, weights_first_split).evaluate(x) * sum(weights_first_split)
 
-    y_2 = FFTKDE("epa").fit(data_second_split, weights_second_split).evaluate(x) * sum(
-        weights_second_split
-    )
+    y_2 = FFTKDE("epa").fit(data_second_split, weights_second_split).evaluate(x) * sum(weights_second_split)
 
     # Additive property of the functions
     assert np.allclose(y, y_1 + y_2)

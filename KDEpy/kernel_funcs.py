@@ -320,9 +320,7 @@ class Kernel(collections.abc.Callable):
         else:
             distances = np.abs(x).ravel()
 
-        return self.function(distances / real_bw, dims) / (
-            (real_bw ** dims) * volume_func(dims)
-        )
+        return self.function(distances / real_bw, dims) / ((real_bw ** dims) * volume_func(dims))
 
     __call__ = evaluate
 

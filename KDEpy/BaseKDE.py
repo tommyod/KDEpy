@@ -76,9 +76,7 @@ class BaseKDE(ABC):
 
         # Test quickly that the method has done what is was supposed to do
         assert callable(self.kernel)
-        assert isinstance(self.bw, (np.ndarray, Sequence, numbers.Number)) or callable(
-            self.bw
-        )
+        assert isinstance(self.bw, (np.ndarray, Sequence, numbers.Number)) or callable(self.bw)
 
     @abstractmethod
     def fit(self, data, weights=None):

@@ -22,10 +22,7 @@ kde_pairs = list(itertools.combinations(kdes, 2))
 
 @pytest.mark.parametrize(
     "kde1, kde2, bw, kernel",
-    [
-        (k[0], k[1], bw, ker)
-        for (k, bw, ker) in itertools.product(kde_pairs, [0.1, "silverman", 1], kernels)
-    ],
+    [(k[0], k[1], bw, ker) for (k, bw, ker) in itertools.product(kde_pairs, [0.1, "silverman", 1], kernels)],
 )
 def test_api_models_kernels_bandwidths(kde1, kde2, bw, kernel):
     """
@@ -57,9 +54,7 @@ type_functions = [tuple, np.array, np.asfarray, lambda x: np.asfarray(x).reshape
 
 @pytest.mark.parametrize(
     "kde, bw, kernel, type_func",
-    itertools.product(
-        kdes, ["silverman", "scott", "ISJ", 0.5], ["epa", "gaussian"], type_functions
-    ),
+    itertools.product(kdes, ["silverman", "scott", "ISJ", 0.5], ["epa", "gaussian"], type_functions),
 )
 def test_api_types(kde, bw, kernel, type_func):
     """
@@ -81,10 +76,7 @@ def test_api_types(kde, bw, kernel, type_func):
 
 @pytest.mark.parametrize(
     "kde1, kde2, bw, kernel",
-    [
-        (k[0], k[1], bw, ker)
-        for (k, bw, ker) in itertools.product(kde_pairs, [0.5, 1], kernels)
-    ],
+    [(k[0], k[1], bw, ker) for (k, bw, ker) in itertools.product(kde_pairs, [0.5, 1], kernels)],
 )
 def test_api_models_kernels_bandwidths_2D(kde1, kde2, bw, kernel):
     """
@@ -125,9 +117,7 @@ def test_api_2D_data(estimator):
     # Create 2D data of shape (obs, dims)
     np.random.seed(123)
     n = 16
-    data = np.concatenate(
-        (np.random.randn(n).reshape(-1, 1), np.random.randn(n).reshape(-1, 1)), axis=1
-    )
+    data = np.concatenate((np.random.randn(n).reshape(-1, 1), np.random.randn(n).reshape(-1, 1)), axis=1)
 
     grid_points = 2 ** 5  # Grid points in each dimension
     N = 16  # Number of contours

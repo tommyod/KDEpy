@@ -127,11 +127,7 @@ class NaiveKDE(BaseKDE):
 
         # TODO: Implementation w.r.t grid points for faster evaluation
         # See the SciPy evaluation for how this can be done
-        weights = (
-            itertools.repeat(1 / self.data.shape[0])
-            if self.weights is None
-            else self.weights
-        )
+        weights = itertools.repeat(1 / self.data.shape[0]) if self.weights is None else self.weights
 
         for weight, data_point, bw in zip(weights, self.data, bw):
             x = self.grid_points - data_point

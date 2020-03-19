@@ -15,16 +15,7 @@ import itertools
 
 class TestKernelHelperFunctions:
     @pytest.mark.parametrize(
-        "dim, expected",
-        [
-            (0, 1.25331),
-            (1, 1),
-            (2, 1.25331),
-            (3, 2),
-            (4, 3.75994),
-            (5, 8),
-            (6, 18.7997),
-        ],
+        "dim, expected", [(0, 1.25331), (1, 1), (2, 1.25331), (3, 2), (4, 3.75994), (5, 8), (6, 18.7997),],
     )
     def test_gauss_integral(self, dim, expected):
         """
@@ -33,9 +24,7 @@ class TestKernelHelperFunctions:
         """
         assert np.allclose(gauss_integral(dim), expected, rtol=10e-5)
 
-    @pytest.mark.parametrize(
-        "dim, expected", [(2, (0.29454, 0.12060)), (3, (0.23032, 0.074080))]
-    )
+    @pytest.mark.parametrize("dim, expected", [(2, (0.29454, 0.12060)), (3, (0.23032, 0.074080))])
     def test_trig_integral(self, dim, expected):
         """
         Test that the results of the trig integral are equal to those obtained
@@ -45,9 +34,7 @@ class TestKernelHelperFunctions:
 
 
 class TestKernelFunctions:
-    @pytest.mark.parametrize(
-        "fname, function", list(BaseKDE._available_kernels.items())
-    )
+    @pytest.mark.parametrize("fname, function", list(BaseKDE._available_kernels.items()))
     def test_integral_unity(self, fname, function):
         """
         Verify that all available kernel functions have an integral evaluating
@@ -62,8 +49,7 @@ class TestKernelFunctions:
         assert np.isclose(integral, 1)
 
     @pytest.mark.parametrize(
-        "p, kernel_name",
-        itertools.product([0.5, 1, 1.5, 2, 13, np.inf], ["triweight", "gaussian"]),
+        "p, kernel_name", itertools.product([0.5, 1, 1.5, 2, 13, np.inf], ["triweight", "gaussian"]),
     )
     def test_integral_unity_2D_many_p_norms(self, p, kernel_name):
         """
@@ -79,9 +65,7 @@ class TestKernelFunctions:
         def int2D(x1, x2):
             return function([[x1, x2]], norm=p)
 
-        ans, err = scipy.integrate.nquad(
-            int2D, [[a, b], [a, b]], opts={"epsabs": 10e-2, "epsrel": 10e-2}
-        )
+        ans, err = scipy.integrate.nquad(int2D, [[a, b], [a, b]], opts={"epsabs": 10e-2, "epsrel": 10e-2})
 
         assert np.allclose(ans, 1, rtol=10e-4, atol=10e-4)
 
@@ -100,9 +84,7 @@ class TestKernelFunctions:
         def int2D(x1, x2, x3):
             return function([[x1, x2, x3]], norm=p)
 
-        ans, err = scipy.integrate.nquad(
-            int2D, [[a, b], [a, b], [a, b]], opts={"epsabs": 10e-1, "epsrel": 10e-1}
-        )
+        ans, err = scipy.integrate.nquad(int2D, [[a, b], [a, b], [a, b]], opts={"epsabs": 10e-1, "epsrel": 10e-1})
 
         assert np.allclose(ans, 1, rtol=10e-2, atol=10e-2)
 
@@ -110,11 +92,7 @@ class TestKernelFunctions:
         "fname, function, p",
         [
             (a[0], a[1], b)
-            for (a, b) in list(
-                itertools.product(
-                    BaseKDE._available_kernels.items(), [0.5, 1, 2, 5.5, np.inf]
-                )
-            )
+            for (a, b) in list(itertools.product(BaseKDE._available_kernels.items(), [0.5, 1, 2, 5.5, np.inf]))
         ],
     )
     def test_integral_unity_2D_p_norm(self, fname, function, p):
@@ -134,9 +112,7 @@ class TestKernelFunctions:
         def int2D(x1, x2):
             return function([[x1, x2]], norm=p)
 
-        ans, err = scipy.integrate.nquad(
-            int2D, [[a, b], [a, b]], opts={"epsabs": 10e-1, "epsrel": 10e-1}
-        )
+        ans, err = scipy.integrate.nquad(int2D, [[a, b], [a, b]], opts={"epsabs": 10e-1, "epsrel": 10e-1})
 
         assert np.allclose(ans, 1, rtol=10e-3, atol=10e-3)
 
@@ -145,11 +121,7 @@ class TestKernelFunctions:
         "fname, function, p",
         [
             (a[0], a[1], b)
-            for (a, b) in list(
-                itertools.product(
-                    BaseKDE._available_kernels.items(), [1, 2, 5.5, np.inf]
-                )
-            )
+            for (a, b) in list(itertools.product(BaseKDE._available_kernels.items(), [1, 2, 5.5, np.inf]))
         ],
     )
     def test_integral_unity_3D_p_norm(self, fname, function, p):
@@ -169,15 +141,11 @@ class TestKernelFunctions:
         def int2D(x1, x2, x3):
             return function([[x1, x2, x3]], norm=p)
 
-        ans, err = scipy.integrate.nquad(
-            int2D, [[a, b], [a, b], [a, b]], opts={"epsabs": 10e-1, "epsrel": 10e-1}
-        )
+        ans, err = scipy.integrate.nquad(int2D, [[a, b], [a, b], [a, b]], opts={"epsabs": 10e-1, "epsrel": 10e-1})
 
         assert np.allclose(ans, 1, rtol=10e-2, atol=10e-2)
 
-    @pytest.mark.parametrize(
-        "fname, function", list(BaseKDE._available_kernels.items())
-    )
+    @pytest.mark.parametrize("fname, function", list(BaseKDE._available_kernels.items()))
     def test_monotonic_decreasing(self, fname, function):
         """
         Verify that all available kernel functions decrease away from 0.
@@ -193,9 +161,7 @@ class TestKernelFunctions:
         assert np.all(diffs_right <= 0)
         assert np.all(diffs_left >= 0)
 
-    @pytest.mark.parametrize(
-        "fname, function", list(BaseKDE._available_kernels.items())
-    )
+    @pytest.mark.parametrize("fname, function", list(BaseKDE._available_kernels.items()))
     def test_non_negative(self, fname, function):
         """
         Verify that all available kernel functions are non-negative.

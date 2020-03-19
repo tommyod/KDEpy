@@ -20,9 +20,7 @@ class TestGridSorted:
         grid_size = 20
         min_X = np.array([-2.6, -4.0])
         max_X = np.array([3.2, 7.7])
-        grid_margins = tuple(
-            np.linspace(mn, mx, grid_size) for mn, mx in zip(min_X, max_X)
-        )
+        grid_margins = tuple(np.linspace(mn, mx, grid_size) for mn, mx in zip(min_X, max_X))
         grid = np.stack(np.meshgrid(*grid_margins), -1).reshape(-1, len(grid_margins))
         assert not grid_is_sorted(grid)
 
@@ -52,17 +50,13 @@ class TestGridSorted:
         import KDEpy
 
         # Create bimodal 2D data
-        data = np.vstack(
-            (np.random.randn(2 ** 8, 2), np.random.randn(2 ** 8, 2) + (0, 5))
-        )
+        data = np.vstack((np.random.randn(2 ** 8, 2), np.random.randn(2 ** 8, 2) + (0, 5)))
 
         # Create 2D grid
         grid_size = 20
         min_X = np.min(data, axis=0) - 0.1
         max_X = np.max(data, axis=0) + 0.1
-        grid_margins = tuple(
-            np.linspace(mn, mx, grid_size) for mn, mx in zip(min_X, max_X)
-        )
+        grid_margins = tuple(np.linspace(mn, mx, grid_size) for mn, mx in zip(min_X, max_X))
         grid = np.stack(np.meshgrid(*grid_margins), -1).reshape(-1, len(grid_margins))
 
         # density estimates
@@ -77,10 +71,7 @@ class TestGridSorted:
         grid = np.array([[0], [0], [0], [1], [1], [1], [2], [2], [2]], dtype=float)
         assert grid_is_sorted(grid)
 
-        grid = np.array(
-            [[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]],
-            dtype=float,
-        )
+        grid = np.array([[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]], dtype=float,)
         assert grid_is_sorted(grid)
 
         grid = np.array([[1, 1], [2, 2], [3, 3]], dtype=float)
@@ -309,10 +300,7 @@ class TestGridSorted:
         grid = np.array([[0], [0], [2], [1], [1], [1], [2], [2], [2]], dtype=float)
         assert not grid_is_sorted(grid)
 
-        grid = np.array(
-            [[0, 0], [0, 1], [0, 2], [1, 0], [1, 2], [1, 1], [2, 0], [2, 1], [2, 2]],
-            dtype=float,
-        )
+        grid = np.array([[0, 0], [0, 1], [0, 2], [1, 0], [1, 2], [1, 1], [2, 0], [2, 1], [2, 2]], dtype=float,)
         assert not grid_is_sorted(grid)
 
         grid = np.array([[1, 1], [3, 3], [2, 2]], dtype=float)
