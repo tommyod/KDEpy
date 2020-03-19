@@ -25,7 +25,7 @@ If you have [trouble on Ubuntu](https://github.com/tommyod/KDEpy/issues/11), try
 
 ## Example code and documentation
 
-Below is an example using NumPy as `np` and `scipy.stats.norm` to plot a density estimate.
+Below is an example showing an unweighted and weighted kernel density.
 From the code below, it should be clear how to set the *kernel*, *bandwidth* (variance of the kernel) and *weights*.
 See the [documentation](https://kdepy.readthedocs.io/en/latest/examples.html) for more examples.
 
@@ -36,7 +36,7 @@ import matplotlib.pyplot as plt
 customer_ages = [40, 56, 20, 35, 27, 24, 29, 37, 39, 46]
 
 # Distribution of customers
-x, y = FFTKDE(bw="silverman").fit(customer_ages).evaluate()
+x, y = FFTKDE(kernel="gaussian", bw="silverman").fit(customer_ages).evaluate()
 plt.plot(x, y)
 
 # Distribution of customer income (weight each customer by their income)

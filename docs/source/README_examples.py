@@ -13,7 +13,7 @@ if __name__ == "__main__":
     customer_ages = [40, 56, 20, 35, 27, 24, 29, 37, 39, 46]
 
     # Distribution of customers
-    x, y = FFTKDE(bw="silverman").fit(customer_ages).evaluate()
+    x, y = FFTKDE(kernel="gaussian", bw="silverman").fit(customer_ages).evaluate()
     plt.plot(x, y)
 
     # Distribution of customer income (weight each customer by their income)
