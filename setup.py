@@ -52,15 +52,15 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/tommyod/KDEpy",
     author="tommyod",
-    author_email="tod001@uib.no",
+    author_email="tommy.odland@gmail.com",
     license="GNU GPLv3",
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
     ],
     packages=["KDEpy"],
     install_requires=["numpy>=1.14.2", "scipy>=1.0.1", "matplotlib>=2.2.0"],

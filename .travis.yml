@@ -37,7 +37,7 @@ matrix:
 # The remaining 2 are set to assure Python 3 is used on OS X (mac)
 env:
   global:
-    - CIBW_SKIP="cp27-* cp33-* cp34-* cp38-*"
+    - CIBW_SKIP="cp27-* cp33-* cp34-* cp35-*"
     - CIBW_TEST_REQUIRES=pytest
     - CIBW_TEST_COMMAND="python3 -m pytest {project}/KDEpy --doctest-modules"
     - PIP=pip3
