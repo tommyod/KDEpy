@@ -31,12 +31,22 @@ See the [documentation](https://kdepy.readthedocs.io/en/latest/examples.html) fo
 
 ```python
 from KDEpy import FFTKDE
-data = norm(loc=0, scale=1).rvs(2**3)
-estimator = FFTKDE(kernel='gaussian', bw='silverman')
-x, y = estimator.fit(data, weights=None).evaluate()
-plt.plot(x, y, label='KDE estimate')
+import matplotlib.pyplot as plt
+
+customer_ages = [40, 56, 20, 35, 27, 24, 29, 37, 39, 46]
+
+# Distribution of customers
+x, y = FFTKDE(bw="silverman").fit(customer_ages).evaluate()
+plt.plot(x, y)
+
+# Distribution of customer income (weight each customer by their income)
+customer_income = [152, 64, 24, 140, 88, 64, 103, 148, 150, 132]
+
+# The `bw` parameter can be manually set, e.g. `bw=5`
+x, y = FFTKDE(bw="silverman").fit(customer_ages, weights=customer_income).evaluate()
+plt.plot(x, y)
 ```
-![Plot](./docs/source/_static/img/mwe.png)
+![Plot](./docs/source/_static/img/README_example.png)
 
 The package consists of three algorithms. Here's a brief explanation:
 - [`NaiveKDE`](https://kdepy.readthedocs.io/en/latest/API.html#naivekde) - A naive computation. Supports d-dimensional data, variable bandwidth, weighted data and many kernel functions. Very slow on large data sets.
@@ -54,6 +64,7 @@ If you are having trouble using the package, please let me know by creating an [
 Whatever your mathematical and Python background is, you are very welcome to contribute to KDEpy.
 To contribute, fork the project, create a branch and submit and Pull Request.
 Please follow these guidelines:
+
 - Import as few external dependencies as possible.
 - Use test driven development, have tests and docs for every method.
 - Cite literature and implement recent methods.
