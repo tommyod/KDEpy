@@ -60,11 +60,7 @@ def _fixed_point(t, N, I_sq, a2):
     ell = 7
 
     # Fast evaluation of |f^l|^2 using the DCT, see Plancherel theorem
-    f = (
-        2
-        * np.pi ** (2 * ell)
-        * np.sum(np.power(I_sq, ell) * a2 * np.exp(-I_sq * np.pi ** 2 * t))
-    )
+    f = 2 * np.pi ** (2 * ell) * np.sum(np.power(I_sq, ell) * a2 * np.exp(-I_sq * np.pi ** 2 * t))
 
     # Norm of a function, should never be negative
     if f <= 0:
@@ -80,11 +76,7 @@ def _fixed_point(t, N, I_sq, a2):
         time = np.power((2 * const * K0 / (N * f)), (2.0 / (3.0 + 2.0 * s)))
 
         # Step two: estimate |f^s| from t_s
-        f = (
-            2
-            * np.pi ** (2 * s)
-            * np.sum(np.power(I_sq, s) * a2 * np.exp(-I_sq * np.pi ** 2 * time))
-        )
+        f = 2 * np.pi ** (2 * s) * np.sum(np.power(I_sq, s) * a2 * np.exp(-I_sq * np.pi ** 2 * time))
 
     # This is the minimizer of the AMISE
     t_opt = np.power(2 * N * np.sqrt(np.pi) * f, -2.0 / 5)
@@ -261,9 +253,7 @@ def silvermans_rule(data):
         return sigma * (obs * 3 / 4.0) ** (-1 / 5)
     else:
         # stats.norm.ppf(.99) - stats.norm.ppf(.01) = 4.6526957480816815
-        IQR = (
-            np.percentile(data, q=99) - np.percentile(data, q=1)
-        ) / 4.6526957480816815
+        IQR = (np.percentile(data, q=99) - np.percentile(data, q=1)) / 4.6526957480816815
         if IQR > 0:
             bw = IQR * (obs * 3 / 4.0) ** (-1 / 5)
             warnings.warn(
@@ -275,9 +265,7 @@ Setting bw = {}".format(
             return bw
 
         # Here, all values are basically constant
-        warnings.warn(
-            "Silverman's rule failed. Too many idential values. Setting bw = 1.0"
-        )
+        warnings.warn("Silverman's rule failed. Too many idential values. Setting bw = 1.0")
         return 1.0
 
 

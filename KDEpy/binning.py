@@ -192,9 +192,7 @@ def linbin_numpy(data, grid_points, weights=None):
     # If the data is not a subset of the grid, the integral values will be
     # outside of the grid. To solve the problem, we filter these values away
     unique_integrals = np.unique(integral)
-    unique_integrals = unique_integrals[
-        (unique_integrals >= 0) & (unique_integrals <= len(grid_points))
-    ]
+    unique_integrals = unique_integrals[(unique_integrals >= 0) & (unique_integrals <= len(grid_points))]
 
     result = np.asfarray(np.zeros(len(grid_points) + 1))
     for grid_point in unique_integrals:
@@ -270,10 +268,7 @@ def linbin_Ndim_python(data, grid_points, weights=None):
         # Compute integer part and fractional part for every x_i
         # Compute relation to previous grid point, and next grid point
         int_frac = (
-            (
-                (int(coordinate), 1 - (coordinate % 1)),
-                (int(coordinate) + 1, (coordinate % 1)),
-            )
+            ((int(coordinate), 1 - (coordinate % 1)), (int(coordinate) + 1, (coordinate % 1)),)
             for coordinate in observation
         )
 
@@ -359,13 +354,9 @@ def linbin_Ndim(data, grid_points, weights=None):
     if weights is not None:
         if data_dims >= 3:
             binary_flgs = cartesian(([0, 1],) * dims)
-            result = cutils.iterate_data_ND_weighted(
-                data, weights, result, grid_num, obs_tot, binary_flgs
-            )
+            result = cutils.iterate_data_ND_weighted(data, weights, result, grid_num, obs_tot, binary_flgs)
         else:
-            result = cutils.iterate_data_2D_weighted(
-                data, weights, result, grid_num, obs_tot
-            )
+            result = cutils.iterate_data_2D_weighted(data, weights, result, grid_num, obs_tot)
         result = np.asarray_chkfinite(result, dtype=np.float)
 
     # Unweighted data has two specific routines too. This is because creating
@@ -374,9 +365,7 @@ def linbin_Ndim(data, grid_points, weights=None):
     else:
         if data_dims >= 3:
             binary_flgs = cartesian(([0, 1],) * dims)
-            result = cutils.iterate_data_ND(
-                data, result, grid_num, obs_tot, binary_flgs
-            )
+            result = cutils.iterate_data_ND(data, result, grid_num, obs_tot, binary_flgs)
         else:
             result = cutils.iterate_data_2D(data, result, grid_num, obs_tot)
         result = np.asarray_chkfinite(result, dtype=np.float)

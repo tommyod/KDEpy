@@ -157,9 +157,7 @@ class TreeKDE(BaseKDE):
             # TODO: Is this epsilon value sensible?
             # Scipy 1.3.0 introduced error: ValueError: ndarray is not C-contiguous
             grid_point = np.ascontiguousarray(grid_point)
-            indices = tree.query_ball_point(
-                x=grid_point, r=kernel_radius, p=self.norm, eps=eps * obs ** 0.5
-            )
+            indices = tree.query_ball_point(x=grid_point, r=kernel_radius, p=self.norm, eps=eps * obs ** 0.5)
 
             # Use broadcasting to find x-values (distances)
             x = grid_point - self.data[indices]

@@ -44,9 +44,7 @@ def test_vs_simple_weighted(est1, est2):
     assert np.sqrt(np.mean((y1 - y2) ** 2)) < 0.0001
 
 
-@pytest.mark.parametrize(
-    "estimators, kernel, bw", list(itertools.product(estimators_2, kernels, [0.1, 5]))
-)
+@pytest.mark.parametrize("estimators, kernel, bw", list(itertools.product(estimators_2, kernels, [0.1, 5])))
 def test_vs_simple_weighted_kernels(estimators, kernel, bw):
     """
     Test every kernel function over every implementation.

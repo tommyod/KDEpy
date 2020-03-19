@@ -156,15 +156,11 @@ class FFTKDE(BaseKDE):
 
         # Step 1 - Obtaining the grid counts
         # TODO: Consider moving this to the fitting phase instead
-        data = linear_binning(
-            self.data, grid_points=self.grid_points, weights=self.weights
-        )
+        data = linear_binning(self.data, grid_points=self.grid_points, weights=self.weights)
 
         # Step 2 - Computing kernel weights
         g_shape = self.grid_points.shape[1]
-        num_grid_points = np.array(
-            list(len(np.unique(self.grid_points[:, i])) for i in range(g_shape))
-        )
+        num_grid_points = np.array(list(len(np.unique(self.grid_points[:, i])) for i in range(g_shape)))
 
         num_intervals = num_grid_points - 1
         dx = (max_grid - min_grid) / num_intervals
