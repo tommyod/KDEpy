@@ -47,7 +47,7 @@ customer_income = [152, 64, 24, 140, 88, 64, 103, 148, 150, 132]
 x, y = FFTKDE(bw="silverman").fit(customer_ages, weights=customer_income).evaluate()
 plt.plot(x, y)
 ```
-![Plot](./docs/source/_static/img/README_example.png)
+![Plot](https://raw.githubusercontent.com/tommyod/KDEpy/master/docs/source/_static/img/README_example.png)
 
 The package consists of three algorithms. Here's a brief explanation:
 - [`NaiveKDE`](https://kdepy.readthedocs.io/en/latest/API.html#naivekde) - A naive computation. Supports d-dimensional data, variable bandwidth, weighted data and many kernel functions. Very slow on large data sets.
