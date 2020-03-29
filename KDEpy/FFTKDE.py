@@ -31,7 +31,7 @@ class FFTKDE(BaseKDE):
     See references for more information.
 
     The implementation is reminiscent of the one found in statsmodels. However,
-    ulike the statsmodels implementation every kernel is available for FFT
+    unlike the statsmodels implementation every kernel is available for FFT
     computation, weighted data is available for FFT computation, and no large
     temporary arrays are created.
 
