@@ -97,7 +97,7 @@ Boundary correction using mirroring
 
 If the domain is bounded (e.g. :math:`\mathbb{R}_+`) and you expect observations to fall near the boundary, a KDE might put density outside of the domain.
 Mirroring the data about the boundary is an elementary way to reduce this unfortunate effect.
-If :math:`\hat{g}(x)` is the original KDE, then :math:`\hat{g}_*(x)=\hat{g}(x-2a)` is the KDE obtained when mirroring the data about :math:`x=a`.
+If :math:`\hat{g}(x)` is the original KDE, then :math:`\hat{g}_*(x)=\hat{g}(2a-x)` is the KDE obtained when mirroring the data about :math:`x=a`.
 Note that at the boundary :math:`a`, the derivative of the final estimate :math:`\hat{f}(x)` is zero, since
 
 .. math::
