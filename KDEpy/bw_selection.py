@@ -41,10 +41,10 @@ def _fixed_point(t, N, I_sq, a2):
     --------
     >>> # From the matlab code
     >>> ans = _fixed_point(0.01, 50, np.arange(1, 51), np.arange(1, 51))
-    >>> assert np.allclose(ans, 0.009947962622371)
+    >>> assert np.allclose(ans, 0.0099076220293967618515)
     >>> # another
     >>> ans = _fixed_point(0.07, 25, np.arange(1, 11), np.arange(1, 11))
-    >>> assert np.allclose(ans, 0.069100181315957)
+    >>> assert np.allclose(ans, 0.068342291525717486795)
 
     References
     ----------
