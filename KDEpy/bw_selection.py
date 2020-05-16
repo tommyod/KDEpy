@@ -41,10 +41,10 @@ def _fixed_point(t, N, I_sq, a2):
     --------
     >>> # From the matlab code
     >>> ans = _fixed_point(0.01, 50, np.arange(1, 51), np.arange(1, 51))
-    >>> assert np.allclose(ans, 0.009947962622371)
+    >>> assert np.allclose(ans, 0.0099076220293967618515)
     >>> # another
     >>> ans = _fixed_point(0.07, 25, np.arange(1, 11), np.arange(1, 11))
-    >>> assert np.allclose(ans, 0.069100181315957)
+    >>> assert np.allclose(ans, 0.068342291525717486795)
 
     References
     ----------
@@ -60,7 +60,7 @@ def _fixed_point(t, N, I_sq, a2):
     ell = 7
 
     # Fast evaluation of |f^l|^2 using the DCT, see Plancherel theorem
-    f = 2 * np.pi ** (2 * ell) * np.sum(np.power(I_sq, ell) * a2 * np.exp(-I_sq * np.pi ** 2 * t))
+    f = (0.5) * np.pi ** (2 * ell) * np.sum(np.power(I_sq, ell) * a2 * np.exp(-I_sq * np.pi ** 2 * t))
 
     # Norm of a function, should never be negative
     if f <= 0:
@@ -76,7 +76,7 @@ def _fixed_point(t, N, I_sq, a2):
         time = np.power((2 * const * K0 / (N * f)), (2.0 / (3.0 + 2.0 * s)))
 
         # Step two: estimate |f^s| from t_s
-        f = 2 * np.pi ** (2 * s) * np.sum(np.power(I_sq, s) * a2 * np.exp(-I_sq * np.pi ** 2 * time))
+        f = (0.5) * np.pi ** (2 * s) * np.sum(np.power(I_sq, s) * a2 * np.exp(-I_sq * np.pi ** 2 * time))
 
     # This is the minimizer of the AMISE
     t_opt = np.power(2 * N * np.sqrt(np.pi) * f, -2.0 / 5)
@@ -92,7 +92,7 @@ def _root(function, N, args):
     >>> # From the matlab code
     >>> ints = np.arange(1, 51)
     >>> ans = _root(_fixed_point, N=50, args=(50, ints, ints))
-    >>> np.allclose(ans, 5.203713947289470e-05)
+    >>> np.allclose(ans, 9.237610787616029e-05)
     True
     """
     # From the implementation by Botev, the original paper author
