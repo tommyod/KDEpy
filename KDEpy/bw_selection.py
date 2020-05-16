@@ -92,7 +92,7 @@ def _root(function, N, args):
     >>> # From the matlab code
     >>> ints = np.arange(1, 51)
     >>> ans = _root(_fixed_point, N=50, args=(50, ints, ints))
-    >>> np.allclose(ans, 5.203713947289470e-05)
+    >>> np.allclose(ans, 9.237610787616029e-05)
     True
     """
     # From the implementation by Botev, the original paper author
