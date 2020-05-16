@@ -60,7 +60,7 @@ def _fixed_point(t, N, I_sq, a2):
     ell = 7
 
     # Fast evaluation of |f^l|^2 using the DCT, see Plancherel theorem
-    f = 2 * np.pi ** (2 * ell) * np.sum(np.power(I_sq, ell) * a2 * np.exp(-I_sq * np.pi ** 2 * t))
+    f = (0.5) * np.pi ** (2 * ell) * np.sum(np.power(I_sq, ell) * a2 * np.exp(-I_sq * np.pi ** 2 * t))
 
     # Norm of a function, should never be negative
     if f <= 0:
@@ -76,7 +76,7 @@ def _fixed_point(t, N, I_sq, a2):
         time = np.power((2 * const * K0 / (N * f)), (2.0 / (3.0 + 2.0 * s)))
 
         # Step two: estimate |f^s| from t_s
-        f = 2 * np.pi ** (2 * s) * np.sum(np.power(I_sq, s) * a2 * np.exp(-I_sq * np.pi ** 2 * time))
+        f = (0.5) * np.pi ** (2 * s) * np.sum(np.power(I_sq, s) * a2 * np.exp(-I_sq * np.pi ** 2 * time))
 
     # This is the minimizer of the AMISE
     t_opt = np.power(2 * N * np.sqrt(np.pi) * f, -2.0 / 5)
