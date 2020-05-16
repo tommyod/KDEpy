@@ -27,11 +27,11 @@ class FFTKDE(BaseKDE):
     of the kernel evaluation and the binned data is convolved. Using the
     convolution theorem, this step runs in :math:`O(n \log n)` time.
     While :math:`N` may be millions, :math:`n` is typically 2**10. The total
-    running time of the algorithm is :math:`O(N d^2 + n \log n)`.
+    running time of the algorithm is :math:`O(N 2^d + n \log n)`.
     See references for more information.
 
     The implementation is reminiscent of the one found in statsmodels. However,
-    ulike the statsmodels implementation every kernel is available for FFT
+    unlike the statsmodels implementation every kernel is available for FFT
     computation, weighted data is available for FFT computation, and no large
     temporary arrays are created.
 
