@@ -12,7 +12,7 @@ class TestGridSorted:
     def test_regression_issue_grids(self):
         """
         This test is based on Issue 15, raised by @blasern.
-        
+
         https://github.com/tommyod/KDEpy/issues/15
         """
 
@@ -42,7 +42,7 @@ class TestGridSorted:
     def test_regression_issue_code(self):
         """
         This test is based on Issue 15, raised by @blasern. Tests the full code.
-        
+
         https://github.com/tommyod/KDEpy/issues/15
         """
         # imports
@@ -71,7 +71,10 @@ class TestGridSorted:
         grid = np.array([[0], [0], [0], [1], [1], [1], [2], [2], [2]], dtype=float)
         assert grid_is_sorted(grid)
 
-        grid = np.array([[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]], dtype=float,)
+        grid = np.array(
+            [[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]],
+            dtype=float,
+        )
         assert grid_is_sorted(grid)
 
         grid = np.array([[1, 1], [2, 2], [3, 3]], dtype=float)
@@ -300,7 +303,10 @@ class TestGridSorted:
         grid = np.array([[0], [0], [2], [1], [1], [1], [2], [2], [2]], dtype=float)
         assert not grid_is_sorted(grid)
 
-        grid = np.array([[0, 0], [0, 1], [0, 2], [1, 0], [1, 2], [1, 1], [2, 0], [2, 1], [2, 2]], dtype=float,)
+        grid = np.array(
+            [[0, 0], [0, 1], [0, 2], [1, 0], [1, 2], [1, 1], [2, 0], [2, 1], [2, 2]],
+            dtype=float,
+        )
         assert not grid_is_sorted(grid)
 
         grid = np.array([[1, 1], [3, 3], [2, 2]], dtype=float)
