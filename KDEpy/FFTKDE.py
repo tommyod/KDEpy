@@ -64,7 +64,7 @@ class FFTKDE(BaseKDE):
       London ; New York: Chapman and Hall/CRC, 1995. Pages 182-192.
     - Statsmodels implementation, at
       ``statsmodels.nonparametric.kde.KDEUnivariate``.
-      
+
     """
 
     def __init__(self, kernel="gaussian", bw=1, norm=2):

@@ -15,7 +15,16 @@ import itertools
 
 class TestKernelHelperFunctions:
     @pytest.mark.parametrize(
-        "dim, expected", [(0, 1.25331), (1, 1), (2, 1.25331), (3, 2), (4, 3.75994), (5, 8), (6, 18.7997),],
+        "dim, expected",
+        [
+            (0, 1.25331),
+            (1, 1),
+            (2, 1.25331),
+            (3, 2),
+            (4, 3.75994),
+            (5, 8),
+            (6, 18.7997),
+        ],
     )
     def test_gauss_integral(self, dim, expected):
         """
@@ -49,7 +58,8 @@ class TestKernelFunctions:
         assert np.isclose(integral, 1)
 
     @pytest.mark.parametrize(
-        "p, kernel_name", itertools.product([0.5, 1, 1.5, 2, 13, np.inf], ["triweight", "gaussian"]),
+        "p, kernel_name",
+        itertools.product([0.5, 1, 1.5, 2, 13, np.inf], ["triweight", "gaussian"]),
     )
     def test_integral_unity_2D_many_p_norms(self, p, kernel_name):
         """
