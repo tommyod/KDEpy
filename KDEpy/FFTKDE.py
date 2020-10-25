@@ -48,7 +48,7 @@ class FFTKDE(BaseKDE):
     Examples
     --------
     >>> data = np.random.randn(2**10)
-    >>> # (1) Automatic bw selection using Improved Sheather Jones
+    >>> # (1) Automatic bw selection using Improved Sheather Jones (ISJ)
     >>> x, y = FFTKDE(bw='ISJ').fit(data).evaluate()
     >>> # (2) Explicit choice of kernel and bw (standard deviation of kernel)
     >>> x, y = FFTKDE(kernel='triweight', bw=0.5).fit(data).evaluate()
@@ -95,7 +95,7 @@ class FFTKDE(BaseKDE):
         >>> weights = [3, 4, 2, 1]
         >>> kde = FFTKDE().fit(data, weights=None)
         >>> kde = FFTKDE().fit(data, weights=weights)
-        >>> x, y = kde()
+        >>> x, y = kde.evaluate()
         """
 
         # Sets self.data
@@ -124,12 +124,12 @@ class FFTKDE(BaseKDE):
         Examples
         --------
         >>> kde = FFTKDE().fit([1, 3, 4, 7])
-        >>> # Three ways to evaluated:
+        >>> # Three ways to evaluate a fitted KDE object:
         >>> x, y = kde.evaluate()  # (1) Auto grid
         >>> x, y = kde.evaluate(256)  # (2) Auto grid with 256 points
         >>> # (3) Use a custom grid (make sure it's wider than the data)
-        >>> x_grid = np.linspace(-10, 25, num=2**10)
-        >>> y = kde.evaluate(x_grid)
+        >>> x_grid = np.linspace(-10, 25, num=2**10)  # <- Must be equidistant
+        >>> y = kde.evaluate(x_grid)  # Notice that only y is returned
         """
 
         # This method sets self.grid_points and verifies it
