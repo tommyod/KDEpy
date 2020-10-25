@@ -124,10 +124,12 @@ class FFTKDE(BaseKDE):
         Examples
         --------
         >>> kde = FFTKDE().fit([1, 3, 4, 7])
-        >>> # Two ways to evaluate, either with a grid or without
-        >>> x, y = kde.evaluate()
-        >>> x, y = kde.evaluate(256)
-        >>> y = kde.evaluate(x)
+        >>> # Three ways to evaluated:
+        >>> x, y = kde.evaluate()  # (1) Auto grid
+        >>> x, y = kde.evaluate(256)  # (2) Auto grid with 256 points
+        >>> # (3) Use a custom grid (make sure it's wider than the data)
+        >>> x_grid = np.linspace(-10, 25, num=2**10)
+        >>> y = kde.evaluate(x_grid)
         """
 
         # This method sets self.grid_points and verifies it
