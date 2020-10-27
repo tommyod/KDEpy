@@ -184,7 +184,34 @@ class TestKernelFunctions:
         y = function(x)
         assert np.all(y >= 0)
 
+    @pytest.mark.parametrize("fname, function", list(BaseKDE._available_kernels.items()))
+    def test_standard_deviation_equals_one(self, fname, function):
+        """
+        Verify that the standard devaiation equals unity on a single data point.
+        """
+
+        if function.finite_support:
+            a, b = -function.support, function.support
+        else:
+            a, b = -10, 10
+
+        x = np.linspace(a, b, num=2 ** 14)
+
+        # Scale so that standard deviation should be 10 instead of one
+        # Since 1**1 = 1, but 10**2 = 100
+        DESIRED_STD = 10
+        y = function(x) / DESIRED_STD
+        x = x * DESIRED_STD
+
+        # Find the std: sqrt(integral(  f(x) [x - E[f(x)]]  dx))
+        zeroth_moment = 0
+        dx = x[1] - x[0]
+        second_moment = np.sum(dx * y * (x - zeroth_moment) ** 2)
+        standard_deviation = np.sqrt(second_moment)
+
+        assert np.allclose(standard_deviation, DESIRED_STD, rtol=1e-03)
+
 
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
-    pytest.main(args=[__file__, "--doctest-modules", "-v", "--durations=15"])
+    pytest.main(args=[__file__, "--doctest-modules", "-v", "--durations=15", "-k test_standard_deviation_equals_one"])
