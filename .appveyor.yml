@@ -31,8 +31,8 @@ build_script:
   - pip install -r requirements.txt
   - python setup.py develop
   - pip install --upgrade cibuildwheel wheel
-  - "echo $env:APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH"
-  - "echo $env:APPVEYOR_REPO_BRANCH"
+  - echo $env:APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH
+  - echo $env:APPVEYOR_REPO_BRANCH
 
 
 # Run the tests (but linting is done on Travis)
