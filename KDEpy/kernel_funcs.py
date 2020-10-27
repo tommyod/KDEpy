@@ -326,7 +326,7 @@ class Kernel(collections.abc.Callable):
 
 
 gaussian = Kernel(gaussian, var=1, support=np.inf)
-exp = Kernel(exponential, var=4, support=np.inf)
+exp = Kernel(exponential, var=2, support=np.inf)
 box = Kernel(box, var=1 / 3, support=1)
 tri = Kernel(tri, var=1 / 6, support=1)
 epa = Kernel(epanechnikov, var=1 / 5, support=1)

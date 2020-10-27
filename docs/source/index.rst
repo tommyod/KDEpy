@@ -7,9 +7,6 @@ This Python 3.5+ package implements various Kernel Density Estimators (KDE).
 Three algorithms are implemented through the same API: :class:`~KDEpy.NaiveKDE.NaiveKDE`, :class:`~KDEpy.TreeKDE.TreeKDE` and :class:`~KDEpy.FFTKDE.FFTKDE`.
 The :class:`~KDEpy.FFTKDE.FFTKDE` outperforms other popular implementations, see the `comparison page <comparison.rst>`_.
 
-.. note:: If you have feedback, please report an `Issue <https://github.com/tommyod/KDEpy/issues>`_ on GitHub.
-   Contributions to code and documentation is welcome.
-
 
 .. image:: _static/img/showcase.png
    :target: #
@@ -42,7 +39,7 @@ The other classes share this common API of instantiating, fitting and finally ev
    data = dist.rvs(2**6)
 
    # Compute kernel density estimate on a grid using Silverman's rule for bw
-   x, y1 = FFTKDE().fit(data)(2**10)
+   x, y1 = FFTKDE(bw="silverman").fit(data).evaluate(2**10)
 
    # Compute a weighted estimate on the same grid, using verbose API
    weights = np.arange(len(data)) + 1

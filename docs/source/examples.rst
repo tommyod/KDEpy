@@ -12,10 +12,11 @@ This *minimal working example* shows how to compute a KDE in one line of code.
     from KDEpy import FFTKDE
     data = np.random.randn(2**6)
 
-    # Notice how bw (variance), kernel, weights and grid points are set
+    # Notice how bw (standard deviation), kernel, weights and grid points are set
     x, y = FFTKDE(bw=1, kernel='gaussian').fit(data, weights=None).evaluate(2**8)
 
     plt.plot(x, y); plt.tight_layout()
+
 
 Three kernels in 1D
 -------------------
@@ -59,6 +60,43 @@ A *weight* :math:`w_i` may be associated with every data point :math:`x_i`.
 
     plt.title('Weighted and unweighted KDE')
     plt.tight_layout(); plt.legend(loc='best');
+    
+    
+    
+Resampling from the distribution
+--------------------------------
+
+Resampling data from the fitted KDE is equivalent to (1) first resampling the
+original data (with replacement), then (2) adding noise drawn from the same
+probability density as the kernel function in the KDE. Below an example is shown.
+
+
+.. plot::
+   :include-source:
+
+    from KDEpy import FFTKDE
+    from KDEpy.bw_selection import silvermans_rule, improved_sheather_jones
+    
+    # Get the standard deviation of the kernel functions    
+    data = np.array([3.1, 5.2, 6.9, 7.9, 8.5, 11.3, 11.5, 11.5, 11.5, 15.5])
+    # Silverman assumes normality of data - use ISJ with much data instead
+    kernel_std = silvermans_rule(data.reshape(-1, 1))  # Shape (obs, dims)
+    
+    # (1) First resample original data, then (2) add noise from kernel
+    size = 50
+    resampled_data = np.random.choice(data, size=size, replace=True)
+    resampled_data = resampled_data + np.random.randn(size) * kernel_std
+    
+    # Plot the results
+    plt.scatter(data, np.zeros_like(data), marker='|', label="Original data")
+    plt.scatter(resampled_data, np.ones_like(resampled_data) * 0.01, 
+                marker='|', label="Resampled from KDE")
+    x, y = FFTKDE(kernel="gaussian", bw="silverman").fit(data).evaluate()
+    plt.plot(x, y, label="FFTKDE with Silverman's rule")
+    plt.title('Weighted and unweighted KDE')
+    plt.tight_layout(); plt.legend(loc='upper left');
+    
+
 
 
 Multimodal distributions
@@ -262,6 +300,38 @@ Extensions to model the conditional variance :math:`\operatorname{var}[y | x]` a
     plt.plot(x, y_pred, zorder=25, label='Kernel regression esimate')
     
     plt.legend(); plt.tight_layout()
+    
+    
+Fast evaluation on a non-equidistant grid
+-----------------------------------------
+
+For plotting and in most computations, an equidistant grid is exactly what we want.
+To evaluate the :class:`~KDEpy.FFTKDE.FFTKDE` on an arbitrary grid, we can make use of scipy.
+
+
+.. plot::
+   :include-source:
+
+    from KDEpy import FFTKDE
+    from scipy.interpolate import interp1d
+    
+    data = [-0.7, -0.2, -0.2, -0.0, 0.0, 0.1, 0.8, 1.1, 1.2, 1.4]
+    x, y = FFTKDE(bw="silverman").fit(data).evaluate()
+    
+    # Use scipy to interplate and evaluate on arbitrary grid
+    x_grid = np.array([-2.5, -2, -1, 0, 0.5, 1, 1.5, 1.75, 2, 2.25, 2.5])
+    f = interp1d(x, y, kind="linear", assume_sorted=True)
+    y_grid = f(x_grid)
+    
+    # Plot the resulting KDEs
+    plt.scatter(data, np.zeros_like(data), marker='|', label="Data")
+    plt.plot(x, y, label="KDE on equidistant grid")
+    plt.plot(x_grid, y_grid, '-o', label="KDE on arbitrary grid")
+    plt.title('KDE on an equidistant grid by interpolation')
+    plt.tight_layout(); plt.legend(loc='upper left');
+
+    
+
     
 
 .. comment:

@@ -54,9 +54,7 @@ before_install:
     fi
   - $PYTHON --version
   - $PIP install -r requirements.txt
-  - $PIP install pep8>=1.7.1
-  - $PIP install flake8>=3.5.0
-  - $PIP install black
+  - $PIP install pep8>=1.7.1 flake8>=3.5.0 black
 
 # Install the package, create source distribution (worse alternative to wheels)
 # Run the tests.

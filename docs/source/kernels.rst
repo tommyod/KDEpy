@@ -26,7 +26,7 @@ Kernel properties
 The kernels implemented in KDEpy obey some common properties.
 
 * Normalization: :math:`\int K(x) \, dx = 1`.
-* Unit variance: :math:`\operatorname{Var}[K(x)] = 1` when the bandwidth :math:`h` is 1.
+* Unit variance: :math:`\operatorname{Var}[K(x)] = 1` when the bandwidth :math:`h` is 1. The bandwith of the each kernel equals its standard deviation.
 * Symmetry: :math:`K(-x) = K(x)` for every :math:`x`.
 
 Kernels are radial basis functions
