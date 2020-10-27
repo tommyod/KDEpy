@@ -17,6 +17,7 @@ This *minimal working example* shows how to compute a KDE in one line of code.
 
     plt.plot(x, y); plt.tight_layout()
 
+
 Three kernels in 1D
 -------------------
 
@@ -299,6 +300,38 @@ Extensions to model the conditional variance :math:`\operatorname{var}[y | x]` a
     plt.plot(x, y_pred, zorder=25, label='Kernel regression esimate')
     
     plt.legend(); plt.tight_layout()
+    
+    
+Fast evaluation on a non-equidistant grid
+-----------------------------------------
+
+For plotting and in most computations, an equidistant grid is exactly what we want.
+To evaluate the :class:`~KDEpy.FFTKDE.FFTKDE` on an arbitrary grid, we can make use of scipy.
+
+
+.. plot::
+   :include-source:
+
+    from KDEpy import FFTKDE
+    from scipy.interpolate import interp1d
+    
+    data = [-0.7, -0.2, -0.2, -0.0, 0.0, 0.1, 0.8, 1.1, 1.2, 1.4]
+    x, y = FFTKDE(bw="silverman").fit(data).evaluate()
+    
+    # Use scipy to interplate and evaluate on arbitrary grid
+    x_grid = np.array([-2.5, -2, -1, 0, 0.5, 1, 1.5, 1.75, 2, 2.25, 2.5])
+    f = interp1d(x, y, kind="linear", assume_sorted=True)
+    y_grid = f(x_grid)
+    
+    # Plot the resulting KDEs
+    plt.scatter(data, np.zeros_like(data), marker='|', label="Data")
+    plt.plot(x, y, label="KDE on equidistant grid")
+    plt.plot(x_grid, y_grid, '-o', label="KDE on arbitrary grid")
+    plt.title('KDE on an equidistant grid by interpolation')
+    plt.tight_layout(); plt.legend(loc='upper left');
+
+    
+
     
 
 .. comment:
