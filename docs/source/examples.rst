@@ -12,7 +12,7 @@ This *minimal working example* shows how to compute a KDE in one line of code.
     from KDEpy import FFTKDE
     data = np.random.randn(2**6)
 
-    # Notice how bw (variance), kernel, weights and grid points are set
+    # Notice how bw (standard deviation), kernel, weights and grid points are set
     x, y = FFTKDE(bw=1, kernel='gaussian').fit(data, weights=None).evaluate(2**8)
 
     plt.plot(x, y); plt.tight_layout()
@@ -59,6 +59,43 @@ A *weight* :math:`w_i` may be associated with every data point :math:`x_i`.
 
     plt.title('Weighted and unweighted KDE')
     plt.tight_layout(); plt.legend(loc='best');
+    
+    
+    
+Resampling from the distribution
+--------------------------------
+
+Resampling data from the fitted KDE is equivalent to (1) first resampling the
+original data (with replacement), then (2) adding noise drawn from the same
+probability density as the kernel function in the KDE. Below an example is shown.
+
+
+.. plot::
+   :include-source:
+
+    from KDEpy import FFTKDE
+    from KDEpy.bw_selection import silvermans_rule, improved_sheather_jones
+    
+    # Get the standard deviation of the kernel functions    
+    data = np.array([3.1, 5.2, 6.9, 7.9, 8.5, 11.3, 11.5, 11.5, 11.5, 15.5])
+    # Silverman assumes normality of data - use ISJ with much data instead
+    kernel_std = silvermans_rule(data.reshape(-1, 1))  # Shape (obs, dims)
+    
+    # (1) First resample original data, then (2) add noise from kernel
+    size = 50
+    resampled_data = np.random.choice(data, size=size, replace=True)
+    resampled_data = resampled_data + np.random.randn(size) * kernel_std
+    
+    # Plot the results
+    plt.scatter(data, np.zeros_like(data), marker='|', label="Original data")
+    plt.scatter(resampled_data, np.ones_like(resampled_data) * 0.01, 
+                marker='|', label="Resampled from KDE")
+    x, y = FFTKDE(kernel="gaussian", bw="silverman").fit(data).evaluate()
+    plt.plot(x, y, label="FFTKDE with Silverman's rule")
+    plt.title('Weighted and unweighted KDE')
+    plt.tight_layout(); plt.legend(loc='upper left');
+    
+
 
 
 Multimodal distributions
