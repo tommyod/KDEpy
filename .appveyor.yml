@@ -30,8 +30,9 @@ build_script:
   - conda update conda --quiet
   - pip install -r requirements.txt
   - python setup.py develop
-  - pip install wheel
-  - pip install --upgrade cibuildwheel
+  - pip install --upgrade cibuildwheel wheel
+  - "echo $env:APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH"
+  - "echo $env:APPVEYOR_REPO_BRANCH"
 
 
 # Run the tests (but linting is done on Travis)
@@ -44,6 +45,7 @@ after_test:
   - cmd: "echo [pypi] > %USERPROFILE%\\.pypirc"
   - "echo username: tommyod >> %USERPROFILE%\\.pypirc"
   - "echo password: %TWINE_PASSWORD% >> %USERPROFILE%\\.pypirc"
+
 
 # If a tag was associated with the commit, push to pypi
 on_success:

@@ -116,7 +116,7 @@ class TestKernelFunctions:
         if function.finite_support:
             a, b = -function.support, function.support
         else:
-            a, b = -4, 4
+            a, b = -6, 6
 
         # Perform integration 2D
         def int2D(x1, x2):
@@ -195,7 +195,7 @@ class TestKernelFunctions:
         else:
             a, b = -10, 10
 
-        x = np.linspace(a, b, num=2 ** 14)
+        x = np.linspace(a, b, num=2 ** 11)
 
         # Scale so that standard deviation should be 10 instead of one
         # Since 1**1 = 1, but 10**2 = 100
@@ -214,4 +214,4 @@ class TestKernelFunctions:
 
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
-    pytest.main(args=[__file__, "--doctest-modules", "-v", "--durations=15", "-k test_standard_deviation_equals_one"])
+    pytest.main(args=[__file__, "--doctest-modules", "-v", "--durations=15"])
