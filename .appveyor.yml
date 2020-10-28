@@ -30,7 +30,7 @@ build_script:
   - conda update conda --quiet
   - pip install -r requirements.txt
   - python setup.py develop
-  - pip install --upgrade cibuildwheel wheel
+  - pip install --upgrade cibuildwheel wheel twine
   - echo $env:APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH
   - echo $env:APPVEYOR_REPO_BRANCH
   - echo "APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH = $env:APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH"
@@ -56,9 +56,9 @@ on_success:
   - cmd: "echo $env:APPVEYOR_REPO_TAG"
   - ps: |
        if ($env:APPVEYOR_REPO_TAG -eq 'true' -or $env:APPVEYOR_REPO_TAG -eq 'True') {
-         pip install twine
+         pip install --upgrade cibuildwheel wheel twine
          python -m cibuildwheel --output-dir wheelhouse
-         twine upload wheelhouse\\*.whl --skip-existing
+         twine upload "wheelhouse/*.whl" --skip-existing
           }
 
 
