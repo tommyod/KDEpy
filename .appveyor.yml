@@ -44,8 +44,11 @@ test_script:
   - pip install --upgrade cibuildwheel wheel twine certifi
   - set SSL_CERT_FILE=(python -c "import certifi;print(certifi.where())")
   - echo %SSL_CERT_FILE%
-  - set SSL_CERT_FILE=`python3 -c "import certifi;print(certifi.where())"`
+  - set SSL_CERT_FILE=`python -c "import certifi;print(certifi.where())"`
   - echo %SSL_CERT_FILE%
+    # Fix git SSL errors.
+  - python -c "import certifi;print(certifi.where())">cacert.txt
+  - "set /p SSL_CERT_FILE=<cacert.txt"
   - python -m cibuildwheel --output-dir wheelhouse
   - pytest KDEpy --doctest-modules --doctest-glob="*.rst" --capture=sys
 
