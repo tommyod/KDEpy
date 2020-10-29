@@ -41,7 +41,13 @@ build_script:
 
 # Run the tests (but linting is done on Travis)
 test_script:
-- pytest KDEpy --doctest-modules --doctest-glob="*.rst" --capture=sys
+  - pytest KDEpy --doctest-modules --doctest-glob="*.rst" --capture=sys
+  - pip install --upgrade cibuildwheel wheel twine certifi
+  - set SSL_CERT_FILE=(python -c "import certifi;print(certifi.where())")
+  - echo $SSL_CERT_FILE
+  - export SSL_CERT_FILE=`python3 -c "import certifi;print(certifi.where())"`
+  - echo $SSL_CERT_FILE
+  - python -m cibuildwheel --output-dir wheelhouse
 
 
 # Store user and password for twine - in preparation for upload
@@ -56,7 +62,9 @@ on_success:
   - cmd: "echo $env:APPVEYOR_REPO_TAG"
   - ps: |
        if ($env:APPVEYOR_REPO_TAG -eq 'true' -or $env:APPVEYOR_REPO_TAG -eq 'True') {
-         pip install --upgrade cibuildwheel wheel twine
+         pip install --upgrade cibuildwheel wheel twine certifi
+         set SSL_CERT_FILE=(python -c "import certifi;print(certifi.where())")
+         export SSL_CERT_FILE=`python3 -c "import certifi;print(certifi.where())"`
          python -m cibuildwheel --output-dir wheelhouse
          twine upload "wheelhouse/*.whl" --skip-existing
           }
