@@ -52,7 +52,7 @@ on_success:
        if ($env:APPVEYOR_REPO_TAG -eq 'true' -or $env:APPVEYOR_REPO_TAG -eq 'True') {
          pip install --upgrade cibuildwheel wheel twine certifi
          python -c "import certifi;print(certifi.where())">cacert.txt
-         "set /p SSL_CERT_FILE=<cacert.txt"
+         set /p SSL_CERT_FILE=<cacert.txt
          python -m cibuildwheel --output-dir wheelhouse
          twine upload "wheelhouse/*.whl" --skip-existing
           }
