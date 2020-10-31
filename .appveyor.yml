@@ -31,17 +31,11 @@ build_script:
   - pip install -r requirements.txt
   - python setup.py develop
   - pip install --upgrade cibuildwheel wheel twine
-  - echo $env:APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH
-  - echo $env:APPVEYOR_REPO_BRANCH
-  - echo "APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH = $env:APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH"
-  - echo "APPVEYOR_REPO_BRANCH = $env:APPVEYOR_REPO_BRANCH"
-  - echo APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH=%APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH%
-  - echo APPVEYOR_REPO_BRANCH=%APPVEYOR_REPO_BRANCH%
 
 
 # Run the tests (but linting is done on Travis)
 test_script:
-- pytest KDEpy --doctest-modules --doctest-glob="*.rst" --capture=sys
+  - pytest KDEpy --doctest-modules --doctest-glob="*.rst" --capture=sys
 
 
 # Store user and password for twine - in preparation for upload
@@ -56,7 +50,9 @@ on_success:
   - cmd: "echo $env:APPVEYOR_REPO_TAG"
   - ps: |
        if ($env:APPVEYOR_REPO_TAG -eq 'true' -or $env:APPVEYOR_REPO_TAG -eq 'True') {
-         pip install --upgrade cibuildwheel wheel twine
+         pip install --upgrade cibuildwheel wheel twine certifi
+         python -c "import certifi;print(certifi.where())">cacert.txt
+         "set /p SSL_CERT_FILE=<cacert.txt"
          python -m cibuildwheel --output-dir wheelhouse
          twine upload "wheelhouse/*.whl" --skip-existing
           }
