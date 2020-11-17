@@ -135,8 +135,6 @@ class TreeKDE(BaseKDE):
         bw = self.bw
         if isinstance(bw, numbers.Number):
             bw = np.asfarray(np.ones(obs) * bw)
-        elif callable(bw):
-            bw = np.asfarray(np.ones(obs) * bw(self.data))
         else:
             bw = np.asarray_chkfinite(bw, dtype=np.float)
 

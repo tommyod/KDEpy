@@ -139,12 +139,10 @@ class FFTKDE(BaseKDE):
         if not grid_is_sorted(self.grid_points):
             raise ValueError("The grid must be sorted.")
 
-        if callable(self.bw):
-            bw = self.bw(self.data)
-        elif isinstance(self.bw, numbers.Number) and self.bw > 0:
+        if isinstance(self.bw, numbers.Number) and self.bw > 0:
             bw = self.bw
         else:
-            raise ValueError("The bw must be a callable or a number.")
+            raise ValueError("The bw must be a number.")
         self.bw = bw
 
         # Step 0 - Make sure data points are inside of the grid
