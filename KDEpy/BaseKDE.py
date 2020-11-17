@@ -145,7 +145,7 @@ class BaseKDE(ABC):
             else:
                 bw = self.bw
         elif callable(self.bw):
-            bw = self.bw(self.data)
+            bw = self.bw(self.data, self.weights)
         else:
             bw = self.bw
         self.bw = bw
