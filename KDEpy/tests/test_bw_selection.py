@@ -23,7 +23,7 @@ def test_equal_weights_dont_changed_bw(data, method):
     np.testing.assert_almost_equal(bw_no_weights, bw_weighted)
 
 
-def test_ISJ_bw_weights_single_zero_weighted_point(data):
+def test_isj_bw_weights_single_zero_weighted_point(data):
     data_with_outlier = np.concatenate((data.copy(), np.array([[1000]])))
     weights = np.ones_like(data_with_outlier).squeeze()
     weights[-1] = 0
