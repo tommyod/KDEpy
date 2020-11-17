@@ -136,13 +136,21 @@ def improved_sheather_jones(data, weights=None):
     sheather+jones+why+use+dct&source=bl&ots=1ETdKd_6EF&sig=jZk4R515GB1xsn-
     VZVnjr-JfjSI&hl=en&sa=X&ved=2ahUKEwi1_czNncTcAhVGhqYKHaPiBtcQ6AEwA3oEC
     AcQAQ#v=onepage&q=sheather%20jones%20why%20use%20dct&f=false
+
+    Parameters
+    ----------
+    data: array-like
+        The data points. Data must have shape (obs, 1).
+    weights: array-like, optional
+        One weight per data point. Must have shape (obs,). If None is
+        passed, uniform weights are used.
     """
     obs, dims = data.shape
     if not dims == 1:
         raise ValueError("ISJ is only available for 1D data.")
 
     n = 2 ** 10
-    
+
     # weights <= 0 still affect calculations unless we remove them
     if weights is not None:
         data = data[weights > 0]
