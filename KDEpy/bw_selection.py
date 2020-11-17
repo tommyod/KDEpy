@@ -142,6 +142,12 @@ def improved_sheather_jones(data, weights=None):
         raise ValueError("ISJ is only available for 1D data.")
 
     n = 2 ** 10
+    
+    # weights <= 0 still affect calculations unless we remove them
+    if weights is not None:
+        data = data[weights > 0]
+        weights = weights[weights > 0]
+
     # Setting `percentile` higher decreases the chance of overflow
     xmesh = autogrid(data, boundary_abs=6, num_points=n, boundary_rel=0.5)
     data = data.ravel()
