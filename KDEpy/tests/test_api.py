@@ -61,8 +61,6 @@ def test_api_types(kde, bw, kernel, type_func):
     Test the API. Data and weights may be passed as tuples, arrays, lists, etc.
     """
     # Test various input types
-    data = [1, 2, 3]
-    weights = [4, 5, 6]
     data = np.random.randn(64)
     weights = np.random.randn(64) + 10
     model = kde(kernel=kernel, bw=bw)
