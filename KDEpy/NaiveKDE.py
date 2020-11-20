@@ -122,8 +122,6 @@ class NaiveKDE(BaseKDE):
         bw = self.bw
         if isinstance(bw, numbers.Number):
             bw = np.asfarray(np.ones(self.data.shape[0]) * bw)
-        elif callable(bw):
-            bw = np.asfarray(np.ones(self.data.shape[0]) * bw(self.data))
 
         # TODO: Implementation w.r.t grid points for faster evaluation
         # See the SciPy evaluation for how this can be done

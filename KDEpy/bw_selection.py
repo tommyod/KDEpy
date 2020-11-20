@@ -122,7 +122,7 @@ def _root(function, N, args):
     return x
 
 
-def improved_sheather_jones(data):
+def improved_sheather_jones(data, weights=None):
     """
     The Improved Sheater Jones (ISJ) algorithm from the paper by Botev et al.
     This algorithm computes the optimal bandwidth for a gaussian kernel,
@@ -136,12 +136,26 @@ def improved_sheather_jones(data):
     sheather+jones+why+use+dct&source=bl&ots=1ETdKd_6EF&sig=jZk4R515GB1xsn-
     VZVnjr-JfjSI&hl=en&sa=X&ved=2ahUKEwi1_czNncTcAhVGhqYKHaPiBtcQ6AEwA3oEC
     AcQAQ#v=onepage&q=sheather%20jones%20why%20use%20dct&f=false
+
+    Parameters
+    ----------
+    data: array-like
+        The data points. Data must have shape (obs, 1).
+    weights: array-like, optional
+        One weight per data point. Must have shape (obs,). If None is
+        passed, uniform weights are used.
     """
     obs, dims = data.shape
     if not dims == 1:
         raise ValueError("ISJ is only available for 1D data.")
 
     n = 2 ** 10
+
+    # weights <= 0 still affect calculations unless we remove them
+    if weights is not None:
+        data = data[weights > 0]
+        weights = weights[weights > 0]
+
     # Setting `percentile` higher decreases the chance of overflow
     xmesh = autogrid(data, boundary_abs=6, num_points=n, boundary_rel=0.5)
     data = data.ravel()
@@ -155,7 +169,7 @@ def improved_sheather_jones(data):
 
     # Use linear binning to bin the data on an equidistant grid, this is a
     # prerequisite for using the FFT (evenly spaced samples)
-    initial_data = linear_binning(data.reshape(-1, 1), xmesh)
+    initial_data = linear_binning(data.reshape(-1, 1), xmesh, weights)
     assert np.allclose(initial_data.sum(), 1)
 
     # Compute the type 2 Discrete Cosine Transform (DCT) of the data
@@ -187,7 +201,7 @@ def improved_sheather_jones(data):
     return bandwidth
 
 
-def scotts_rule(data):
+def scotts_rule(data, weights=None):
     """
     Scotts rule.
 
@@ -204,6 +218,9 @@ def scotts_rule(data):
     if not len(data.shape) == 2:
         raise ValueError("Data must be of shape (obs, dims).")
 
+    if weights is not None:
+        warnings.warn("Scott's rule currently ignores all weights")
+
     obs, dims = data.shape
     if not dims == 1:
         raise ValueError("Scotts rule is only available for 1D data.")
@@ -215,7 +232,7 @@ def scotts_rule(data):
     return sigma * np.power(obs, -1.0 / (dims + 4))
 
 
-def silvermans_rule(data):
+def silvermans_rule(data, weights=None):
     """
     Returns optimal smoothing (standard deviation) if the data is close to
     normal.
@@ -235,6 +252,9 @@ def silvermans_rule(data):
     obs, dims = data.shape
     if not dims == 1:
         raise ValueError("Silverman's rule is only available for 1D data.")
+
+    if weights is not None:
+        warnings.warn("Silverman's rule currently ignores all weights")
 
     if obs == 1:
         return 1
