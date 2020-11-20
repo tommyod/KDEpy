@@ -43,7 +43,7 @@ jobs:
 # ======================= BUILD WHEELS AND UPLOAD TO PYPI ==================================
 
       - name: Build wheels ${{ matrix.python-version }} on ${{ matrix.os }}
-        if: matrix.python-version == '3.8'
+        if: github.ref == 'refs/heads/master' && matrix.python-version == '3.8'
         env:
           CIBW_BUILD: 'cp36-* cp37-* cp38-*'
         run: |
