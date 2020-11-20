@@ -44,6 +44,7 @@ jobs:
       - name: Install libpython
         if: matrix.os == 'ubuntu-latest'
         run: |
+          sudo apt install glibc;
           sudo apt install libpython3.6-dev;
           
       - name: Build package ${{ matrix.python-version }} on ${{ matrix.os }}
