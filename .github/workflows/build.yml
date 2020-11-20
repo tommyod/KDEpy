@@ -55,7 +55,7 @@ jobs:
         env:
           CIBW_BUILD: 'cp36-* cp37-* cp38-*'
           CIBW_TEST_REQUIRES: pytest
-          CIBW_TEST_COMMAND: "pytest {project} --doctest-modules"
+          CIBW_TEST_COMMAND: "pytest {project}\\KDEpy --doctest-modules"
         run: |
           pip install cibuildwheel twine;
           python -m cibuildwheel --output-dir dist;
