@@ -13,15 +13,22 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.6, 3.7, 3.8]
+        
+    # The job
     name: Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    
+    # The steps in the job. Each step either RUNS code, or USES an action
     steps:
+    
       - name: Checkout
         uses: actions/checkout@v2
+        
       - name: Setup python
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
+          
       - name: Run tests and linting
         run: |
           pip install -r requirements.txt --quiet
@@ -29,7 +36,7 @@ jobs:
           pip install -e .
           black KDEpy -l 120 --check
           flake8 --show-source --ignore=F811,W293,W391,W292,W291,W504,W503,E231 --max-line-length=120 --exclude="*examples.py,testing.py,*kde.py" KDEpy
-          pytest KDEpy --doctest-modules --capture=sys
+# pytest KDEpy --doctest-modules --capture=sys
           
       - name: Build package ${{ matrix.python-version }} on ${{ matrix.os }}
         # if: github.event_name == 'push'
@@ -38,14 +45,13 @@ jobs:
           CIBW_BUILD: 'cp36-* cp37-* cp38-*'
           CIBW_TEST_REQUIRES: pytest
           CIBW_TEST_COMMAND: "python3 -m pytest {project}/KDEpy --doctest-modules"
-
         run: |
           pip install cibuildwheel twine;
           python -m cibuildwheel --output-dir dist;
           echo ${{ github.event_name }}
    
-      - name: Publish a Python distribution to PyPI
-        if: github.event_name == 'push'
+      - name: Publish Python distribution to PyPI
+        if: github.event_name == 'push' && runner.os != 'Windows' && matrix.python-version == '3.8'
         uses: pypa/gh-action-pypi-publish@master
         with:
           skip_existing: true
