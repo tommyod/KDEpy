@@ -21,6 +21,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
+      - name: Run tests and linting
         run: |
           pip install -r requirements.txt --quiet
           pip install pep8>=1.7.1 flake8>=3.5.0 black --quiet
@@ -31,10 +32,6 @@ jobs:
           
       - name: Build package ${{ matrix.python-version }} on ${{ matrix.os }}
         if: github.event_name == 'push'
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-          architecture: x64
         run: |
           pip install cibuildwheel twine;
           python -m cibuildwheel --output-dir dist;
