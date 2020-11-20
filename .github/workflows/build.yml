@@ -57,7 +57,7 @@ jobs:
           CIBW_TEST_REQUIRES: pytest
           CIBW_TEST_COMMAND: "python3 -m pytest {project}/KDEpy --doctest-modules"
         run: |
-          pip install cibuildwheel twine;
+          pip install cibuildwheel==1.6.3 twine;
           python -m cibuildwheel --output-dir dist;
           
       
@@ -70,7 +70,7 @@ jobs:
           CIBW_TEST_REQUIRES: pytest
           CIBW_TEST_COMMAND: "pytest {project}\\KDEpy --doctest-modules"
         run: |
-          pip install cibuildwheel twine;
+          pip install cibuildwheel==1.6.3 twine;
           python -m cibuildwheel --output-dir dist;
    
       - name: Publish Python distribution to PyPI
