@@ -49,8 +49,7 @@ jobs:
         run: |
           pip install cibuildwheel twine --upgrade;
           python -m cibuildwheel --output-dir dist;
-   
-   	# 'dist' is the default folder, so use it above when running cibuildwheel
+
       - name: Publish Python distribution to PyPI
         if: github.ref == 'refs/heads/master' && matrix.python-version == '3.8'
         uses: pypa/gh-action-pypi-publish@master
