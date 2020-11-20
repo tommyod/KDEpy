@@ -44,6 +44,7 @@ jobs:
       - name: Install libpython
         if: matrix.os == 'ubuntu-latest'
         run: |
+          sudo apt-get upgrade;
           sudo apt-get install libc6;
           sudo apt install libpython3.6-dev;
           pip install tensorflow;
