@@ -21,10 +21,29 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
-      - run: |
-          pip install -r requirements.txt
-          pip install pep8>=1.7.1 flake8>=3.5.0 black
+        run: |
+          pip install -r requirements.txt --quiet
+          pip install pep8>=1.7.1 flake8>=3.5.0 black --quiet
           pip install -e .
           black KDEpy -l 120 --check
-          pytest KDEpy --doctest-modules --capture=sys
           flake8 --show-source --ignore=F811,W293,W391,W292,W291,W504,W503,E231 --max-line-length=120 --exclude="*examples.py,testing.py,*kde.py" KDEpy
+          pytest KDEpy --doctest-modules --capture=sys
+          
+      - name: Build package ${{ matrix.python-version }} on ${{ matrix.os }}
+        if: github.event_name == 'push'
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+        run: |
+          pip install cibuildwheel twine;
+          python -m cibuildwheel --output-dir dist;
+   
+      - name: Publish a Python distribution to PyPI
+        if: github.event_name == 'push'
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          skip_existing: true
+          user: __token__
+          password: ${{ secrets.pypi_password }}
+          
