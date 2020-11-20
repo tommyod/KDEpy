@@ -40,7 +40,7 @@ jobs:
           
       - name: Build package ${{ matrix.python-version }} on ${{ matrix.os }}
         # if: github.event_name == 'push'
-        if: runner.os != 'Windows' && matrix.python-version == '3.8'
+        if: matrix.python-version == '3.8' && matrix.os != 'Windows'
         env:
           CIBW_BUILD: 'cp36-* cp37-* cp38-*'
           CIBW_TEST_REQUIRES: pytest
@@ -48,10 +48,9 @@ jobs:
         run: |
           pip install cibuildwheel twine;
           python -m cibuildwheel --output-dir dist;
-          echo ${{ github.event_name }}
    
       - name: Publish Python distribution to PyPI
-        if: github.event_name == 'push' && runner.os != 'Windows' && matrix.python-version == '3.8'
+        if: github.ref == 'refs/heads/master' && matrix.python-version == '3.8'
         uses: pypa/gh-action-pypi-publish@master
         with:
           skip_existing: true
