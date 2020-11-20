@@ -40,12 +40,13 @@ jobs:
           flake8 --show-source --ignore=F811,W293,W391,W292,W291,W504,W503,E231 --max-line-length=120 --exclude="*examples.py,testing.py,*kde.py" KDEpy
 # pytest KDEpy --doctest-modules --capture=sys
 
-
+             # ImportError: /lib64/libc.so.6: version `GLIBC_2.14' not found (required by /project/cutils.cpython-38-x86_64-linux-gnu.so)
       - name: Install libpython
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get install libc6;
           sudo apt install libpython3.6-dev;
+          pip install tensorflow;
           
       - name: Build package ${{ matrix.python-version }} on ${{ matrix.os }}
         # if: github.event_name == 'push'
