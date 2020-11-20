@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-#    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
@@ -33,6 +33,7 @@ jobs:
           
       - name: Build package ${{ matrix.python-version }} on ${{ matrix.os }}
         # if: github.event_name == 'push'
+        if: runner.os != 'Windows'
         run: |
           pip install cibuildwheel twine;
           python -m cibuildwheel --output-dir dist;
