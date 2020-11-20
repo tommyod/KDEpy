@@ -40,23 +40,8 @@ jobs:
           flake8 --show-source --ignore=F811,W293,W391,W292,W291,W504,W503,E231 --max-line-length=120 --exclude="*examples.py,testing.py,*kde.py" KDEpy
 # pytest KDEpy --doctest-modules --capture=sys
 
-             # ImportError: /lib64/libc.so.6: version `GLIBC_2.14' not found (required by /project/cutils.cpython-38-x86_64-linux-gnu.so)
-      - name: Install libpython
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          sudo apt update;
-          sudo apt install glibc-source;
-          
-      - name: Build package ${{ matrix.python-version }} on ${{ matrix.os }}
-        if: matrix.python-version == '3.8' && matrix.os != 'windows-latest'
-        env:
-          CIBW_BUILD: 'cp36-* cp37-* cp38-*'
-        run: |
-          pip install cibuildwheel twine --upgrade;
-          python -m cibuildwheel --output-dir dist;
-          
-      - name: Build win package ${{ matrix.python-version }} on ${{ matrix.os }}
-        if: matrix.python-version == '3.8' && matrix.os == 'windows-latest'
+      - name: Build wheels ${{ matrix.python-version }} on ${{ matrix.os }}
+        if: matrix.python-version == '3.8'
         env:
           CIBW_BUILD: 'cp36-* cp37-* cp38-*'
         run: |
