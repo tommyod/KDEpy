@@ -13,7 +13,7 @@ jobs:
       fail-fast: false # Allow one of the matrix builds to fail without failing others
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: [3.6, 3.7, 3.8]
+        python-version: [3.6, 3.7, 3.8, 3.9]
         
         
     # The job
@@ -45,7 +45,7 @@ jobs:
       - name: Build wheels ${{ matrix.python-version }} on ${{ matrix.os }}
         if: matrix.python-version == '3.8'
         env:
-          CIBW_BUILD: 'cp36-* cp37-* cp38-*'
+          CIBW_BUILD: 'cp36-* cp37-* cp38-* cp39-*'
         run: |
           pip install cibuildwheel twine --upgrade;
           python -m cibuildwheel --output-dir dist;
