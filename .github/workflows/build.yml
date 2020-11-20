@@ -8,14 +8,15 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+#    runs-on: ubuntu-latest
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.6, 3.7, 3.8]
     name: Python ${{ matrix.python-version }} on ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
       - name: Setup python
         uses: actions/setup-python@v2
         with:
@@ -24,17 +25,18 @@ jobs:
       - name: Run tests and linting
         run: |
           pip install -r requirements.txt --quiet
-          pip install pep8>=1.7.1 flake8>=3.5.0 black --quiet
+          pip install pep8>=1.7.1 flake8>=3.5.0 black pip --upgrade --quiet
           pip install -e .
           black KDEpy -l 120 --check
           flake8 --show-source --ignore=F811,W293,W391,W292,W291,W504,W503,E231 --max-line-length=120 --exclude="*examples.py,testing.py,*kde.py" KDEpy
           pytest KDEpy --doctest-modules --capture=sys
           
       - name: Build package ${{ matrix.python-version }} on ${{ matrix.os }}
-        if: github.event_name == 'push'
+        # if: github.event_name == 'push'
         run: |
           pip install cibuildwheel twine;
           python -m cibuildwheel --output-dir dist;
+          echo ${{ github.event_name }}
    
       - name: Publish a Python distribution to PyPI
         if: github.event_name == 'push'
