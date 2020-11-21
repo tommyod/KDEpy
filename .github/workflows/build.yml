@@ -44,8 +44,8 @@ jobs:
         env: 
           MYVAR: 'hello-world'
         run: |
-          echo %MYVAR%
-          echo "%MYVAR%"
+          echo ${env:MYVAR}
+          echo "${env:MYVAR}"
 
 # ======================= BUILD WHEELS AND UPLOAD TO PYPI ==================================
 
