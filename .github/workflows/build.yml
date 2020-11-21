@@ -42,8 +42,8 @@ jobs:
 
 # ======================= BUILD WHEELS AND UPLOAD TO PYPI ==================================
 
-      - name: Build wheels ${{ matrix.python-version }} on ${{ matrix.os }}
-        if: github.ref == 'refs/heads/master' && matrix.python-version == '3.8'
+      - name: Build wheels (non-windows) ${{ matrix.python-version }} on ${{ matrix.os }}
+        if: github.ref == 'refs/heads/master' && matrix.python-version == '3.8' && matrix.os != 'windows-latest'
         env:
           CIBW_BUILD: 'cp36-* cp37-* cp38-*'
           PYPI_PASSWORD: ${{ secrets.pypi_password }}
@@ -51,3 +51,13 @@ jobs:
           pip install cibuildwheel twine --upgrade;
           python -m cibuildwheel --output-dir dist;
           python -m twine upload dist/* -u tommyod -p "$PYPI_PASSWORD" --skip-existing;
+          
+      - name: Build wheels (windows) ${{ matrix.python-version }} on ${{ matrix.os }}
+        if: github.ref == 'refs/heads/master' && matrix.python-version == '3.8' && matrix.os == 'windows-latest'
+        env:
+          CIBW_BUILD: 'cp36-* cp37-* cp38-*'
+          PYPI_PASSWORD: ${{ secrets.pypi_password }}
+        run: |
+          pip install cibuildwheel twine --upgrade;
+          python -m cibuildwheel --output-dir dist;
+          python -m twine upload dist/* -u tommyod -p "${env:PYPI_PASSWORD}" --skip-existing;
