@@ -41,7 +41,8 @@ jobs:
           pytest KDEpy --doctest-modules --capture=sys
           
       - name: Testing
-        env: MYVAR: 'hello-world'
+        env: 
+          MYVAR: 'hello-world'
         run: |
           echo %MYVAR%
           echo "%MYVAR%"
