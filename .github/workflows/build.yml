@@ -46,15 +46,9 @@ jobs:
         if: github.ref == 'refs/heads/master' && matrix.python-version == '3.8'
         env:
           CIBW_BUILD: 'cp36-* cp37-* cp38-*'
+          PYPI_PASSWORD: ${{ secrets.pypi_password }}
         run: |
           pip install cibuildwheel twine --upgrade;
           python -m cibuildwheel --output-dir dist;
-
-      - name: Publish Python distribution to PyPI
-        if: github.ref == 'refs/heads/master' && matrix.python-version == '3.8'
-        uses: pypa/gh-action-pypi-publish@master
-        with:
-          skip_existing: true
-          user: __token__
-          password: ${{ secrets.pypi_password }}
-          
+          echo "$PYPI_PASSWORD"
+          python -m twine upload dist/* -u tommyod -p "$PYPI_PASSWORD" --skip-existing;
