@@ -50,5 +50,4 @@ jobs:
         run: |
           pip install cibuildwheel twine --upgrade;
           python -m cibuildwheel --output-dir dist;
-          echo "$PYPI_PASSWORD"
           python -m twine upload dist/* -u tommyod -p "$PYPI_PASSWORD" --skip-existing;
