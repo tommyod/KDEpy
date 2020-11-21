@@ -39,18 +39,11 @@ jobs:
           black KDEpy -l 120 --check
           flake8 --show-source --ignore=F811,W293,W391,W292,W291,W504,W503,E231 --max-line-length=120 --exclude="*examples.py,testing.py,*kde.py" KDEpy
           pytest KDEpy --doctest-modules --capture=sys
-          
-      - name: Testing
-        env: 
-          MYVAR: 'hello-world'
-        run: |
-          echo ${env:MYVAR}
-          echo "${env:MYVAR}"
 
 # ======================= BUILD WHEELS AND UPLOAD TO PYPI ==================================
 
-      - name: Build wheels ${{ matrix.python-version }} on ${{ matrix.os }}
-        if: github.ref == 'refs/heads/master' && matrix.python-version == '3.8'
+      - name: Build wheels (non-windows) ${{ matrix.python-version }} on ${{ matrix.os }}
+        if: github.ref == 'refs/heads/master' && matrix.python-version == '3.8' && matrix.os != 'windows-latest'
         env:
           CIBW_BUILD: 'cp36-* cp37-* cp38-*'
           PYPI_PASSWORD: ${{ secrets.pypi_password }}
@@ -58,3 +51,13 @@ jobs:
           pip install cibuildwheel twine --upgrade;
           python -m cibuildwheel --output-dir dist;
           python -m twine upload dist/* -u tommyod -p "$PYPI_PASSWORD" --skip-existing;
+          
+      - name: Build wheels (windows) ${{ matrix.python-version }} on ${{ matrix.os }}
+        if: github.ref == 'refs/heads/master' && matrix.python-version == '3.8' && matrix.os == 'windows-latest'
+        env:
+          CIBW_BUILD: 'cp36-* cp37-* cp38-*'
+          PYPI_PASSWORD: ${{ secrets.pypi_password }}
+        run: |
+          pip install cibuildwheel twine --upgrade;
+          python -m cibuildwheel --output-dir dist;
+          python -m twine upload dist/* -u tommyod -p "${env:PYPI_PASSWORD}" --skip-existing;
