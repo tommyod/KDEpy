@@ -7,7 +7,7 @@ import numpy as np
 import scipy
 import warnings
 from KDEpy.binning import linear_binning
-from KDEpy.utils import autogrid
+from KDEpy.utils import autogrid, weighted_std, weighted_percentile
 from scipy import fftpack
 from scipy.optimize import brentq
 
@@ -212,21 +212,35 @@ def scotts_rule(data, weights=None):
     Examples
     --------
     >>> data = np.arange(9).reshape(-1, 1)
-    >>> ans = scotts_rule(data)
-    >>> assert np.allclose(ans, 1.76474568962182)
+    >>> scotts_rule(data)
+    1.6638...
     """
     if not len(data.shape) == 2:
         raise ValueError("Data must be of shape (obs, dims).")
 
-    if weights is not None:
-        warnings.warn("Scott's rule currently ignores all weights")
-
     obs, dims = data.shape
     if not dims == 1:
         raise ValueError("Scotts rule is only available for 1D data.")
-    sigma = np.std(data, ddof=1)
+
+    if obs == 1:
+        return 1
+    if obs < 1:
+        raise ValueError("Data must be of length > 0.")
+
+    data = data.ravel()
+
     # scipy.norm.ppf(.75) - scipy.norm.ppf(.25) -> 1.3489795003921634
-    IQR = (np.percentile(data, q=75) - np.percentile(data, q=25)) / 1.3489795003921634
+    IQR_norm = 1.3489795003921634
+
+    # Compute sigma and IQR
+    if weights is not None:
+        sigma = weighted_std(data, weights=weights)
+        low, high = weighted_percentile(data, [0.25, 0.75], weights=weights)
+        IQR = (high - low) / IQR_norm
+    else:
+        sigma = np.std(data)
+        low, high = np.percentile(data, q=[25, 75])
+        IQR = (high - low) / IQR_norm
 
     sigma = min(sigma, IQR)
     return sigma * np.power(obs, -1.0 / (dims + 4))
@@ -244,26 +258,35 @@ def silvermans_rule(data, weights=None):
     Examples
     --------
     >>> data = np.arange(9).reshape(-1, 1)
-    >>> ans = silvermans_rule(data)
-    >>> assert np.allclose(ans, 1.8692607078355594)
+    >>> silvermans_rule(data)
+    1.762355896...
     """
     if not len(data.shape) == 2:
         raise ValueError("Data must be of shape (obs, dims).")
+
     obs, dims = data.shape
     if not dims == 1:
         raise ValueError("Silverman's rule is only available for 1D data.")
-
-    if weights is not None:
-        warnings.warn("Silverman's rule currently ignores all weights")
 
     if obs == 1:
         return 1
     if obs < 1:
         raise ValueError("Data must be of length > 0.")
 
-    sigma = np.std(data, ddof=1)
-    # scipy.stats.norm.ppf(.75) - scipy.stats.norm.ppf(.25) -> 1.3489795003921634
-    IQR = (np.percentile(data, q=75) - np.percentile(data, q=25)) / 1.3489795003921634
+    data = data.ravel()
+
+    # scipy.norm.ppf(.75) - scipy.norm.ppf(.25) -> 1.3489795003921634
+    IQR_norm = 1.3489795003921634
+
+    # Compute sigma and IQR
+    if weights is not None:
+        sigma = weighted_std(data, weights=weights)
+        low, high = weighted_percentile(data, [0.25, 0.75], weights=weights)
+        IQR = (high - low) / IQR_norm
+    else:
+        sigma = np.std(data)
+        low, high = np.percentile(data, q=[25, 75])
+        IQR = (high - low) / IQR_norm
 
     sigma = min(sigma, IQR)
 
@@ -271,22 +294,29 @@ def silvermans_rule(data, weights=None):
     # it's nice to return a value instead of getting an error. A warning will be raised.
     if sigma > 0:
         return sigma * (obs * 3 / 4.0) ** (-1 / 5)
-    else:
-        # stats.norm.ppf(.99) - stats.norm.ppf(.01) = 4.6526957480816815
-        IQR = (np.percentile(data, q=99) - np.percentile(data, q=1)) / 4.6526957480816815
-        if IQR > 0:
-            bw = IQR * (obs * 3 / 4.0) ** (-1 / 5)
-            warnings.warn(
-                "Silverman's rule failed. Too many idential values. \
-Setting bw = {}".format(
-                    bw
-                )
-            )
-            return bw
 
-        # Here, all values are basically constant
-        warnings.warn("Silverman's rule failed. Too many idential values. Setting bw = 1.0")
-        return 1.0
+    # ===================== Little spread of values =======================
+
+    # stats.norm.ppf(.99) - stats.norm.ppf(.01) = 4.6526957480816815
+    IQR_norm = 4.6526957480816815
+
+    # Compute sigma and IQR
+    if weights is not None:
+        low, high = weighted_percentile(data, [0.25, 0.75], weights=weights)
+        IQR = (high - low) / IQR_norm
+    else:
+        low, high = np.percentile(data, q=[25, 75])
+        IQR = (high - low) / IQR_norm
+
+    if IQR > 0:
+        bw = IQR * (obs * 3 / 4.0) ** (-1 / 5)
+        msg = "Silverman's rule failed. Too many idential values. Setting bw = {}".format(bw)
+        warnings.warn(msg)
+        return bw
+
+    # Here, all values are basically constant
+    warnings.warn("Silverman's rule failed. Too many idential values. Setting bw = 1.0")
+    return 1.0
 
 
 _bw_methods = {
@@ -294,3 +324,10 @@ _bw_methods = {
     "scott": scotts_rule,
     "ISJ": improved_sheather_jones,
 }
+
+
+if __name__ == "__main__":
+    import pytest
+
+    # --durations=10  <- May be used to show potentially slow tests
+    pytest.main(args=[".", "--doctest-modules", "-v", "--capture=sys"])
