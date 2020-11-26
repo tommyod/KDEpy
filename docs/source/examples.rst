@@ -93,7 +93,7 @@ probability density as the kernel function in the KDE. Below an example is shown
                 marker='|', label="Resampled from KDE")
     x, y = FFTKDE(kernel="gaussian", bw="silverman").fit(data).evaluate()
     plt.plot(x, y, label="FFTKDE with Silverman's rule")
-    plt.title('Weighted and unweighted KDE')
+    plt.title('Resampling from distribution')
     plt.tight_layout(); plt.legend(loc='upper left');
     
 
