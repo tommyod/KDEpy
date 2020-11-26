@@ -62,21 +62,21 @@ class BaseKDE(ABC):
         # The `bw` paramter may either be a positive number, a string, or
         # array-like such that each point in the data has a uniue bw
         if isinstance(bw, numbers.Number) and bw > 0:
-            self.bw = bw
+            self.bw_method = bw
         elif isinstance(bw, str):
             amethods = sorted(list(self._bw_methods.keys()))
             if bw.lower() not in set(m.lower() for m in amethods):
                 msg = "bw not recognized. Options are: {}".format(amethods)
                 raise ValueError(msg)
-            self.bw = self._bw_methods[bw]
+            self.bw_method = self._bw_methods[bw]
         elif isinstance(bw, (np.ndarray, Sequence)):
-            self.bw = bw
+            self.bw_method = bw
         else:
             raise ValueError("Bandwidth must be > 0, array-like or a string.")
 
         # Test quickly that the method has done what is was supposed to do
         assert callable(self.kernel)
-        assert isinstance(self.bw, (np.ndarray, Sequence, numbers.Number)) or callable(self.bw)
+        assert isinstance(self.bw_method, (np.ndarray, Sequence, numbers.Number)) or callable(self.bw_method)
 
     @abstractmethod
     def fit(self, data, weights=None):
@@ -123,6 +123,13 @@ class BaseKDE(ABC):
             assert len(self.weights.shape) == 1
             assert self.data.shape[0] == len(self.weights)
 
+        if isinstance(self.bw_method, (np.ndarray, Sequence)):
+            self.bw = self.bw_method
+        elif callable(self.bw_method):
+            self.bw = self.bw_method(self.data, self.weights)
+        else:
+            self.bw = self.bw_method
+
     @abstractmethod
     def evaluate(self, grid_points=None, bw_to_scalar=True):
         """
@@ -139,16 +146,10 @@ class BaseKDE(ABC):
             raise ValueError("Must call fit before evaluating.")
 
         # -------------- Set up the bandwidth depending on inputs -------------
-        if isinstance(self.bw, (np.ndarray, Sequence)):
-            if bw_to_scalar:
-                bw = max(self.bw)
-            else:
-                bw = self.bw
-        elif callable(self.bw):
-            bw = self.bw(self.data, self.weights)
+        if bw_to_scalar:
+            bw = np.max(self.bw)
         else:
             bw = self.bw
-        self.bw = bw
 
         # -------------- Set up the grid depending on input -------------------
         # If the grid None or an integer, use that in the autogrid method
@@ -170,8 +171,8 @@ class BaseKDE(ABC):
 
         # Test quickly that the method has done what is was supposed to do
         if bw_to_scalar:
-            assert isinstance(self.bw, numbers.Number)
-            assert self.bw > 0
+            assert isinstance(bw, numbers.Number)
+            assert bw > 0
         assert len(self.grid_points.shape) == 2
 
     @staticmethod
@@ -226,4 +227,4 @@ if __name__ == "__main__":
     import pytest
 
     # --durations=10  <- May be used to show potentially slow tests
-    pytest.main(args=[".", "--doctest-modules", "-v"])
+    pytest.main(args=[".", "--doctest-modules", "-v", "-x"])
