@@ -213,7 +213,7 @@ def scotts_rule(data, weights=None):
     --------
     >>> data = np.arange(9).reshape(-1, 1)
     >>> scotts_rule(data)
-    1.6638...
+    1.764745689...
     """
     if not len(data.shape) == 2:
         raise ValueError("Data must be of shape (obs, dims).")
@@ -234,11 +234,11 @@ def scotts_rule(data, weights=None):
 
     # Compute sigma and IQR
     if weights is not None:
-        sigma = weighted_std(data, weights=weights)
+        sigma = weighted_std(data, weights=weights, ddof=1)
         low, high = weighted_percentile(data, [0.25, 0.75], weights=weights)
         IQR = (high - low) / IQR_norm
     else:
-        sigma = np.std(data)
+        sigma = np.std(data, ddof=1)
         low, high = np.percentile(data, q=[25, 75])
         IQR = (high - low) / IQR_norm
 
@@ -259,7 +259,7 @@ def silvermans_rule(data, weights=None):
     --------
     >>> data = np.arange(9).reshape(-1, 1)
     >>> silvermans_rule(data)
-    1.762355896...
+    1.8692607078...
     """
     if not len(data.shape) == 2:
         raise ValueError("Data must be of shape (obs, dims).")
@@ -280,11 +280,11 @@ def silvermans_rule(data, weights=None):
 
     # Compute sigma and IQR
     if weights is not None:
-        sigma = weighted_std(data, weights=weights)
+        sigma = weighted_std(data, weights=weights, ddof=1)
         low, high = weighted_percentile(data, [0.25, 0.75], weights=weights)
         IQR = (high - low) / IQR_norm
     else:
-        sigma = np.std(data)
+        sigma = np.std(data, ddof=1)
         low, high = np.percentile(data, q=[25, 75])
         IQR = (high - low) / IQR_norm
 
@@ -330,4 +330,4 @@ if __name__ == "__main__":
     import pytest
 
     # --durations=10  <- May be used to show potentially slow tests
-    pytest.main(args=[".", "--doctest-modules", "-v", "--capture=sys"])
+    pytest.main(args=[__file__, "--doctest-modules", "-v", "--capture=sys"])

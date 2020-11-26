@@ -153,8 +153,9 @@ def weighted_std(values, weights, ddof=0):
 
     # If the degrees of freedom is greater than zero, we need to scale results
     if ddof > 0:
+        smallest_weight = np.min(weights)
         weights_summed = np.sum(weights)
-        factor = weights_summed / (weights_summed - ddof)
+        factor = weights_summed / (weights_summed - ddof * smallest_weight)
     else:
         factor = 1
 
