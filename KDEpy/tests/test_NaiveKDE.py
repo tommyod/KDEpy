@@ -170,19 +170,19 @@ def test_constant_values_silverman():
     """
 
     data = np.ones(100, dtype=float)
-    kde = NaiveKDE(bw="silverman").fit(data)
+    kde = NaiveKDE(bw="silverman")
     with pytest.warns(UserWarning):
-        kde.evaluate()
+        kde.fit(data)
     assert np.isclose(kde.bw, 1.0)
 
     data = np.ones(1000, dtype=float)
     data[0] = 0.0
     data[999] = 2.0
-    kde = NaiveKDE(bw="silverman").fit(data)
+    kde = NaiveKDE(bw="silverman")
     with pytest.warns(UserWarning):
-        kde.evaluate()
+        kde.fit(data)
 
 
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
-    pytest.main(args=[".", "--doctest-modules", "-v"])
+    pytest.main(args=[".", "--doctest-modules", "-v", "-k constant"])
