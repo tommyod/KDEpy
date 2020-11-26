@@ -180,7 +180,29 @@ def test_api_2D_data_which_is_1D(estimator):
     assert np.all(np.isclose(prop, prop[0]))
 
 
+@pytest.mark.parametrize("estimator", kdes)
+def test_fitting_twice(estimator):
+    """Fitting several times should re-fit the BW.
+    Issue: https://github.com/tommyod/KDEpy/issues/78
+    """
+    x_grid = np.linspace(-100, 100, 2 ** 6)
+
+    # Create two data sets
+    data = np.arange(-5, 6)
+    data_scaled = data * 10
+
+    kde = estimator(bw="silverman")
+
+    # The BW from the first fit should be used in the second fit
+    kde.fit(data).evaluate(x_grid)
+    y = kde.fit(data_scaled).evaluate(x_grid)
+
+    y2 = estimator(bw="silverman").fit(data_scaled).evaluate(x_grid)
+
+    assert np.allclose(y, y2)
+
+
 if __name__ == "__main__":
     if True:
         # --durations=10  <- May be used to show potentially slow tests
-        pytest.main(args=[".", "--doctest-modules", "-v", "--capture=sys", "-k 2D"])
+        pytest.main(args=[__file__, "--doctest-modules", "-v", "--capture=sys", "-k fitting"])
