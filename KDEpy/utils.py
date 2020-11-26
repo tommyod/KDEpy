@@ -148,8 +148,9 @@ def weighted_std(values, weights, ddof=0):
     """
     values = np.asarray(values)
     weights = np.asarray(weights)
-    assert np.all(weights > 0), "All weights must be >= 0"
-    assert isinstance(ddof, numbers.Integral), "ddof must be int"
+    assert np.all(weights > 0), "All weights must be > 0"
+    assert isinstance(ddof, numbers.Integral), "ddof must be an integer"
+    assert ddof >= 0
 
     # If the degrees of freedom is greater than zero, we need to scale results
     if ddof > 0:
@@ -176,11 +177,14 @@ def weighted_percentile(values, perc, weights=None):
     1.0
     >>> weighted_percentile([1, 2, 2], 1.)
     2.0
-    >>> # These computations differ, but it does not matter
-    >>> weighted_percentile([1, 2], 0.5, [1, 2])
-    1.66666...
+    >>> # These computations differ, but the difference between the
+    >>> # results goes to zero if we increase the weight of `2` even more.
     >>> weighted_percentile([1, 2, 2], 0.5)
     2.0
+    >>> weighted_percentile([1, 2], 0.5, [1, 2])
+    1.66666...
+    >>> weighted_percentile([1, 2], 0.5, [1, 20])
+    1.9523809...
 
     """
     values = np.asarray(values)
@@ -189,14 +193,17 @@ def weighted_percentile(values, perc, weights=None):
         weights = np.ones_like(values)
     else:
         weights = np.asarray(weights)
-        assert np.all(weights > 0), "All weights must be >= 0"
+        assert np.all(weights > 0), "All weights must be > 0"
 
-    ix = np.argsort(values)
-    values = values[ix]  # sort data
-    weights = weights[ix]  # sort weights
+    # Sort data and weights
+    sorted_indices = np.argsort(values)
+    values = values[sorted_indices]
+    weights = weights[sorted_indices]
+
+    # Compute interpolation
     weights_cumsum = np.cumsum(weights)
     cdf = (weights_cumsum - 0.5 * weights) / weights_cumsum[-1]
-    return np.interp(perc, cdf, values)
+    return np.interp(x=perc, xp=cdf, fp=values)
 
 
 if __name__ == "__main__":
