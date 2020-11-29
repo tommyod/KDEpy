@@ -200,6 +200,16 @@ def test_fitting_twice(estimator):
     y2 = estimator(bw="silverman").fit(data_scaled).evaluate(x_grid)
 
     assert np.allclose(y, y2)
+    
+    
+@pytest.mark.parametrize("estimator", kdes)
+def test_bws_match_dims_or_samples(estimator):
+    """Test that when bw is an iterable, it matches data dims.
+    """
+    np.random.seed(123)
+    data = np.random.randn(1000)
+    with pytest.raises(ValueError):
+         x, y = estimator(bw=[1, 2]).fit(data).evaluate()
 
 
 if __name__ == "__main__":
