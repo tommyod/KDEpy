@@ -131,8 +131,83 @@ def autogrid(data, boundary_abs=3, num_points=None, boundary_rel=0.05):
     return cartesian(list_of_grids)
 
 
+def weighted_std(values, weights, ddof=0):
+    """Return the weighted standard deviation.
+
+    Examples
+    --------
+    >>> weighted_std([1, 2, 2], weights=[1, 1, 1])
+    0.4714045207910317
+    >>> weighted_std([1, 2], weights=[1, 2])
+    0.4714045207910317
+    >>> weighted_std([1, 2, 2], weights=[1, 1, 1], ddof=1)
+    0.5773502691896257
+    >>> weighted_std([1, 2], weights=[1, 2], ddof=1)
+    0.5773502691896257
+
+    """
+    values = np.asarray(values)
+    weights = np.asarray(weights)
+    assert np.all(weights > 0), "All weights must be > 0"
+    assert isinstance(ddof, numbers.Integral), "ddof must be an integer"
+    assert ddof >= 0
+
+    # If the degrees of freedom is greater than zero, we need to scale results
+    if ddof > 0:
+        smallest_weight = np.min(weights)
+        weights_summed = np.sum(weights)
+        factor = weights_summed / (weights_summed - ddof * smallest_weight)
+    else:
+        factor = 1
+
+    average = np.average(values, weights=weights)
+    # Fast and numerically precise:
+    variance = np.average((values - average) ** 2, weights=weights)
+    return np.sqrt(factor * variance)
+
+
+def weighted_percentile(values, perc, weights=None):
+    """Compue the weighted percentile.
+
+    Based on: https://stackoverflow.com/a/61343915
+
+    Examples
+    --------
+    >>> weighted_percentile([1, 2, 2], 0)
+    1.0
+    >>> weighted_percentile([1, 2, 2], 1.)
+    2.0
+    >>> # These computations differ, but the difference between the
+    >>> # results goes to zero if we increase the weight of `2` even more.
+    >>> weighted_percentile([1, 2, 2], 0.5)
+    2.0
+    >>> weighted_percentile([1, 2], 0.5, [1, 2])
+    1.66666...
+    >>> weighted_percentile([1, 2], 0.5, [1, 20])
+    1.9523809...
+
+    """
+    values = np.asarray(values)
+
+    if weights is None:
+        weights = np.ones_like(values)
+    else:
+        weights = np.asarray(weights)
+        assert np.all(weights > 0), "All weights must be > 0"
+
+    # Sort data and weights
+    sorted_indices = np.argsort(values)
+    values = values[sorted_indices]
+    weights = weights[sorted_indices]
+
+    # Compute interpolation
+    weights_cumsum = np.cumsum(weights)
+    cdf = (weights_cumsum - 0.5 * weights) / weights_cumsum[-1]
+    return np.interp(x=perc, xp=cdf, fp=values)
+
+
 if __name__ == "__main__":
     import pytest
 
     # --durations=10  <- May be used to show potentially slow tests
-    pytest.main(args=[".", "--doctest-modules", "-v", "--capture=sys"])
+    pytest.main(args=[__file__, "--doctest-modules", "-v", "--capture=sys"])
