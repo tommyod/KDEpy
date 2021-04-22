@@ -34,6 +34,7 @@ jobs:
       - name: Run tests and linting
         run: |
           pip install -r requirements.txt --quiet
+          pip install cython --upgrade --no-cache-dir
           pip install pep8>=1.7.1 flake8>=3.5.0 black pip --upgrade --quiet
           pip install -e .
           python -m black KDEpy -l 120 --check
