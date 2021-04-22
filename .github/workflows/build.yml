@@ -13,7 +13,7 @@ jobs:
       fail-fast: false # Allow one of the matrix builds to fail without failing others
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: [3.6, 3.7, 3.8]
+        python-version: [3.6, 3.7, 3.8, 3.9]
         
         
     # The job
