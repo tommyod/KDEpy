@@ -33,13 +33,13 @@ def naivebinning(data, grid_points, weights=None):
     """
 
     # Convert the data to numpy Arrays
-    data = np.asarray_chkfinite(data, dtype=np.float)
-    grid_points = np.asarray_chkfinite(grid_points, dtype=np.float)
+    data = np.asarray_chkfinite(data, dtype=float)
+    grid_points = np.asarray_chkfinite(grid_points, dtype=float)
 
     if weights is None:
         weights = np.ones_like(data)
 
-    weights = np.asarray_chkfinite(weights, dtype=np.float)
+    weights = np.asarray_chkfinite(weights, dtype=float)
     weights = weights / np.sum(weights)
 
     # Prepare to transform data
@@ -48,7 +48,7 @@ def naivebinning(data, grid_points, weights=None):
     max_grid = np.max(grid_points)
     transformed_data = (data - min_grid) / (max_grid - min_grid) * n
 
-    result = np.zeros_like(grid_points, dtype=np.float)
+    result = np.zeros_like(grid_points, dtype=float)
 
     # Go through data points and weights, use O(1) lookups and weight the
     # data point linearily by distance and the perscribed weights

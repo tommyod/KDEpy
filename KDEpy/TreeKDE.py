@@ -136,7 +136,7 @@ class TreeKDE(BaseKDE):
         if isinstance(bw, numbers.Number):
             bw = np.asfarray(np.ones(obs) * bw)
         else:
-            bw = np.asarray_chkfinite(bw, dtype=np.float)
+            bw = np.asarray_chkfinite(bw, dtype=float)
 
         # Initialize the tree structure for fast lookups of neighbors
         tree = cKDTree(self.data)
