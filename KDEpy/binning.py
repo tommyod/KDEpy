@@ -175,7 +175,7 @@ def linbin_numpy(data, grid_points, weights=None):
     # The integral part is used for lookups, the fractional part is used
     # to weight the data
     fractional, integral = np.modf(transformed_data)
-    integral = integral.astype(np.int)
+    integral = integral.astype(int)
 
     # Sort the integral values, and the fractional data and weights by
     # the same key. This lets us use binary search, which is faster
