@@ -203,7 +203,7 @@ class BaseKDE(ABC):
                 raise ValueError("Must be of shape (obs, dims)")
         else:
             raise TypeError("Must be of shape (obs, dims)")
-        return np.asarray_chkfinite(out, dtype=np.float)
+        return np.asarray_chkfinite(out, dtype=float)
 
     def _evalate_return_logic(self, evaluated, grid_points):
         """
