@@ -189,7 +189,7 @@ def improved_sheather_jones(data, weights=None):
 
     # Smooth the initial data using the computed optimal t
     # Multiplication in frequency domain is convolution
-    # integers = np.arange(n, dtype=np.float)
+    # integers = np.arange(n, dtype=float)
     # a_t = a * np.exp(-integers**2 * np.pi ** 2 * t_star / 2)
 
     # Diving by 2 done because of the implementation of fftpack.idct
