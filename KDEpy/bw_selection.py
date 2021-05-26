@@ -176,8 +176,11 @@ def improved_sheather_jones(data, weights=None):
     a = fftpack.dct(initial_data)
 
     # Compute the bandwidth
+    # The definition of a2 used here and in `_fixed_point` correspond to
+    # the one cited in this issue:
+    # https://github.com/tommyod/KDEpy/issues/95
     I_sq = np.power(np.arange(1, n, dtype=FLOAT), 2)
-    a2 = a[1:] ** 2 / 4
+    a2 = a[1:] ** 2
 
     # Solve for the optimal (in the AMISE sense) t
     t_star = _root(_fixed_point, N, args=(N, I_sq, a2))
