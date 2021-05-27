@@ -4,6 +4,8 @@
 Tests for the NaiveKDE. The NaiveKDE is tested against various properties, and
 in turn more advanced implementations are tested against the NaiveKDE.
 """
+from __future__ import absolute_import, division, print_function
+
 import numpy as np
 from KDEpy.NaiveKDE import NaiveKDE
 import itertools

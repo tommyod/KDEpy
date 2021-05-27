@@ -5,14 +5,21 @@ Module for kernel functions. A kernel function is a radial basis function which
 is everywhere non-negative and whose integral evalutes to unity. Every kernel
 function takes an `x` of shape (obs, dims) and returns a y of shape (obs, 1).
 """
+from __future__ import division, absolute_import, print_function
 
 import numpy as np
-import collections.abc
 import numbers
 import functools
 from scipy.special import gamma, factorial2
 from scipy.stats import norm
 from scipy.optimize import brentq
+import six
+
+if six.PY3:
+    import collections.abc as collections_abc
+else:
+    import collections as collections_abc
+
 
 # In R, the following are implemented:
 # "gaussian", "rectangular", "triangular", "epanechnikov",
@@ -223,7 +230,7 @@ def sigmoid(x, dims=1):
     return 1 / (np.pi * np.cosh(x))
 
 
-class Kernel(collections.abc.Callable):
+class Kernel(collections_abc.Callable):
     def __init__(self, function, var=1, support=3):
         """
         Initialize a new kernel function.

@@ -3,6 +3,8 @@
 """
 Tests for binning functions.
 """
+from __future__ import division, absolute_import, print_function
+
 import pytest
 import numpy as np
 from KDEpy.utils import autogrid

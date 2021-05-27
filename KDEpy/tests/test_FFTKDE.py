@@ -3,6 +3,8 @@
 """
 Tests for the FFTKDE.
 """
+from __future__ import absolute_import, division, print_function
+
 import numpy as np
 from KDEpy.FFTKDE import FFTKDE
 from KDEpy.NaiveKDE import NaiveKDE

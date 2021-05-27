@@ -3,6 +3,8 @@
 """
 Tests for verifying that grids obeys the sorting properties required for linear binning.
 """
+from __future__ import absolute_import, division, print_function
+
 import pytest
 import numpy as np
 from KDEpy.binning import grid_is_sorted  # Imported from .pyx to binning.py, then here

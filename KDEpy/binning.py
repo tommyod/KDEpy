@@ -29,6 +29,8 @@ References
   Journal of Computational and Graphical Statistics 3, no. 1 (March 1, 1994).
   https://doi.org/10.1080/10618600.1994.10474629.
 """
+from __future__ import division, absolute_import, print_function
+
 import numpy as np
 import itertools
 import functools

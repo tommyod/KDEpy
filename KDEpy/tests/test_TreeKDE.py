@@ -3,6 +3,8 @@
 """
 Tests for the TreeKDE.
 """
+from __future__ import absolute_import, division, print_function
+
 import numpy as np
 from KDEpy.TreeKDE import TreeKDE
 import itertools
