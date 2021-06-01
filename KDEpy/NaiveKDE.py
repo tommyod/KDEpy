@@ -50,10 +50,9 @@ class NaiveKDE(BaseKDE):
     """
 
     def __init__(self, kernel="gaussian", bw=1, norm=2):
-        super().__init__(kernel, bw)
-        self.norm = norm
+        super().__init__(kernel, bw, norm)
 
-    def fit(self, data, weights=None):
+    def fit(self, data, weights=None, **kwargs):
         """
         Fit the KDE to the data. This validates the data and stores it.
         Computations are performed when the KDE is evaluated on a grid.
@@ -65,6 +64,8 @@ class NaiveKDE(BaseKDE):
         weights: array-like
             One weight per data point. Must have shape (obs,). If None is
             passed, uniform weights are used.
+        **kwargs:
+            List of arguments to be passed to bandwidth optimization method.
 
         Returns
         -------
@@ -80,7 +81,7 @@ class NaiveKDE(BaseKDE):
         >>> x, y = kde()
         """
         # Sets self.data
-        super().fit(data, weights)
+        super().fit(data, weights, **kwargs)
         return self
 
     def evaluate(self, grid_points=None):

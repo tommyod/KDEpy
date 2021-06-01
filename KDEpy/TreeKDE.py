@@ -60,10 +60,9 @@ class TreeKDE(BaseKDE):
     """
 
     def __init__(self, kernel="gaussian", bw=1, norm=2.0):
-        super().__init__(kernel, bw)
-        self.norm = norm
+        super().__init__(kernel, bw, norm)
 
-    def fit(self, data, weights=None):
+    def fit(self, data, weights=None, **kwargs):
         """
         Fit the KDE to the data. This validates the data and stores it.
         Computations are performed upon evaluation on a grid.
@@ -75,6 +74,8 @@ class TreeKDE(BaseKDE):
         weights: array-like
             One weight per data point. Numbers of observations must match
             the data points.
+        **kwargs:
+            List of arguments to be passed to bandwidth optimization method.
 
         Returns
         -------
@@ -90,7 +91,7 @@ class TreeKDE(BaseKDE):
         >>> x, y = kde()
         """
         # Sets self.data
-        super().fit(data, weights)
+        super().fit(data, weights, **kwargs)
         return self
 
     def evaluate(self, grid_points=None, eps=10e-4):

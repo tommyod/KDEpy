@@ -68,11 +68,9 @@ class FFTKDE(BaseKDE):
     """
 
     def __init__(self, kernel="gaussian", bw=1, norm=2):
-        self.norm = norm
-        super().__init__(kernel, bw)
-        assert isinstance(self.norm, numbers.Number) and self.norm > 0
+        super().__init__(kernel, bw, norm)
 
-    def fit(self, data, weights=None):
+    def fit(self, data, weights=None, **kwargs):
         """
         Fit the KDE to the data. This validates the data and stores it.
         Computations are performed upon evaluation on a specific grid.
@@ -83,6 +81,8 @@ class FFTKDE(BaseKDE):
             The data points.
         weights: array-like
             One weight per data point. Must have same shape as the data.
+        **kwargs:
+            List of arguments to be passed to bandwidth optimization method.
 
         Returns
         -------
@@ -99,7 +99,7 @@ class FFTKDE(BaseKDE):
         """
 
         # Sets self.data
-        super().fit(data, weights)
+        super().fit(data, weights, **kwargs)
         return self
 
     def evaluate(self, grid_points=None):
