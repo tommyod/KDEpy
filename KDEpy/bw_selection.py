@@ -339,16 +339,16 @@ def k_nearest_neighbors(data, weights=None, k=10, batch_size=10000):
     batches = int(max(1, np.round(obs / batch_size)))
     batch_size = int(obs / batches)
     print("Using k = {} neighbors per batch (batch size = {})".format(k, batch_size))
-    print("Equivalent to aprox. {} total neighbors".format(k*batches))
+    print("Equivalent to aprox. {} total neighbors".format(k * batches))
 
     # This could be easily run in parallel, improving performance, but it would
     # require depending on an external library (e.g.: joblib)
     bw_knn = np.array([])
     for batch,batch_data in enumerate(np.array_split(data, batches)):
-        print("K Nearest Neighbors: batch = {} of {}".format(batch+1, batches))
+        print("K Nearest Neighbors: batch = {} of {}".format(batch + 1, batches))
         kdtree = KDTree(batch_data)
         # Use k+1 to take into account dist=0 between each point and self
-        dists,idxs = kdtree.query(batch_data, k=k+1)
+        dists,idxs = kdtree.query(batch_data, k=k + 1)
         bw_knn = np.concatenate((bw_knn, dists[:,-1]))
     return bw_knn
 
@@ -414,13 +414,13 @@ def _cv_score(model, bw, data, weights=None, cv=10):
     # Compute cross validation for each fold
     for fold,[test_data,test_weights] in enumerate(zip(folds_data,folds_weights)):
         if variable_bw:
-            train_bw = np.concatenate(folds_bw[:fold]+folds_bw[fold+1:], axis=0)
+            train_bw = np.concatenate(folds_bw[:fold] + folds_bw[fold + 1:], axis=0)
         else:
             train_bw = bw
         kde = model.__class__(kernel=model.kernel, bw=train_bw, norm=model.norm)
-        train_data = np.concatenate(folds_data[:fold]+folds_data[fold+1:], axis=0)
+        train_data = np.concatenate(folds_data[:fold] + folds_data[fold + 1:], axis=0)
         if weights is not None:
-            train_weights = np.concatenate(folds_weights[:fold]+folds_weights[fold+1:], axis=0)
+            train_weights = np.concatenate(folds_weights[:fold] + folds_weights[fold + 1:], axis=0)
         else:
             train_weights = None
         kde.fit(train_data, weights=train_weights)
@@ -465,7 +465,7 @@ def grid_search_cv(model, bw_grid, data, weights=None, cv=10):
     # require depending on an external library (e.g.: joblib)
     cv_scores = []
     for idx,bw in enumerate(bw_grid):
-        print("Cross Validation: evaluating bandwidth {} of {}".format(idx+1, len(bw_grid)))
+        print("Cross Validation: evaluating bandwidth {} of {}".format(idx + 1, len(bw_grid)))
         cv_scores.append(_cv_score(model, bw, data, weights=weights, cv=cv))
     
     return cv_scores
@@ -517,7 +517,7 @@ def cross_val(model, data, weights=None, cv=10, seed=None, grid=None):
         # This should be replaced by a call to silverman_rule when it is
         # implemented for multidimensional data
         sigma = np.std(data, axis=0).mean()
-        seed = sigma * (obs * (2.0+dims/4)) ** (-1/(4+dims))
+        seed = sigma * (obs * (2.0 + dims / 4)) ** (-1 / (4 + dims))
 
     if grid is None:
         grid = np.logspace(-1, 1, 20)
@@ -528,7 +528,7 @@ def cross_val(model, data, weights=None, cv=10, seed=None, grid=None):
     idx_best = np.argmax(cv_scores)
 
     # Warn if maximum was in beginning or end of grid
-    if idx_best in (0, len(bw_grid)-1):
+    if idx_best in (0, len(bw_grid) - 1):
         # Could calculate new grid automatically and call recursively
         msg = "Could not find maximum in the selected range of bandwidths.\n"
         msg += "Move grid and try again."

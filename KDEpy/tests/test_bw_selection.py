@@ -7,8 +7,12 @@ Tests for the bandwidth selection.
 import pytest
 import numpy as np
 
-from KDEpy.bw_selection import (_bw_methods, improved_sheather_jones,
-    k_nearest_neighbors, cross_val)
+from KDEpy.bw_selection import (
+    _bw_methods,
+    improved_sheather_jones,
+    k_nearest_neighbors,
+    cross_val
+)
 from KDEpy.TreeKDE import TreeKDE
 
 
@@ -68,7 +72,7 @@ def test_cv_with_2_points(dims):
     # d log(kernel(1,bw)) / d bw = 0
     # For kernel="gaussian" and norm=2.0 it gives:
     bw_optimal = 1 / np.sqrt(dims)
-    grid = np.logspace(-0.01, 0.01, 5) # Make grid of factors around 1
+    grid = np.logspace(-0.01, 0.01, 5)  # Make grid of factors around 1
     np.allclose(
         cross_val(TreeKDE(), data, seed=bw_optimal, grid=grid),
         bw_optimal

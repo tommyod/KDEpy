@@ -212,7 +212,7 @@ class BaseKDE(ABC):
 
         # -------------- Set up the weights depending on input ----------------
         if test_weights is not None:
-            test_weights = _process_sequence(test_weights).ravel()
+            test_weights = self._process_sequence(test_weights).ravel()
             if not obs == len(test_weights):
                 raise ValueError("Number of test data obs must match test weights")
 
@@ -220,7 +220,7 @@ class BaseKDE(ABC):
         
         return np.sum(np.log(self.evaluate(test_data)))
 
-    def cross_val(data, weights=None, cv=10, seed=None, grid=None):
+    def cross_val(self, data, weights=None, cv=10, seed=None, grid=None):
         """
         Computes the cross validated score over a grid of bandwidths, and returns
         the one that maximizes it. It is a robust method against multimodal
