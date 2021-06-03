@@ -63,7 +63,7 @@ setup(
         "Programming Language :: Python :: 3.8",
     ],
     packages=["KDEpy"],
-    install_requires=["numpy>=1.14.2", "scipy>=1.0.1", "matplotlib>=2.2.0"],
+    install_requires=["numpy>=1.14.2", "scipy>=1.0.1", "matplotlib>=2.2.0", "joblib>=1.0.1"],
     cmdclass=cmdclass,
     include_dirs=include_dirs,
     ext_modules=ext_modules,

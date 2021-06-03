@@ -3,13 +3,18 @@
 """
 Functions for bandwidth selection.
 """
+import numbers
 import numpy as np
 import scipy
 import warnings
+from collections.abc import Sequence
 from KDEpy.binning import linear_binning
 from KDEpy.utils import autogrid
 from scipy import fftpack
 from scipy.optimize import brentq
+from scipy.spatial import KDTree
+from joblib import Parallel, delayed
+
 
 # Choose the largest available float on the system
 try:
@@ -292,8 +297,276 @@ Setting bw = {}".format(
         return 1.0
 
 
+def _knn_batch(batch_data, k=10):
+    """
+    Computes k nearest neighbors algorithm in one batch.
+    Returns the array of distances to the kth neighbor
+
+    Parameters
+    ----------
+    batch_data: array-like
+        The data points. Data must have shape (obs, dims).
+    k: int, default=10
+        Number of neighbors per batch (without counting self). Must be > 0 and
+        < len(batch_data)
+    """
+    assert len(batch_data.shape) == 2
+    assert k > 0 and k < len(batch_data)
+
+    kdtree = KDTree(batch_data)
+    # Use k+1 to take into account dist=0 between each point and self
+    dists, idxs = kdtree.query(batch_data, k=k + 1)
+    return dists[:, -1]
+
+
+def k_nearest_neighbors(data, weights=None, k=10, batch_size=10000, n_jobs=-1):
+    """
+    Computes variable bandwidth based on k nearest neighbors algorithm on data.
+    For each data point, sets its bandwidth as the euclidean distance to the
+    kth nearest neighbor within its batch. The computation is performed on
+    batches to allow scalability to large datasets. The scipy KDTree class is
+    used for the nearest neighbors queries.
+
+    https://en.wikipedia.org/wiki/Variable_kernel_density_estimation
+    https://en.wikipedia.org/wiki/K-nearest_neighbour_algorithm
+    https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.KDTree.html
+
+    Parameters
+    ----------
+    data: array-like
+        The data points. Data must have shape (obs, dims).
+    weights: array-like, Sequence or None
+        Ignored, only for compatibility.
+    k: int, default=10
+        Number of neighbors per batch (without counting self).
+    batch_size: int, default=10000
+        Aproximate size of each batch. Will be slightly modified to cover
+        dataset as uniformly as possible.
+    n_jobs : int, default=-1
+        Number of jobs to run in parallel. -1 means using all processors.
+    """
+    if not len(data.shape) == 2:
+        raise ValueError("Data must be of shape (obs, dims).")
+    obs, dims = data.shape
+
+    if weights is not None:
+        warnings.warn("K nearest neighbors ignores all weights")
+
+    if obs < 2:
+        raise ValueError("Data must be of length >= 2.")
+
+    if k < 1 or k >= batch_size:
+        raise ValueError("k must be between 1 and batch_size-1.")
+    k = int(k)
+
+    if batch_size < 2:
+        raise ValueError("Batch size must be >= 2.")
+
+    batches = int(max(1, np.round(obs / batch_size)))
+    batch_size = int(obs / batches)
+    print("Using k = {} neighbors per batch (batch size = {})".format(k, batch_size))
+    if batches > 1:
+        print("Equivalent to aprox. {} total neighbors".format(k * batches))
+
+    batches_dist = Parallel(n_jobs=n_jobs, verbose=10)(
+        delayed(_knn_batch)(batch_data, k) for batch_data in np.array_split(data, batches)
+    )
+    bw_knn = np.concatenate(batches_dist)
+
+    return bw_knn
+
+
+def _cv_score(model, bw, data, weights=None, cv=10):
+    """
+    Computes cross validated score of KDE model, which gives an indicator of
+    the quality of the estimation. Test and train data are taken following a
+    K-folds cross validation scheme.
+
+    Parameters
+    ----------
+    model: NaiveKDE() or TreeKDE()
+        The model to be used to evaluate scores. Technically it could be any
+        object that implements methods __init__, fit and evaluate (on arbitrary
+        grid) with the same syntax than KDEpy.
+    bw : float or array-like
+        Bandwidth. If a float is passed, it is the standard deviation of the
+        kernel. If an array-like it passed, it is the bandwidth of each point.
+    data: array-like
+        The data points. Data must have shape (obs, dims).
+    weights: array-like, Sequence or None
+        One weight per data point. Numbers of observations must match
+        the data points.  If None is passed, uniform weights are used.
+    cv: int, default=10
+        The number of cross validation folds. If cv equals obs, it is the
+        leave-one-out cross validation.
+    """
+    if not len(data.shape) == 2:
+        raise ValueError("Data must be of shape (obs, dims).")
+    obs, dims = data.shape
+
+    if obs < 2:
+        raise ValueError("Data must be of length >= 2.")
+
+    if weights is not None:
+        if not weights.shape == (obs,):
+            raise ValueError("Number of weights must match data points")
+
+    if cv > len(data):
+        cv = len(data)
+    if cv < 2:
+        raise ValueError("Number of folds must be >= 2.")
+
+    if isinstance(bw, numbers.Number) and bw > 0:
+        variable_bw = False
+    elif isinstance(bw, (np.ndarray, Sequence)):
+        if not bw.shape == (obs,):
+            raise ValueError("If bandwidth is variable, it must match data points")
+        folds_bw = np.array_split(bw, cv)
+        variable_bw = True
+    else:
+        raise ValueError("Bandwidth must be > 0, or array-like.")
+
+    # Folds for cross validation
+    folds_data = np.array_split(data, cv)
+    if weights is not None:
+        folds_weights = np.array_split(weights, cv)
+    else:
+        folds_weights = cv * [None]
+    folds_score = []
+
+    # Compute cross validation for each fold
+    for fold, [test_data, test_weights] in enumerate(zip(folds_data, folds_weights)):
+        if variable_bw:
+            train_bw = np.concatenate(folds_bw[:fold] + folds_bw[fold + 1 :], axis=0)
+        else:
+            train_bw = bw
+        kde = model.__class__(kernel=model.kernel, bw=train_bw, norm=model.norm)
+        train_data = np.concatenate(folds_data[:fold] + folds_data[fold + 1 :], axis=0)
+        if weights is not None:
+            train_weights = np.concatenate(folds_weights[:fold] + folds_weights[fold + 1 :], axis=0)
+        else:
+            train_weights = None
+        kde.fit(train_data, weights=train_weights)
+        folds_score.append(kde.score(test_data, test_weights))
+
+    return np.mean(folds_score)
+
+
+def grid_search_cv(model, bw_grid, data, weights=None, cv=10, n_jobs=-1):
+    """
+    Computes the cross validated score over a grid of bandwidths, and returns
+    the list of cv scores.
+
+    Parameters
+    ----------
+    model: NaiveKDE() or TreeKDE()
+        The model to be used to evaluate scores. Technically it could be any
+        object that implements methods __init__, fit and evaluate (on arbitrary
+        grid) with the same syntax than KDEpy.
+    bw_grid : array-like
+        The grid of bandwidths. Each element can be a float or an array of
+        shape (obs,).
+    data: array-like
+        The data points. Data must have shape (obs, dims).
+    weights: array-like, Sequence or None
+        One weight per data point. Numbers of observations must match
+        the data points.  If None is passed, uniform weights are used.
+    cv: int, default=10
+        The number of cross validation folds. If cv equals obs, it is the
+        leave-one-out cross validation.
+    n_jobs : int, default=-1
+        Number of jobs to run in parallel. -1 means using all processors.
+    """
+    if not len(data.shape) == 2:
+        raise ValueError("Data must be of shape (obs, dims).")
+    obs, dims = data.shape
+
+    if obs < 2:
+        raise ValueError("Data must be of length >= 2.")
+
+    assert isinstance(bw_grid, (Sequence, np.ndarray))
+
+    cv_scores = Parallel(n_jobs=n_jobs, verbose=10)(
+        delayed(_cv_score)(model, bw, data, weights=weights, cv=cv) for bw in bw_grid
+    )
+
+    return cv_scores
+
+
+def cross_val(model, data, weights=None, cv=10, seed=None, grid=None, n_jobs=-1):
+    """
+    Computes the cross validated score over a grid of bandwidths, and returns
+    the one that maximizes it. It is a robust method against multimodal
+    distributions, and can be performed on variable bandwidths (e.g.: by
+    setting "seed" parameter as the output of k nearest neighbors algorithm).
+
+    Habbema, J. D. F., Hermans, J., and Van den Broek, K. (1974) A stepwise
+    discrimination analysis program using density estimation.
+
+    Leave-one-out MLCV method in R: https://rdrr.io/cran/kedd/man/h.mlcv.html
+
+    Parameters
+    ----------
+    model: NaiveKDE() or TreeKDE()
+        The model to be used to evaluate scores. Technically it could be any
+        object that implements methods __init__, fit and evaluate (on arbitrary
+        grid) with the same syntax than KDEpy.
+    bw : float or array-like
+    data: array-like
+        The data points. Data must have shape (obs, dims).
+    weights: array-like, Sequence or None
+        One weight per data point. Numbers of observations must match
+        the data points.  If None is passed, uniform weights are used.
+    cv: int, default=10
+        The number of cross validation folds. If cv equals obs, it is the
+        leave-one-out cross validation.
+    seed : float or array-like, default=None
+        The seed bandwidth. If None is passed, a simplified version of the
+        silverman rule is used.
+    grid : array-like, default=None
+        The grid of factors. The bandwidth grid is constructed as:
+        bw_grid[i] = seed * grid[i]
+        If None is passed, the default grid is used: np.logspace(-1,1,20)
+    n_jobs : int, default=-1
+        Number of jobs to run in parallel. -1 means using all processors.
+    """
+    if not len(data.shape) == 2:
+        raise ValueError("Data must be of shape (obs, dims).")
+    obs, dims = data.shape
+
+    if obs < 2:
+        raise ValueError("Data must be of length >= 2.")
+
+    if seed is None:
+        # This should be replaced by a call to silverman_rule when it is
+        # implemented for multidimensional data
+        sigma = np.std(data, axis=0).mean()
+        seed = sigma * (obs * (2.0 + dims / 4)) ** (-1 / (4 + dims))
+
+    if grid is None:
+        grid = np.logspace(-1, 1, 20)
+
+    # Build bandwidths grid so that bw_grid[i] = seed * grid[i]
+    bw_grid = np.reshape(grid, (-1, *np.ones(np.ndim(seed), dtype=int))) * seed
+
+    cv_scores = grid_search_cv(model, bw_grid, data, weights=weights, cv=cv, n_jobs=n_jobs)
+    idx_best = np.argmax(cv_scores)
+
+    # Warn if maximum was in beginning or end of grid
+    if idx_best in (0, len(bw_grid) - 1):
+        # Could calculate new grid automatically and call recursively
+        msg = "Could not find maximum in the selected range of bandwidths.\n"
+        msg += "Move grid and try again."
+        warnings.warn(msg)
+
+    bw_cv = bw_grid[idx_best]
+    return bw_cv
+
+
 _bw_methods = {
     "silverman": silvermans_rule,
     "scott": scotts_rule,
     "ISJ": improved_sheather_jones,
+    "KNN": k_nearest_neighbors,
+    # CV can not be added here since it requires a model
 }

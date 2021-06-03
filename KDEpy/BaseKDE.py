@@ -8,7 +8,7 @@ import numpy as np
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
 from KDEpy.kernel_funcs import _kernel_functions
-from KDEpy.bw_selection import _bw_methods
+from KDEpy.bw_selection import _bw_methods, cross_val
 from KDEpy.utils import autogrid
 
 
@@ -31,7 +31,7 @@ class BaseKDE(ABC):
     _bw_methods = _bw_methods
 
     @abstractmethod
-    def __init__(self, kernel: str, bw: float):
+    def __init__(self, kernel: str, bw: float, norm: float):
         """Initialize the kernel density estimator.
 
         The return type must be duplicated in the docstring to comply
@@ -59,6 +59,9 @@ class BaseKDE(ABC):
         else:
             raise ValueError(msg)
 
+        # CV method must be added here since it depends on self
+        _bw_methods["CV"] = self.cross_val
+
         # The `bw` paramter may either be a positive number, a string, or
         # array-like such that each point in the data has a uniue bw
         if isinstance(bw, numbers.Number) and bw > 0:
@@ -74,12 +77,15 @@ class BaseKDE(ABC):
         else:
             raise ValueError("Bandwidth must be > 0, array-like or a string.")
 
+        self.norm = norm
+
         # Test quickly that the method has done what is was supposed to do
         assert callable(self.kernel)
         assert isinstance(self.bw_method, (np.ndarray, Sequence, numbers.Number)) or callable(self.bw_method)
+        assert isinstance(self.norm, numbers.Number) and self.norm > 0
 
     @abstractmethod
-    def fit(self, data, weights=None):
+    def fit(self, data, weights=None, **kwargs):
         """
         Fit the kernel density estimator to the data.
         This method converts the data to shape (obs, dims) and the weights
@@ -93,6 +99,8 @@ class BaseKDE(ABC):
         weights : array-like, Sequence or None
             May be array-like of shape (obs,), shape (obs, dims), a
             Python Sequence, e.g. a list or tuple, or None.
+        **kwargs:
+            List of arguments to be passed to bandwidth optimization method.
         """
 
         # -------------- Set up the data depending on input -------------------
@@ -126,7 +134,7 @@ class BaseKDE(ABC):
         if isinstance(self.bw_method, (np.ndarray, Sequence)):
             self.bw = self.bw_method
         elif callable(self.bw_method):
-            self.bw = self.bw_method(self.data, self.weights)
+            self.bw = self.bw_method(self.data, self.weights, **kwargs)
         else:
             self.bw = self.bw_method
 
@@ -174,6 +182,75 @@ class BaseKDE(ABC):
             assert isinstance(bw, numbers.Number)
             assert bw > 0
         assert len(self.grid_points.shape) == 2
+
+    def score(self, test_data, test_weights=None):
+        """
+        Computes the score of test data on the KDE model. The score is
+        calculated as the mean log-probability of the test samples
+        on the model. The method takes into account test weights, and
+        works with variable bandwidths.
+
+        Parameters
+        ----------
+        test_data : array-like or Sequence
+            May be array-like of shape (obs,), shape (obs, dims) or a
+            Python Sequence, e.g. a list or tuple.
+        test_weights : array-like, Sequence or None
+            May be array-like of shape (obs,), shape (obs, dims), a
+            Python Sequence, e.g. a list or tuple, or None.
+        """
+
+        # -------------- Set up the data depending on input -------------------
+        # In the end, the data should be an ndarray of shape (obs, dims)
+        test_data = self._process_sequence(test_data)
+
+        obs, dims = test_data.shape
+
+        if not obs > 0:
+            raise ValueError("Test data must contain at least one data point.")
+        assert dims > 0
+
+        # -------------- Set up the weights depending on input ----------------
+        if test_weights is not None:
+            test_weights = self._process_sequence(test_weights).ravel()
+            if not obs == len(test_weights):
+                raise ValueError("Number of test data obs must match test weights")
+
+            return np.mean(test_weights * np.log(self.evaluate(test_data)))
+
+        return np.mean(np.log(self.evaluate(test_data)))
+
+    def cross_val(self, data, weights=None, cv=10, seed=None, grid=None):
+        """
+        Computes the cross validated score over a grid of bandwidths, and returns
+        the one that maximizes it. It is a robust method against multimodal
+        distributions, and can be performed on variable bandwidths (e.g.: by
+        setting "seed" parameter as the output of k nearest neighbors algorithm).
+
+        Habbema, J. D. F., Hermans, J., and Van den Broek, K. (1974) A stepwise
+        discrimination analysis program using density estimation.
+
+        Leave-one-out MLCV method in R: https://rdrr.io/cran/kedd/man/h.mlcv.html
+
+        Parameters
+        ----------
+        data: array-like
+            The data points. Data must have shape (obs, dims).
+        weights: array-like,
+            One weight per data point. Numbers of observations must match
+            the data points.
+        cv: int
+            The number of cross validation folds. If cv equals obs, it is the
+            leave-one-out cross validation.
+        seed : float or array-like
+            The seed bandwidth. By default is a simplified version of the silverman
+            rule.
+        grid : array-like
+            The grid of factors. The bandwidth grid is constructed as:
+            bw_grid[i] = bw * grid[i]
+            By default is np.logspace(-1,1,20)
+        """
+        return cross_val(self, data, weights=weights, cv=cv, seed=seed, grid=grid)
 
     @staticmethod
     def _process_sequence(sequence_array_like):

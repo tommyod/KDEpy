@@ -268,10 +268,7 @@ def linbin_Ndim_python(data, grid_points, weights=None):
         # Compute integer part and fractional part for every x_i
         # Compute relation to previous grid point, and next grid point
         int_frac = (
-            (
-                (int(coordinate), 1 - (coordinate % 1)),
-                (int(coordinate) + 1, (coordinate % 1)),
-            )
+            ((int(coordinate), 1 - (coordinate % 1)), (int(coordinate) + 1, (coordinate % 1)))
             for coordinate in observation
         )
 

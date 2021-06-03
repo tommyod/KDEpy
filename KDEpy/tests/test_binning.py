@@ -69,12 +69,7 @@ class TestBinningFunctions:
     @pytest.mark.parametrize(
         "data, func",
         itertools.product(
-            [
-                [1, 2, 3, 4, 5, 6],
-                [0.04, 0.54, 0.33, 0.85, 0.16],
-                [-4.12, 0.98, -4.3, -1.85],
-                [0, 0, 1],
-            ],
+            [[1, 2, 3, 4, 5, 6], [0.04, 0.54, 0.33, 0.85, 0.16], [-4.12, 0.98, -4.3, -1.85], [0, 0, 1]],
             [linear_binning, linbin_Ndim_python],
         ),
     )
@@ -110,8 +105,7 @@ class TestBinningFunctions:
             assert np.allclose(y, ans)
 
     @pytest.mark.parametrize(
-        "dims, use_weights, eq_grid",
-        itertools.product([1, 2, 3, 4], [True, False], [True, False]),
+        "dims, use_weights, eq_grid", itertools.product([1, 2, 3, 4], [True, False], [True, False])
     )
     def test_cython_binning(self, dims, use_weights, eq_grid):
         """
