@@ -186,7 +186,7 @@ class BaseKDE(ABC):
     def score(self, test_data, test_weights=None):
         """
         Computes the score of test data on the KDE model. The score is
-        calculated as the total log-probability of the test samples
+        calculated as the mean log-probability of the test samples
         on the model. The method takes into account test weights, and
         works with variable bandwidths.
 
@@ -216,9 +216,9 @@ class BaseKDE(ABC):
             if not obs == len(test_weights):
                 raise ValueError("Number of test data obs must match test weights")
 
-            return np.sum(test_weights * np.log(self.evaluate(test_data)))
-        
-        return np.sum(np.log(self.evaluate(test_data)))
+            return np.mean(test_weights * np.log(self.evaluate(test_data)))
+
+        return np.mean(np.log(self.evaluate(test_data)))
 
     def cross_val(self, data, weights=None, cv=10, seed=None, grid=None):
         """
@@ -226,17 +226,17 @@ class BaseKDE(ABC):
         the one that maximizes it. It is a robust method against multimodal
         distributions, and can be performed on variable bandwidths (e.g.: by
         setting "seed" parameter as the output of k nearest neighbors algorithm).
-    
+
         Habbema, J. D. F., Hermans, J., and Van den Broek, K. (1974) A stepwise
         discrimination analysis program using density estimation.
-    
+
         Leave-one-out MLCV method in R: https://rdrr.io/cran/kedd/man/h.mlcv.html
-    
+
         Parameters
         ----------
         data: array-like
             The data points. Data must have shape (obs, dims).
-        weights: array-like, 
+        weights: array-like,
             One weight per data point. Numbers of observations must match
             the data points.
         cv: int

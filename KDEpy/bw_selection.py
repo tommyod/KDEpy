@@ -13,6 +13,8 @@ from KDEpy.utils import autogrid
 from scipy import fftpack
 from scipy.optimize import brentq
 from scipy.spatial import KDTree
+from joblib import Parallel, delayed
+
 
 # Choose the largest available float on the system
 try:
@@ -295,7 +297,29 @@ Setting bw = {}".format(
         return 1.0
 
 
-def k_nearest_neighbors(data, weights=None, k=10, batch_size=10000):
+def _knn_batch(batch_data, k=10):
+    """
+    Computes k nearest neighbors algorithm in one batch.
+    Returns the array of distances to the kth neighbor
+
+    Parameters
+    ----------
+    batch_data: array-like
+        The data points. Data must have shape (obs, dims).
+    k: int, default=10
+        Number of neighbors per batch (without counting self). Must be > 0 and
+        < len(batch_data)
+    """
+    assert len(batch_data.shape) == 2
+    assert k > 0 and k < len(batch_data)
+
+    kdtree = KDTree(batch_data)
+    # Use k+1 to take into account dist=0 between each point and self
+    dists, idxs = kdtree.query(batch_data, k=k + 1)
+    return dists[:, -1]
+
+
+def k_nearest_neighbors(data, weights=None, k=10, batch_size=10000, n_jobs=-1):
     """
     Computes variable bandwidth based on k nearest neighbors algorithm on data.
     For each data point, sets its bandwidth as the euclidean distance to the
@@ -311,13 +335,15 @@ def k_nearest_neighbors(data, weights=None, k=10, batch_size=10000):
     ----------
     data: array-like
         The data points. Data must have shape (obs, dims).
-    weights: array-like, 
-        Ignored, only for compatibility
-    k: int
-        Number of neighbors per batch (without counting self)
-    batch_size: int
+    weights: array-like, Sequence or None
+        Ignored, only for compatibility.
+    k: int, default=10
+        Number of neighbors per batch (without counting self).
+    batch_size: int, default=10000
         Aproximate size of each batch. Will be slightly modified to cover
         dataset as uniformly as possible.
+    n_jobs : int, default=-1
+        Number of jobs to run in parallel. -1 means using all processors.
     """
     if not len(data.shape) == 2:
         raise ValueError("Data must be of shape (obs, dims).")
@@ -339,17 +365,14 @@ def k_nearest_neighbors(data, weights=None, k=10, batch_size=10000):
     batches = int(max(1, np.round(obs / batch_size)))
     batch_size = int(obs / batches)
     print("Using k = {} neighbors per batch (batch size = {})".format(k, batch_size))
-    print("Equivalent to aprox. {} total neighbors".format(k * batches))
+    if batches > 1:
+        print("Equivalent to aprox. {} total neighbors".format(k * batches))
 
-    # This could be easily run in parallel, improving performance, but it would
-    # require depending on an external library (e.g.: joblib)
-    bw_knn = np.array([])
-    for batch,batch_data in enumerate(np.array_split(data, batches)):
-        print("K Nearest Neighbors: batch = {} of {}".format(batch + 1, batches))
-        kdtree = KDTree(batch_data)
-        # Use k+1 to take into account dist=0 between each point and self
-        dists,idxs = kdtree.query(batch_data, k=k + 1)
-        bw_knn = np.concatenate((bw_knn, dists[:,-1]))
+    batches_dist = Parallel(n_jobs=n_jobs, verbose=10)(
+        delayed(_knn_batch)(batch_data, k) for batch_data in np.array_split(data, batches)
+    )
+    bw_knn = np.concatenate(batches_dist)
+
     return bw_knn
 
 
@@ -370,10 +393,10 @@ def _cv_score(model, bw, data, weights=None, cv=10):
         kernel. If an array-like it passed, it is the bandwidth of each point.
     data: array-like
         The data points. Data must have shape (obs, dims).
-    weights: array-like, 
+    weights: array-like, Sequence or None
         One weight per data point. Numbers of observations must match
-        the data points.
-    cv: int
+        the data points.  If None is passed, uniform weights are used.
+    cv: int, default=10
         The number of cross validation folds. If cv equals obs, it is the
         leave-one-out cross validation.
     """
@@ -412,24 +435,24 @@ def _cv_score(model, bw, data, weights=None, cv=10):
     folds_score = []
 
     # Compute cross validation for each fold
-    for fold,[test_data,test_weights] in enumerate(zip(folds_data,folds_weights)):
+    for fold, [test_data, test_weights] in enumerate(zip(folds_data, folds_weights)):
         if variable_bw:
-            train_bw = np.concatenate(folds_bw[:fold] + folds_bw[fold + 1:], axis=0)
+            train_bw = np.concatenate(folds_bw[:fold] + folds_bw[fold + 1 :], axis=0)
         else:
             train_bw = bw
         kde = model.__class__(kernel=model.kernel, bw=train_bw, norm=model.norm)
-        train_data = np.concatenate(folds_data[:fold] + folds_data[fold + 1:], axis=0)
+        train_data = np.concatenate(folds_data[:fold] + folds_data[fold + 1 :], axis=0)
         if weights is not None:
-            train_weights = np.concatenate(folds_weights[:fold] + folds_weights[fold + 1:], axis=0)
+            train_weights = np.concatenate(folds_weights[:fold] + folds_weights[fold + 1 :], axis=0)
         else:
             train_weights = None
         kde.fit(train_data, weights=train_weights)
-        folds_score.append(kde.score(test_data,test_weights))
+        folds_score.append(kde.score(test_data, test_weights))
 
     return np.mean(folds_score)
 
 
-def grid_search_cv(model, bw_grid, data, weights=None, cv=10):
+def grid_search_cv(model, bw_grid, data, weights=None, cv=10, n_jobs=-1):
     """
     Computes the cross validated score over a grid of bandwidths, and returns
     the list of cv scores.
@@ -445,12 +468,14 @@ def grid_search_cv(model, bw_grid, data, weights=None, cv=10):
         shape (obs,).
     data: array-like
         The data points. Data must have shape (obs, dims).
-    weights: array-like, 
+    weights: array-like, Sequence or None
         One weight per data point. Numbers of observations must match
-        the data points.
-    cv: int
+        the data points.  If None is passed, uniform weights are used.
+    cv: int, default=10
         The number of cross validation folds. If cv equals obs, it is the
         leave-one-out cross validation.
+    n_jobs : int, default=-1
+        Number of jobs to run in parallel. -1 means using all processors.
     """
     if not len(data.shape) == 2:
         raise ValueError("Data must be of shape (obs, dims).")
@@ -461,17 +486,14 @@ def grid_search_cv(model, bw_grid, data, weights=None, cv=10):
 
     assert isinstance(bw_grid, (Sequence, np.ndarray))
 
-    # This could be easily run in parallel, improving performance, but it would
-    # require depending on an external library (e.g.: joblib)
-    cv_scores = []
-    for idx,bw in enumerate(bw_grid):
-        print("Cross Validation: evaluating bandwidth {} of {}".format(idx + 1, len(bw_grid)))
-        cv_scores.append(_cv_score(model, bw, data, weights=weights, cv=cv))
-    
+    cv_scores = Parallel(n_jobs=n_jobs, verbose=10)(
+        delayed(_cv_score)(model, bw, data, weights=weights, cv=cv) for bw in bw_grid
+    )
+
     return cv_scores
 
 
-def cross_val(model, data, weights=None, cv=10, seed=None, grid=None):
+def cross_val(model, data, weights=None, cv=10, seed=None, grid=None, n_jobs=-1):
     """
     Computes the cross validated score over a grid of bandwidths, and returns
     the one that maximizes it. It is a robust method against multimodal
@@ -492,19 +514,21 @@ def cross_val(model, data, weights=None, cv=10, seed=None, grid=None):
     bw : float or array-like
     data: array-like
         The data points. Data must have shape (obs, dims).
-    weights: array-like, 
+    weights: array-like, Sequence or None
         One weight per data point. Numbers of observations must match
-        the data points.
-    cv: int
+        the data points.  If None is passed, uniform weights are used.
+    cv: int, default=10
         The number of cross validation folds. If cv equals obs, it is the
         leave-one-out cross validation.
-    seed : float or array-like
-        The seed bandwidth. By default is a simplified version of the silverman
-        rule.
-    grid : array-like
+    seed : float or array-like, default=None
+        The seed bandwidth. If None is passed, a simplified version of the
+        silverman rule is used.
+    grid : array-like, default=None
         The grid of factors. The bandwidth grid is constructed as:
-        bw_grid[i] = bw * grid[i]
-        By default is np.logspace(-1,1,20)
+        bw_grid[i] = seed * grid[i]
+        If None is passed, the default grid is used: np.logspace(-1,1,20)
+    n_jobs : int, default=-1
+        Number of jobs to run in parallel. -1 means using all processors.
     """
     if not len(data.shape) == 2:
         raise ValueError("Data must be of shape (obs, dims).")
@@ -522,9 +546,10 @@ def cross_val(model, data, weights=None, cv=10, seed=None, grid=None):
     if grid is None:
         grid = np.logspace(-1, 1, 20)
 
-    bw_grid = np.reshape(grid, (-1,*np.ones(np.ndim(seed),dtype=int))) * seed
+    # Build bandwidths grid so that bw_grid[i] = seed * grid[i]
+    bw_grid = np.reshape(grid, (-1, *np.ones(np.ndim(seed), dtype=int))) * seed
 
-    cv_scores = grid_search_cv(model, bw_grid, data, weights=weights, cv=cv)
+    cv_scores = grid_search_cv(model, bw_grid, data, weights=weights, cv=cv, n_jobs=n_jobs)
     idx_best = np.argmax(cv_scores)
 
     # Warn if maximum was in beginning or end of grid
@@ -542,6 +567,6 @@ _bw_methods = {
     "silverman": silvermans_rule,
     "scott": scotts_rule,
     "ISJ": improved_sheather_jones,
-    "knn": k_nearest_neighbors,
+    "KNN": k_nearest_neighbors,
     # CV can not be added here since it requires a model
 }

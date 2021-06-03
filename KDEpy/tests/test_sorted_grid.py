@@ -71,10 +71,7 @@ class TestGridSorted:
         grid = np.array([[0], [0], [0], [1], [1], [1], [2], [2], [2]], dtype=float)
         assert grid_is_sorted(grid)
 
-        grid = np.array(
-            [[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]],
-            dtype=float,
-        )
+        grid = np.array([[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]], dtype=float)
         assert grid_is_sorted(grid)
 
         grid = np.array([[1, 1], [2, 2], [3, 3]], dtype=float)
@@ -303,10 +300,7 @@ class TestGridSorted:
         grid = np.array([[0], [0], [2], [1], [1], [1], [2], [2], [2]], dtype=float)
         assert not grid_is_sorted(grid)
 
-        grid = np.array(
-            [[0, 0], [0, 1], [0, 2], [1, 0], [1, 2], [1, 1], [2, 0], [2, 1], [2, 2]],
-            dtype=float,
-        )
+        grid = np.array([[0, 0], [0, 1], [0, 2], [1, 0], [1, 2], [1, 1], [2, 0], [2, 1], [2, 2]], dtype=float)
         assert not grid_is_sorted(grid)
 
         grid = np.array([[1, 1], [3, 3], [2, 2]], dtype=float)

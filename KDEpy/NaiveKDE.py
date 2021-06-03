@@ -23,7 +23,7 @@ class NaiveKDE(BaseKDE):
     bw : float, str or array-like
         Bandwidth or bandwidth selection method. If a float is passed, it
         is the standard deviation of the kernel. If a string it passed, it
-        is the bandwidth selection method, see cls._bw_methods.keys() for
+        is the bandwidth selection method, see cls()._bw_methods.keys() for
         choices. If an array-like it passed, it is the bandwidth of each
         point.
     norm : float
