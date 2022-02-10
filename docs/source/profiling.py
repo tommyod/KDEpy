@@ -60,7 +60,7 @@ def main():
     @timed()
     def KDE_scipy(data, kernel="gaussian"):
         kde = gaussian_kde(data)
-        x = np.linspace(np.min(data) - 1, np.max(data) + 1, num=2 ** 10)
+        x = np.linspace(np.min(data) - 1, np.max(data) + 1, num=2**10)
         return kde(x)
 
     @timed()
@@ -69,7 +69,7 @@ def main():
         if kernel == "epa":
             fft = False
         kde = sm.nonparametric.KDEUnivariate(data)
-        kde.fit(fft=fft, gridsize=2 ** 10)
+        kde.fit(fft=fft, gridsize=2**10)
         return kde.density
 
     @timed()
@@ -82,7 +82,7 @@ def main():
         kde.fit(data.reshape(-1, 1))
 
         # score_samples returns the log of the probability density
-        x = np.linspace(np.min(data) - 1, np.max(data) + 1, num=2 ** 10)
+        x = np.linspace(np.min(data) - 1, np.max(data) + 1, num=2**10)
         logprob = kde.score_samples(x.reshape(-1, 1))
         return np.exp(logprob)
 
@@ -90,9 +90,7 @@ def main():
     # Set up data, create the figure, perform the computations and create plot.
     data_sizes_orig = np.logspace(1, 8, num=15)
     plt.figure(figsize=(8, 4))
-    plt.title(
-        "Profiling KDE implementations." + r"Gaussian kernel on $2^{10}$ grid points."
-    )  # Epanechnikov
+    plt.title("Profiling KDE implementations." + r"Gaussian kernel on $2^{10}$ grid points.")  # Epanechnikov
     algorithms = [KDE_KDEpyFFTKDE, KDE_scipy, KDE_statsmodels, KDE_sklearn]
     names = ["KDEpy.FFTKDE", "scipy", "statsmodels", "sklearn"]
     for function, name in zip(algorithms, names):
@@ -175,10 +173,7 @@ def main():
 
     data_sizes_orig = np.logspace(1, 6, num=11)
     plt.figure(figsize=(8, 4))
-    plt.title(
-        r"Profiling KDE implementations. "
-        + r"Gaussian kernel on $64 \times 64$ grid points."
-    )
+    plt.title(r"Profiling KDE implementations. " + r"Gaussian kernel on $64 \times 64$ grid points.")
     functions = [KDE_KDEpyFFTKDE, KDE_scipy, KDE_statsmodels, KDE_sklearn]
     names = ["KDEpy.FFTKDE", "scipy", "statsmodels", "sklearn"]
     for function, name in zip(functions, names):
@@ -230,7 +225,7 @@ def main():
         for dims in range(1, 9):
 
             np.random.seed(dims)
-            gen = (np.random.randn(10 ** data_size).reshape(-1, 1) for i in range(dims))
+            gen = (np.random.randn(10**data_size).reshape(-1, 1) for i in range(dims))
             data = np.concatenate(tuple(gen), axis=1)
             print(data_size, dims)
             grid_pts = (int(np.round(4096 ** (1 / dims))),) * dims

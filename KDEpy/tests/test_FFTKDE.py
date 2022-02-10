@@ -78,7 +78,7 @@ def test_against_naive_KDE(data, bw):
     """
 
     # Higher accuracy when num gets larger
-    x = np.linspace(min(data) - bw, max(data) + bw, num=2 ** 10)
+    x = np.linspace(min(data) - bw, max(data) + bw, num=2**10)
 
     y1 = NaiveKDE("epa", bw=bw).fit(data, weights=None).evaluate(x)
     y2 = FFTKDE("epa", bw=bw).fit(data, weights=None).evaluate(x)
@@ -96,7 +96,7 @@ def test_against_naive_KDE_w_weights(data, bw):
     """
 
     # Higher accuracy when num gets larger
-    x = np.linspace(min(data) - bw, max(data) + bw, num=2 ** 10)
+    x = np.linspace(min(data) - bw, max(data) + bw, num=2**10)
     weights = np.arange(len(data)) + 1
 
     y1 = NaiveKDE("epa", bw=bw).fit(data, weights=weights).evaluate(x)
@@ -113,19 +113,19 @@ def FFTKDE_test_grid_inside_data_1D():
     https://github.com/tommyod/KDEpy/issues/7
     """
     data = np.array([0, 1, 2, 3, 4, 5])
-    grid = np.linspace(-1, 6, num=2 ** 6)
+    grid = np.linspace(-1, 6, num=2**6)
     FFTKDE().fit(data).evaluate(grid)  # This should cause no problem
 
     with pytest.raises(ValueError):
-        bad_grid = np.linspace(2, 6, num=2 ** 6)
+        bad_grid = np.linspace(2, 6, num=2**6)
         FFTKDE().fit(data).evaluate(bad_grid)
 
     with pytest.raises(ValueError):
-        bad_grid = np.linspace(-2, 4, num=2 ** 6)
+        bad_grid = np.linspace(-2, 4, num=2**6)
         FFTKDE().fit(data).evaluate(bad_grid)
 
     with pytest.raises(ValueError):
-        bad_grid = np.linspace(0, 5, num=2 ** 6)
+        bad_grid = np.linspace(0, 5, num=2**6)
         FFTKDE().fit(data).evaluate(bad_grid)
 
 

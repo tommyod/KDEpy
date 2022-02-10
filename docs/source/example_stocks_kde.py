@@ -28,8 +28,8 @@ data = pd.read_csv("stocks.csv")
 
 def weight_function(arr):
     """
-  Weight function for weighting samples backwards in time less.
-  """
+    Weight function for weighting samples backwards in time less.
+    """
     k = 0.005
     return 0.045 * np.exp(-arr * k)
 
@@ -42,24 +42,13 @@ weights = weight_function(np.arange(0, len(stock_data)))
 # This is not computatationally efficient, but it's reasonably fast
 # The following UNIX command combines the images to a GIF
 # $ convert -delay 10 -loop 0 kde*.png stocks_animation.gif
-points = (
-    list(range(1, 20))
-    + list(range(20, 100, 2))
-    + list(range(100, 300, 3))
-    + list(range(300, len(stock_data), 5))
-)
+points = list(range(1, 20)) + list(range(20, 100, 2)) + list(range(100, 300, 3)) + list(range(300, len(stock_data), 5))
 for i, num_points in enumerate(points):
 
-    fig, (ax1, ax2) = plt.subplots(
-        1, 2, figsize=(10, 3), gridspec_kw={"width_ratios": [3, 1]}, sharey="row"
-    )
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 3), gridspec_kw={"width_ratios": [3, 1]}, sharey="row")
 
     # Create a kernel density estimate, the bandwidth is found by trial and error
-    x, y = (
-        FFTKDE(bw=0.002)
-        .fit(stock_data[:num_points], weights=weights[num_points - 1 :: -1])
-        .evaluate()
-    )
+    x, y = FFTKDE(bw=0.002).fit(stock_data[:num_points], weights=weights[num_points - 1 :: -1]).evaluate()
 
     # The left-most plot
     ax1.set_title("Stock data (IEX)")

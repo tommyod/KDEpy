@@ -195,7 +195,7 @@ class TestKernelFunctions:
         else:
             a, b = -10, 10
 
-        x = np.linspace(a, b, num=2 ** 11)
+        x = np.linspace(a, b, num=2**11)
 
         # Scale so that standard deviation should be 10 instead of one
         # Since 1**1 = 1, but 10**2 = 100

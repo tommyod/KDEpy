@@ -141,12 +141,12 @@ def volume_unit_ball(d, p=2):
       Mathematics Magazine 78, no. 5 (2005): 390–95.
       https://doi.org/10.2307/30044198.
     """
-    return 2.0 ** d * gamma(1 + 1 / p) ** d / gamma(1 + d / p)
+    return 2.0**d * gamma(1 + 1 / p) ** d / gamma(1 + d / p)
 
 
 def epanechnikov(x, dims=1):
     normalization = 2 / (dims + 2)
-    dist_sq = x ** 2
+    dist_sq = x**2
     out = np.zeros_like(dist_sq)
     mask = dist_sq < 1
     out[mask] = (1 - dist_sq)[mask] / normalization
@@ -155,7 +155,7 @@ def epanechnikov(x, dims=1):
 
 def gaussian(x, dims=1):
     normalization = dims * gauss_integral(dims - 1)
-    dist_sq = x ** 2
+    dist_sq = x**2
     return np.exp(-dist_sq / 2) / normalization
 
 
@@ -182,7 +182,7 @@ def tri(x, dims=1):
 
 def biweight(x, dims=1):
     normalization = 8 / ((dims + 2) * (dims + 4))
-    dist_sq = x ** 2
+    dist_sq = x**2
     out = np.zeros_like(dist_sq)
     mask = dist_sq < 1
     out[mask] = np.maximum(0, (1 - dist_sq) ** 2)[mask] / normalization
@@ -191,7 +191,7 @@ def biweight(x, dims=1):
 
 def triweight(x, dims=1):
     normalization = 48 / ((dims + 2) * (dims + 4) * (dims + 6))
-    dist_sq = x ** 2
+    dist_sq = x**2
     out = np.zeros_like(dist_sq)
     mask = dist_sq < 1
     out[mask] = np.maximum(0, (1 - dist_sq) ** 3)[mask] / normalization
@@ -202,7 +202,7 @@ def tricube(x, dims=1):
     normalization = 162 / ((dims + 3) * (dims + 6) * (dims + 9))
     out = np.zeros_like(x)
     mask = x < 1
-    out[mask] = np.maximum(0, (1 - x ** 3) ** 3)[mask] / normalization
+    out[mask] = np.maximum(0, (1 - x**3) ** 3)[mask] / normalization
     return out
 
 
@@ -320,7 +320,7 @@ class Kernel(collections.abc.Callable):
         else:
             distances = np.abs(x).ravel()
 
-        return self.function(distances / real_bw, dims) / ((real_bw ** dims) * volume_func(dims))
+        return self.function(distances / real_bw, dims) / ((real_bw**dims) * volume_func(dims))
 
     __call__ = evaluate
 
@@ -333,9 +333,9 @@ epa = Kernel(epanechnikov, var=1 / 5, support=1)
 biweight = Kernel(biweight, var=1 / 7, support=1)
 triweight = Kernel(triweight, var=1 / 9, support=1)
 tricube = Kernel(tricube, var=35 / 243, support=1)
-cosine = Kernel(cosine, var=(1 - (8 / np.pi ** 2)), support=1)
-logistic = Kernel(logistic, var=(np.pi ** 2 / 3), support=np.inf)
-sigmoid = Kernel(sigmoid, var=(np.pi ** 2 / 4), support=np.inf)
+cosine = Kernel(cosine, var=(1 - (8 / np.pi**2)), support=1)
+logistic = Kernel(logistic, var=(np.pi**2 / 3), support=np.inf)
+sigmoid = Kernel(sigmoid, var=(np.pi**2 / 4), support=np.inf)
 
 _kernel_functions = {
     "gaussian": gaussian,
