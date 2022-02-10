@@ -84,7 +84,7 @@ def test_api_models_kernels_bandwidths_2D(kde1, kde2, bw, kernel):
     data = np.array([[0, 0], [0, 1], [0, 0.5], [-1, 1]])
     weights = [1, 2, 1, 0.8]
 
-    points = 2 ** 5
+    points = 2**5
 
     # Chained expression
     x1, y1 = kde1(kernel=kernel, bw=bw).fit(data, weights).evaluate(points)
@@ -117,7 +117,7 @@ def test_api_2D_data(estimator):
     n = 16
     data = np.concatenate((np.random.randn(n).reshape(-1, 1), np.random.randn(n).reshape(-1, 1)), axis=1)
 
-    grid_points = 2 ** 5  # Grid points in each dimension
+    grid_points = 2**5  # Grid points in each dimension
     N = 16  # Number of contours
 
     fig, axes = plt.subplots(ncols=3, figsize=(10, 3))
@@ -185,7 +185,7 @@ def test_fitting_twice(estimator):
     """Fitting several times should re-fit the BW.
     Issue: https://github.com/tommyod/KDEpy/issues/78
     """
-    x_grid = np.linspace(-100, 100, 2 ** 6)
+    x_grid = np.linspace(-100, 100, 2**6)
 
     # Create two data sets
     data = np.arange(-5, 6)

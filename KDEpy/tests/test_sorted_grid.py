@@ -25,8 +25,8 @@ class TestGridSorted:
         assert not grid_is_sorted(grid)
 
         # More minimal example, should also fail.
-        grid_x = np.linspace(-2, 2, 2 ** 5)
-        grid_y = np.linspace(-2, 2, 2 ** 4)
+        grid_x = np.linspace(-2, 2, 2**5)
+        grid_y = np.linspace(-2, 2, 2**4)
         grid = np.stack(np.meshgrid(grid_x, grid_y), -1).reshape(-1, 2)
         assert not grid_is_sorted(grid)
 
@@ -50,7 +50,7 @@ class TestGridSorted:
         import KDEpy
 
         # Create bimodal 2D data
-        data = np.vstack((np.random.randn(2 ** 8, 2), np.random.randn(2 ** 8, 2) + (0, 5)))
+        data = np.vstack((np.random.randn(2**8, 2), np.random.randn(2**8, 2) + (0, 5)))
 
         # Create 2D grid
         grid_size = 20

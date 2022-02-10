@@ -56,7 +56,7 @@ def main():
     data2 = np.concatenate((gen_random(n) + 1, gen_random(n) + 4), axis=1)
     data = np.concatenate((data1, data2))
 
-    grid_points = 2 ** 7  # Grid points in each dimension
+    grid_points = 2**7  # Grid points in each dimension
     N = 8  # Number of contours
     x, z = FFTKDE(bw=1).fit(data)((grid_points, grid_points))
     x, y = np.unique(x[:, 0]), np.unique(x[:, 1])
@@ -72,11 +72,9 @@ def main():
     from matplotlib import cm
 
     ax = plt.subplot(2, 3, 4, projection="3d")
-    plt.title(
-        "Kernels normalized in any\ndimension for any $p$-norm", fontsize=FONTSIZE
-    )
+    plt.title("Kernels normalized in any\ndimension for any $p$-norm", fontsize=FONTSIZE)
     data = np.array([[0, 0]])
-    grid_points = 2 ** 6  # Grid points in each dimension
+    grid_points = 2**6  # Grid points in each dimension
     x, z = FFTKDE(kernel="gaussian", bw=1, norm=2).fit(data)((grid_points, grid_points))
     x, y = np.unique(x[:, 0]), np.unique(x[:, 1])
     x, y = np.meshgrid(x, y)
@@ -117,16 +115,13 @@ def main():
     plt.grid(True, ls="--", zorder=-15)
 
     plt.subplot(2, 3, 6)
-    data = np.random.gamma(10, 100, size=(10 ** 6))
+    data = np.random.gamma(10, 100, size=(10**6))
     st = time.perf_counter()
-    x, y = FFTKDE(kernel="gaussian", bw=100).fit(data)(2 ** 10)
+    x, y = FFTKDE(kernel="gaussian", bw=100).fit(data)(2**10)
     timed = (time.perf_counter() - st) * 1000
     plt.plot(x, y)
     plt.title(
-        (
-            "One million observations on\n1024 grid"
-            + " points in {} ms".format(int(round(timed, 0)))
-        ),
+        ("One million observations on\n1024 grid" + " points in {} ms".format(int(round(timed, 0)))),
         fontsize=FONTSIZE,
     )
     data = np.random.choice(data, size=100, replace=False)
@@ -145,7 +140,7 @@ def main():
     plt.figure(figsize=(6, 3))
     ##############################
     np.random.seed(42)
-    data = norm(loc=0, scale=1).rvs(2 ** 3)
+    data = norm(loc=0, scale=1).rvs(2**3)
     x, y = TreeKDE(kernel="gaussian", bw="silverman").fit(data).evaluate()
     plt.plot(x, y, label="KDE estimate")
     ##############################
@@ -162,7 +157,7 @@ def main():
     plt.figure(figsize=(6, 3))
     ##############################
 
-    data = norm(loc=0, scale=1).rvs(2 ** 6)
+    data = norm(loc=0, scale=1).rvs(2**6)
     for bw in [0.1, "silverman", 1.5]:
         x, y = FFTKDE(kernel="triweight", bw=bw).fit(data).evaluate()
         plt.plot(x, y, label="KDE estimate, bw={}".format(bw))
@@ -181,7 +176,7 @@ def main():
     plt.figure(figsize=(6, 3))
 
     np.random.seed(42)
-    data = norm(loc=0, scale=1).rvs(2 ** 3)
+    data = norm(loc=0, scale=1).rvs(2**3)
 
     for kde in [NaiveKDE, TreeKDE, FFTKDE]:
         x, y = kde(kernel="gaussian", bw="silverman").fit(data).evaluate()
@@ -210,13 +205,13 @@ if __name__ == "__main__":
 
     plt.scatter(x, y, label="Points")
 
-    x_interpol = np.linspace(min(x) - 1, max(x) + 1, num=2 ** 6)
+    x_interpol = np.linspace(min(x) - 1, max(x) + 1, num=2**6)
     y_interpol = np.interp(x_interpol, x, y)
 
     plt.plot(x_interpol, y_interpol, "--", label="Interpol")
 
     kernel = FFTKDE._available_kernels["box"]
-    kernel_grid = np.linspace(-kernel.support, kernel.support, num=2 ** 6)
+    kernel_grid = np.linspace(-kernel.support, kernel.support, num=2**6)
     bw = 0.02
     kernel_weights = kernel(kernel_grid, bw=bw)
     kernel_weights /= np.sum(kernel_weights)
