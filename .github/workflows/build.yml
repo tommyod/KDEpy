@@ -46,7 +46,7 @@ jobs:
       - name: Build wheels (non-windows) ${{ matrix.python-version }} on ${{ matrix.os }}
         if: github.ref == 'refs/heads/master' && matrix.python-version == '3.9' && matrix.os != 'windows-latest'
         env:
-          CIBW_BUILD: 'cp36-* cp37-* cp38-* cp39-* cp310-*'
+          CIBW_BUILD: 'cp37-* cp38-* cp39-* cp310-*'
           PYPI_PASSWORD: ${{ secrets.pypi_password }}
         run: |
           pip install cibuildwheel twine --upgrade;
@@ -56,7 +56,7 @@ jobs:
       - name: Build wheels (windows) ${{ matrix.python-version }} on ${{ matrix.os }}
         if: github.ref == 'refs/heads/master' && matrix.python-version == '3.9' && matrix.os == 'windows-latest'
         env:
-          CIBW_BUILD: 'cp36-* cp37-* cp38-* cp39-* cp310-*'
+          CIBW_BUILD: 'cp37-* cp38-* cp39-* cp310-*'
           PYPI_PASSWORD: ${{ secrets.pypi_password }}
         run: |
           pip install cibuildwheel twine --upgrade;
