@@ -1,6 +1,8 @@
 [![DOI](https://zenodo.org/badge/118142261.svg)](https://zenodo.org/badge/latestdoi/118142261) ![Build Status](https://github.com/tommyod/KDEpy/workflows/Python%20CI/badge.svg?branch=master) [![Documentation Status](https://readthedocs.org/projects/kdepy/badge/?version=latest)](http://kdepy.readthedocs.io/en/latest/?badge=latest) [![PyPI version](https://badge.fury.io/py/KDEpy.svg)](https://badge.fury.io/py/KDEpy) [![Downloads](https://pepy.tech/badge/kdepy)](https://pepy.tech/project/kdepy)
 ---------
 
+Want to cite KDEpy in your work? See the [bottom right part of this website](https://zenodo.org/record/2392268) for citation information.
+
 # [KDEpy](https://kdepy.readthedocs.io/en/latest/)
 
 ## About
