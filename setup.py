@@ -10,6 +10,7 @@ https://github.com/pypa/sampleproject
 from setuptools import Extension, setup
 import os
 import re
+from io import open
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 

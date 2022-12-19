@@ -4,6 +4,8 @@
 Test the kernel functions K. Every kernel function is a radial basis function,
 i.e. it's a composition of a norm and a function defined on positive reals.
 """
+from __future__ import absolute_import, division, print_function
+
 import numpy as np
 import scipy
 from scipy.integrate import quad

@@ -3,6 +3,8 @@
 """
 Module for the TreeKDE.
 """
+from __future__ import division, absolute_import, print_function
+
 from scipy.spatial import cKDTree
 import numbers
 import numpy as np
@@ -60,7 +62,7 @@ class TreeKDE(BaseKDE):
     """
 
     def __init__(self, kernel="gaussian", bw=1, norm=2.0):
-        super().__init__(kernel, bw)
+        super(TreeKDE, self).__init__(kernel, bw)
         self.norm = norm
 
     def fit(self, data, weights=None):
@@ -90,7 +92,7 @@ class TreeKDE(BaseKDE):
         >>> x, y = kde()
         """
         # Sets self.data
-        super().fit(data, weights)
+        super(TreeKDE, self).fit(data, weights)
         return self
 
     def evaluate(self, grid_points=None, eps=10e-4):
@@ -126,7 +128,7 @@ class TreeKDE(BaseKDE):
         """
 
         # This method sets self.grid points and verifies it
-        super().evaluate(grid_points)
+        super(TreeKDE, self).evaluate(grid_points)
 
         evaluated = np.zeros(self.grid_points.shape[0])
 

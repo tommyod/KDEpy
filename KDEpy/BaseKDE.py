@@ -3,16 +3,24 @@
 """
 Module for the BaseKDE class.
 """
+from __future__ import absolute_import, division, print_function
+
+import six
 import numbers
 import numpy as np
-from abc import ABC, abstractmethod
-from collections.abc import Sequence
+from abc import ABCMeta, abstractmethod
 from KDEpy.kernel_funcs import _kernel_functions
 from KDEpy.bw_selection import _bw_methods
 from KDEpy.utils import autogrid
 
+if six.PY3:
+    from collections.abc import Sequence
+else:
+    from collections import Sequence
 
-class BaseKDE(ABC):
+
+@six.add_metaclass(ABCMeta)
+class BaseKDE:
     """
     Abstract Base Class for every Kernel Density Estimator.
 
@@ -31,7 +39,7 @@ class BaseKDE(ABC):
     _bw_methods = _bw_methods
 
     @abstractmethod
-    def __init__(self, kernel: str, bw: float):
+    def __init__(self, kernel, bw):
         """Initialize the kernel density estimator.
 
         The return type must be duplicated in the docstring to comply

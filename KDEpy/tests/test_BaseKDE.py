@@ -4,6 +4,8 @@
 API tests. Since BaseKDE is an abstract class, the testing is done using the
 naiveKDE class instead. The tests here are related to input types.
 """
+from __future__ import absolute_import, division, print_function
+
 import numpy as np
 from KDEpy.NaiveKDE import NaiveKDE
 import itertools
