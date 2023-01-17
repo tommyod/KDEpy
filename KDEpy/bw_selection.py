@@ -3,13 +3,15 @@
 """
 Functions for bandwidth selection.
 """
+import warnings
+
 import numpy as np
 import scipy
-import warnings
-from KDEpy.binning import linear_binning
-from KDEpy.utils import autogrid
 from scipy import fftpack
 from scipy.optimize import brentq
+
+from KDEpy.binning import linear_binning
+from KDEpy.utils import autogrid
 
 # Choose the largest available float on the system
 try:

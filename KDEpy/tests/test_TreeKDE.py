@@ -3,11 +3,12 @@
 """
 Tests for the TreeKDE.
 """
-import numpy as np
-from KDEpy.TreeKDE import TreeKDE
 import itertools
+
+import numpy as np
 import pytest
 
+from KDEpy.TreeKDE import TreeKDE
 
 args = list(itertools.product([[-1, 0, 1, 10], [1, 2, 3, 4], [1, 1, 1, 2]], [1, 2, 3]))
 

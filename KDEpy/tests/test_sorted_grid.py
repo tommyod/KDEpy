@@ -3,8 +3,9 @@
 """
 Tests for verifying that grids obeys the sorting properties required for linear binning.
 """
-import pytest
 import numpy as np
+import pytest
+
 from KDEpy.binning import grid_is_sorted  # Imported from .pyx to binning.py, then here
 
 
@@ -47,6 +48,7 @@ class TestGridSorted:
         """
         # imports
         import numpy as np
+
         import KDEpy
 
         # Create bimodal 2D data

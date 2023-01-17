@@ -4,8 +4,8 @@
 Tests for the bandwidth selection.
 """
 
-import pytest
 import numpy as np
+import pytest
 
 from KDEpy.bw_selection import _bw_methods, improved_sheather_jones
 

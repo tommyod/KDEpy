@@ -5,13 +5,15 @@ Test the API. The API should be considered fixed in future releases and should
 be equal for every implementation. Therefore it's important to have unit tests
 for the API.
 """
+import itertools
+
+import matplotlib
 import numpy as np
+import pytest
+
 from KDEpy.FFTKDE import FFTKDE
 from KDEpy.NaiveKDE import NaiveKDE
 from KDEpy.TreeKDE import TreeKDE
-import itertools
-import pytest
-import matplotlib
 
 matplotlib.use("Agg")  # For testing on servers
 

@@ -3,9 +3,11 @@
 """
 Module for the NaiveKDE.
 """
-import numbers
 import itertools
+import numbers
+
 import numpy as np
+
 from KDEpy.BaseKDE import BaseKDE
 
 

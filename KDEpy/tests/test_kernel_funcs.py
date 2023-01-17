@@ -4,13 +4,15 @@
 Test the kernel functions K. Every kernel function is a radial basis function,
 i.e. it's a composition of a norm and a function defined on positive reals.
 """
+import itertools
+
 import numpy as np
+import pytest
 import scipy
 from scipy.integrate import quad
+
 from KDEpy.BaseKDE import BaseKDE
 from KDEpy.kernel_funcs import gauss_integral, trig_integral
-import pytest
-import itertools
 
 
 class TestKernelHelperFunctions:

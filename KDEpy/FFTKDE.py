@@ -5,10 +5,12 @@ Module for the FFTKDE.
 """
 import numbers
 import warnings
+
 import numpy as np
-from KDEpy.BaseKDE import BaseKDE
-from KDEpy.binning import linear_binning, grid_is_sorted
 from scipy.signal import convolve
+
+from KDEpy.BaseKDE import BaseKDE
+from KDEpy.binning import grid_is_sorted, linear_binning
 from KDEpy.utils import cartesian
 
 

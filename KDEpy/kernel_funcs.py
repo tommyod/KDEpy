@@ -6,13 +6,14 @@ is everywhere non-negative and whose integral evalutes to unity. Every kernel
 function takes an `x` of shape (obs, dims) and returns a y of shape (obs, 1).
 """
 
-import numpy as np
 import collections.abc
-import numbers
 import functools
-from scipy.special import gamma, factorial2
-from scipy.stats import norm
+import numbers
+
+import numpy as np
 from scipy.optimize import brentq
+from scipy.special import factorial2, gamma
+from scipy.stats import norm
 
 # In R, the following are implemented:
 # "gaussian", "rectangular", "triangular", "epanechnikov",

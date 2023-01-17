@@ -3,12 +3,13 @@
 """
 Tests for the FFTKDE.
 """
-import numpy as np
-from KDEpy.FFTKDE import FFTKDE
-from KDEpy.NaiveKDE import NaiveKDE
 import itertools
+
+import numpy as np
 import pytest
 
+from KDEpy.FFTKDE import FFTKDE
+from KDEpy.NaiveKDE import NaiveKDE
 
 args = list(itertools.product([[-1, 0, 1, 10], [1, 2, 3, 4], [1, 1, 1, 2]], [1, 2, 3]))
 
