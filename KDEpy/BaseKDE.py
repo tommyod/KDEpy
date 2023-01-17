@@ -4,11 +4,13 @@
 Module for the BaseKDE class.
 """
 import numbers
-import numpy as np
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
-from KDEpy.kernel_funcs import _kernel_functions
+
+import numpy as np
+
 from KDEpy.bw_selection import _bw_methods
+from KDEpy.kernel_funcs import _kernel_functions
 from KDEpy.utils import autogrid
 
 

@@ -3,9 +3,11 @@
 """
 Module for the TreeKDE.
 """
-from scipy.spatial import cKDTree
 import numbers
+
 import numpy as np
+from scipy.spatial import cKDTree
+
 from KDEpy.BaseKDE import BaseKDE
 
 

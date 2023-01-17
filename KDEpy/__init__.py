@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 
+from KDEpy.FFTKDE import FFTKDE
 from KDEpy.NaiveKDE import NaiveKDE
 from KDEpy.TreeKDE import TreeKDE
-from KDEpy.FFTKDE import FFTKDE
 
 __version__ = "1.1.0"
 __author__ = "tommyod"

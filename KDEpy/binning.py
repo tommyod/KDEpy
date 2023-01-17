@@ -29,13 +29,14 @@ References
   Journal of Computational and Graphical Statistics 3, no. 1 (March 1, 1994).
   https://doi.org/10.1080/10618600.1994.10474629.
 """
-import numpy as np
-import itertools
 import functools
+import itertools
 import operator
-from KDEpy.utils import cartesian
-import cutils
 
+import numpy as np
+
+import cutils
+from KDEpy.utils import cartesian
 
 grid_is_sorted = cutils.grid_is_sorted
 

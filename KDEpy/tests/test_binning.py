@@ -3,12 +3,14 @@
 """
 Tests for binning functions.
 """
-import pytest
-import numpy as np
-from KDEpy.utils import autogrid
-from KDEpy.binning import linbin_numpy, linear_binning, linbin_Ndim_python
 import itertools
 import random
+
+import numpy as np
+import pytest
+
+from KDEpy.binning import linbin_Ndim_python, linbin_numpy, linear_binning
+from KDEpy.utils import autogrid
 
 
 def naivebinning(data, grid_points, weights=None):

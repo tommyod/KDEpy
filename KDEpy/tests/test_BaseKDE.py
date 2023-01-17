@@ -4,11 +4,12 @@
 API tests. Since BaseKDE is an abstract class, the testing is done using the
 naiveKDE class instead. The tests here are related to input types.
 """
-import numpy as np
-from KDEpy.NaiveKDE import NaiveKDE
 import itertools
+
+import numpy as np
 import pytest
 
+from KDEpy.NaiveKDE import NaiveKDE
 
 args = itertools.product([0.5, 1, 3], NaiveKDE._available_kernels)
 

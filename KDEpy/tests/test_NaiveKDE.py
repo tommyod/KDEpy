@@ -4,11 +4,12 @@
 Tests for the NaiveKDE. The NaiveKDE is tested against various properties, and
 in turn more advanced implementations are tested against the NaiveKDE.
 """
-import numpy as np
-from KDEpy.NaiveKDE import NaiveKDE
 import itertools
+
+import numpy as np
 import pytest
 
+from KDEpy.NaiveKDE import NaiveKDE
 
 args = list(itertools.product([[-1, 0, 1, 10], [1, 2, 3, 4], [1, 1, 1, 2]], [1, 2, 3]))
 

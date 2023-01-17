@@ -3,8 +3,9 @@
 """
 Module for utility functions.
 """
-import numpy as np
 import numbers
+
+import numpy as np
 
 
 def cartesian(arrays):

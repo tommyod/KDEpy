@@ -3,12 +3,14 @@
 """
 Test the implemented estimators against each other on simple data sets.
 """
+import itertools
+
 import numpy as np
+import pytest
+
+from KDEpy.FFTKDE import FFTKDE
 from KDEpy.NaiveKDE import NaiveKDE
 from KDEpy.TreeKDE import TreeKDE
-from KDEpy.FFTKDE import FFTKDE
-import itertools
-import pytest
 
 N = 2**5
 
