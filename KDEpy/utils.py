@@ -53,7 +53,7 @@ def cartesian(arrays):
 
     out = np.empty_like(ix, dtype=dtype)
 
-    for n, arr in enumerate(arrays):
+    for n, _ in enumerate(arrays):
         out[:, n] = arrays[n][ix[:, n]]
 
     return out
@@ -104,7 +104,7 @@ def autogrid(data, boundary_abs=3, num_points=None, boundary_rel=0.05):
            [ 0.5,  0. ],
            [ 0.5,  0.5]])
     """
-    obs, dims = data.shape
+    _, dims = data.shape
     minimums, maximums = data.min(axis=0), data.max(axis=0)
     ranges = maximums - minimums
 
@@ -124,7 +124,7 @@ def autogrid(data, boundary_abs=3, num_points=None, boundary_rel=0.05):
     list_of_grids = []
 
     generator = enumerate(zip(minimums, maximums, ranges, num_points))
-    for i, (minimum, maximum, rang, points) in generator:
+    for _, (minimum, maximum, rang, points) in generator:
         assert points >= 2
         outside_borders = max(boundary_rel * rang, boundary_abs)
         list_of_grids.append(np.linspace(minimum - outside_borders, maximum + outside_borders, num=points))

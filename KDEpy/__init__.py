@@ -9,6 +9,4 @@ from KDEpy.TreeKDE import TreeKDE
 __version__ = "1.1.0"
 __author__ = "tommyod"
 
-TreeKDE = TreeKDE
-NaiveKDE = NaiveKDE
-FFTKDE = FFTKDE
+__all__ = ["TreeKDE", "NaiveKDE", "FFTKDE"]
