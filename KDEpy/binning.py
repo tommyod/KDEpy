@@ -197,7 +197,6 @@ def linbin_numpy(data, grid_points, weights=None):
 
     result = np.asfarray(np.zeros(len(grid_points) + 1))
     for grid_point in unique_integrals:
-
         # Use binary search to find indices for the grid point
         # Then sum the data assigned to that grid point
         low_index = np.searchsorted(integral, grid_point, side="left")
@@ -265,7 +264,6 @@ def linbin_Ndim_python(data, grid_points, weights=None):
 
     # Go through every data point
     for observation, weight in zip(data, weights):
-
         # Compute integer part and fractional part for every x_i
         # Compute relation to previous grid point, and next grid point
         int_frac = (
@@ -279,7 +277,6 @@ def linbin_Ndim_python(data, grid_points, weights=None):
         # Go through every cartesian product, i.e. every corner in the
         # hypercube grid points surrounding the observation
         for cart_prod in itertools.product(*int_frac):
-
             fractions = (frac for (integral, frac) in cart_prod)
             integrals = list(integral for (integral, frac) in cart_prod)
             # Find the index in the resulting array, compured by

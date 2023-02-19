@@ -125,7 +125,6 @@ def test_api_2D_data(estimator):
     fig, axes = plt.subplots(ncols=3, figsize=(10, 3))
 
     for ax, norm in zip(axes, [1, 2, np.inf]):
-
         ax.set_title("Norm $p={}$".format(norm))
 
         # Compute
