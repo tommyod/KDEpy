@@ -39,6 +39,7 @@ jobs:
           python -m black KDEpy -l 120 --check
           python -m flake8 --show-source --ignore=F811,W293,W391,W292,W291,W504,W503,E231 --max-line-length=120 --exclude="*examples.py,testing.py,*kde.py" KDEpy
           python -m pytest KDEpy --doctest-modules --capture=sys
+          sphinx-build doc/source _build/html -W
 
 # ======================= BUILD WHEELS AND UPLOAD TO PYPI ==================================
 

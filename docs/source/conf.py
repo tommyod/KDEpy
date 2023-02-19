@@ -16,12 +16,13 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 from KDEpy import __version__
+import datetime as dt
 
 
 # -- Project information -----------------------------------------------------
 
 project = "KDEpy"
-copyright = "2018, tommyod"
+copyright = "2018 - {}, tommyod".format(str(dt.date.today().year))
 author = "tommyod"
 
 # The short X.Y version
@@ -41,7 +42,7 @@ release = __version__
 # ones.
 extensions = [
     "sphinx.ext.autodoc",
-    "sphinx.ext.doctest",
+    #"sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
     "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
@@ -54,8 +55,10 @@ extensions = [
     "matplotlib.sphinxext.plot_directive",
     "IPython.sphinxext.ipython_directive",
     "IPython.sphinxext.ipython_console_highlighting",
-    "sphinx.ext.inheritance_diagram",
+   # "sphinx.ext.inheritance_diagram",
 ]
+
+numpydoc_show_class_members = False 
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -74,7 +77,7 @@ master_doc = "index"
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = "en"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
