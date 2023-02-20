@@ -1,5 +1,5 @@
 Examples
-=======
+========
 
 Minimal working example with options
 ------------------------------------
@@ -68,7 +68,7 @@ Resampling from the distribution
 
 Resampling data from the fitted KDE is equivalent to (1) first resampling the
 original data (with replacement), then (2) adding noise drawn from the same
-probability density as the kernel function in the KDE. Below an example is shown.
+probability density as the kernel function in the KDE. Here is an example:
 
 
 .. plot::
@@ -293,7 +293,7 @@ Extensions to model the conditional variance :math:`\operatorname{var}[y | x]` a
     x, y = np.unique(grid[:, 0]), np.unique(grid[:, 1])
     z = points.reshape(grid_points_x, grid_points_y)
     plt.axvline(np.min(data_x), ls='--', c='k', label='Domain lower bound')
-    plt.axvline(np.max(data_x), ls='--', c='k', label='Domain lower bound')
+    plt.axvline(np.max(data_x), ls='--', c='k', label='Domain upper bound')
     
     # Compute y_pred = E[y | x] = sum_y p(y | x) * y
     y_pred =  np.sum((z.T / np.sum(z, axis=1)).T  * y , axis=1) 

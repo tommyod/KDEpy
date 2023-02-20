@@ -152,7 +152,6 @@ class TreeKDE(BaseKDE):
         # Since we iterate through grid points, we need the maximum bw to
         # ensure that we get data points that are close enough
         for i, grid_point in enumerate(self.grid_points):
-
             # Query for data points that are close to this grid point
             # TODO: Is this epsilon value sensible?
             # Scipy 1.3.0 introduced error: ValueError: ndarray is not C-contiguous

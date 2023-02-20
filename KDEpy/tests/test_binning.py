@@ -55,7 +55,6 @@ def naivebinning(data, grid_points, weights=None):
     # Go through data points and weights, use O(1) lookups and weight the
     # data point linearily by distance and the perscribed weights
     for data_point, w in zip(transformed_data, weights):
-
         # Retrieve the integral and fractional parts quickly
         integral, fractional = int(data_point), (data_point) % 1
 
