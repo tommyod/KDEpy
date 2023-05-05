@@ -1,0 +1,18 @@
+[project]
+name = "KDEpy"
+version = "1.1.1"
+dependencies = [
+    "numpy>=1.14.2",
+    "numpydoc>=0.7.0",
+    "scipy>=1.0.1",
+    "nbsphinx>=0.3.2",
+    "pytest>=3.6.2",
+    "matplotlib>=2.2.2",
+    "ipython>=6.4.0",
+    "cython>=0.29",
+    "setuptools>=39.2.0",
+]
+
+[build-system]
+requires = ["setuptools>=45", "wheel", "Cython", "numpy>=1.14.2"]
+build-backend = "setuptools.build_meta"
