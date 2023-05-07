@@ -11,12 +11,6 @@ from setuptools import Extension, setup
 import os
 import re
 
-HERE = os.path.abspath(os.path.dirname(__file__))
-
-
-def read(fname):
-    return open(os.path.join(HERE, fname)).read()
-
 
 try:
     from Cython.Distutils import build_ext
@@ -26,10 +20,6 @@ except ImportError:
 else:
     can_build_ext = True
 
-
-# Get version
-# with open(os.path.join(HERE, "KDEpy/__init__.py"), encoding="utf-8") as file:
-#    VERSION = re.search(r"__version__ = \"(.*?)\"", file.read()).group(1)
 
 cmdclass = {}
 ext_modules = []

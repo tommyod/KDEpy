@@ -1,6 +1,6 @@
 [project]
 name = "KDEpy"
-version = "1.1.1"
+version = "1.1.2"
 
 [build-system]
 requires = ["setuptools>=45", "wheel", "Cython", "numpy>=1.14.2"]
