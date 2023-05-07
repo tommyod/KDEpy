@@ -28,8 +28,8 @@ else:
 
 
 # Get version
-with open(os.path.join(HERE, "KDEpy/__init__.py"), encoding="utf-8") as file:
-    VERSION = re.search(r"__version__ = \"(.*?)\"", file.read()).group(1)
+# with open(os.path.join(HERE, "KDEpy/__init__.py"), encoding="utf-8") as file:
+#    VERSION = re.search(r"__version__ = \"(.*?)\"", file.read()).group(1)
 
 cmdclass = {}
 ext_modules = []
@@ -45,8 +45,8 @@ else:
 
 
 setup(
-    name="KDEpy",
-    version=VERSION,
+    # name="KDEpy",
+    # version=VERSION,
     description="Kernel Density Estimation in Python.",
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
