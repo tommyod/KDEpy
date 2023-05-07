@@ -20,6 +20,12 @@ except ImportError:
 else:
     can_build_ext = True
 
+HERE = os.path.abspath(os.path.dirname(__file__))
+
+
+def read(fname):
+    return open(os.path.join(HERE, fname)).read()
+
 
 cmdclass = {}
 ext_modules = []
