@@ -11,12 +11,6 @@ from setuptools import Extension, setup
 import os
 import re
 
-HERE = os.path.abspath(os.path.dirname(__file__))
-
-
-def read(fname):
-    return open(os.path.join(HERE, fname)).read()
-
 
 try:
     from Cython.Distutils import build_ext
@@ -26,10 +20,12 @@ except ImportError:
 else:
     can_build_ext = True
 
+HERE = os.path.abspath(os.path.dirname(__file__))
 
-# Get version
-with open(os.path.join(HERE, "KDEpy/__init__.py"), encoding="utf-8") as file:
-    VERSION = re.search(r"__version__ = \"(.*?)\"", file.read()).group(1)
+
+def read(fname):
+    return open(os.path.join(HERE, fname)).read()
+
 
 cmdclass = {}
 ext_modules = []
@@ -45,8 +41,8 @@ else:
 
 
 setup(
-    name="KDEpy",
-    version=VERSION,
+    # name="KDEpy",
+    # version=VERSION,
     description="Kernel Density Estimation in Python.",
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
@@ -58,8 +54,6 @@ setup(
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "License :: OSI Approved :: BSD License",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
