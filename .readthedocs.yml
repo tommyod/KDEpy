@@ -9,4 +9,6 @@ python:
     - method: pip
       path: .
       extra_requirements:
-        - dev,test,lint
+        - dev
+        - test
+        - lint
