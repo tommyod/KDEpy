@@ -7,37 +7,17 @@ https://packaging.python.org/en/latest/distributing.html
 https://github.com/pypa/sampleproject
 """
 
-from setuptools import Extension, setup
 import os
-import re
 
-
-try:
-    from Cython.Distutils import build_ext
-    import numpy as np
-except ImportError:
-    can_build_ext = False
-else:
-    can_build_ext = True
+import numpy as np
+from Cython.Distutils import build_ext
+from setuptools import Extension, setup
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
 
 def read(fname):
     return open(os.path.join(HERE, fname)).read()
-
-
-cmdclass = {}
-ext_modules = []
-include_dirs = []
-
-if can_build_ext:
-    cmdclass["build_ext"] = build_ext
-    ext_modules.append(Extension("cutils", ["KDEpy/cutils.pyx"]))
-    include_dirs.append(np.get_include())
-else:
-    # Build extension with previously Cython generated source.
-    ext_modules.append(Extension("cutils", ["KDEpy/cutils.c"]))
 
 
 setup(
@@ -61,7 +41,7 @@ setup(
     ],
     packages=["KDEpy"],
     install_requires=["numpy>=1.14.2", "scipy>=1.0.1", "matplotlib>=2.2.0"],
-    cmdclass=cmdclass,
-    include_dirs=include_dirs,
-    ext_modules=ext_modules,
+    cmdclass={"build_ext": build_ext},
+    include_dirs=[np.get_include()],
+    ext_modules=[Extension("cutils", ["KDEpy/cutils.pyx"])],
 )
