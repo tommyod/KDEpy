@@ -2,6 +2,26 @@
 name = "KDEpy"
 version = "1.1.2"
 
+dependencies = [
+    "numpy>=1.14.2",
+    "scipy>=1.0.1",
+    "matplotlib>=2.2.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "numpydoc>=0.7.0",
+    "nbsphinx>=0.3.2",
+    "ipython>=6.4.0",
+]
+test = [
+    "pytest>=3.6.2"
+]
+lint = [
+  "black",
+  "flake8>=3.5.0",
+]
+
 [build-system]
-requires = ["setuptools>=45", "wheel", "Cython", "numpy>=1.14.2"]
+requires = ["setuptools>=45", "wheel", "cython>=0.29", "numpy>=1.14.2"]
 build-backend = "setuptools.build_meta"

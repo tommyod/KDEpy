@@ -40,7 +40,6 @@ setup(
         "Programming Language :: Python :: 3.11",
     ],
     packages=["KDEpy"],
-    install_requires=["numpy>=1.14.2", "scipy>=1.0.1", "matplotlib>=2.2.0"],
     cmdclass={"build_ext": build_ext},
     include_dirs=[np.get_include()],
     ext_modules=[Extension("cutils", ["KDEpy/cutils.pyx"])],
