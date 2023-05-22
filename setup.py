@@ -60,7 +60,6 @@ setup(
         "Programming Language :: Python :: 3.11",
     ],
     packages=["KDEpy"],
-    install_requires=["numpy>=1.14.2", "scipy>=1.0.1", "matplotlib>=2.2.0"],
     cmdclass=cmdclass,
     include_dirs=include_dirs,
     ext_modules=ext_modules,
