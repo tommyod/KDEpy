@@ -1,6 +1,12 @@
+version: 2
+
 build:
   image: latest
 
 python:
-  version: 3.8
-  setup_py_install: true
+  version: 3.10
+  install:
+    - method: pip
+      path: .
+      extra_requirements:
+        - dev,test,lint
