@@ -13,6 +13,7 @@ dev = [
     "numpydoc>=0.7.0",
     "nbsphinx>=0.3.2",
     "ipython>=6.4.0",
+    "build>=0.10.0"
 ]
 test = [
     "pytest>=3.6.2"
