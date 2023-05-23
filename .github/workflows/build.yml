@@ -54,6 +54,7 @@ jobs:
           PYPI_PASSWORD: ${{ secrets.pypi_password }}
         run: |
           pip install cibuildwheel twine --upgrade;
+          python -m build --sdist
           python -m cibuildwheel --output-dir dist;
           python -m twine upload dist/* -u tommyod -p "$PYPI_PASSWORD" --skip-existing;
           
