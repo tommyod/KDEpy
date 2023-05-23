@@ -21,24 +21,6 @@ def read(fname):
 
 
 setup(
-    # name="KDEpy",
-    # version=VERSION,
-    description="Kernel Density Estimation in Python.",
-    long_description=read("README.md"),
-    long_description_content_type="text/markdown",
-    url="https://github.com/tommyod/KDEpy",
-    author="tommyod",
-    author_email="tommy.odland@gmail.com",
-    license="new BSD",
-    # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
-    classifiers=[
-        "Development Status :: 5 - Production/Stable",
-        "License :: OSI Approved :: BSD License",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
-        "Programming Language :: Python :: 3.11",
-    ],
     packages=["KDEpy"],
     cmdclass={"build_ext": build_ext},
     include_dirs=[np.get_include()],

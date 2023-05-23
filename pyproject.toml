@@ -1,12 +1,28 @@
 [project]
 name = "KDEpy"
 version = "1.1.3"
-
 dependencies = [
     "numpy>=1.14.2",
     "scipy>=1.0.1",
     "matplotlib>=2.2.2",
 ]
+description = "Kernel Density Estimation in Python."
+readme = {file = "README.md", content-type = "text/markdown"}
+authors = [
+  {name = "tommyod", email = "tommy.odland@gmail.com"},
+]
+license = {file = "LICENSE"}
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+
+[project.urls]
+Repository = "https://github.com/tommyod/KDEpy"
 
 [project.optional-dependencies]
 dev = [
