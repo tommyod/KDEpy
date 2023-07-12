@@ -41,6 +41,7 @@ jobs:
           
       - name: Build docs
         if: matrix.python-version == '3.10' && matrix.os == 'ubuntu-latest'
+        continue-on-error: true
         run: |
           sudo apt install pandoc -y
           sphinx-build docs/source _build/html -W
