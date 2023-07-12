@@ -45,7 +45,17 @@ def gauss_integral(n):
     True
     """
     factor = np.sqrt(np.pi * 2)
-    if n % 2 == 0:
+
+    # Special case:
+    # factorial2(-1) used to return 1
+    # but now it returns 0
+    # https://github.com/scipy/scipy/pull/15841
+    # https://github.com/tommyod/KDEpy/issues/145
+    if n == 0:
+        return factor * factorial2(n - 0) / 2
+
+    # Normal cases
+    elif n % 2 == 0:
         return factor * factorial2(n - 1) / 2
     elif n % 2 == 1:
         return factor * norm.pdf(0) * factorial2(n - 1)
@@ -264,6 +274,14 @@ class Kernel(collections.abc.Callable):
         """
         Return the support for practical purposes. Used to find a support value
         for computations for kernel functions without finite (bounded) support.
+
+        Examples
+        --------
+        >>> kernel = Kernel(gaussian, var=1, support=np.inf)
+        >>> kernel.practical_support(bw=1)
+        3.8994...
+        >>> kernel.practical_support(bw=2)
+        7.4331...
         """
         # If the kernel has finite support, return the support accounting for
         # the bw
@@ -353,8 +371,8 @@ _kernel_functions = {
 }
 
 
-if __name__ == "__main__" and False:
+if __name__ == "__main__":
     import pytest
 
     # --durations=10  <- May be used to show potentially slow tests
-    pytest.main(args=[".", "--doctest-modules", "-v"])
+    pytest.main(args=[__file__, "--doctest-modules", "-v"])
