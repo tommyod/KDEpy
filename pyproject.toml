@@ -1,6 +1,6 @@
 [project]
 name = "KDEpy"
-version = "1.1.4"
+version = "1.1.5"
 dependencies = [
     "numpy>=1.14.2,<2.0",
     "scipy>=1.0.1,<2.0",
