@@ -35,7 +35,10 @@ import operator
 
 import numpy as np
 
-import cutils
+# Import compiled cutils module locally (not declared in __init__)
+# and ignore unresolved reference (may not be build in dev environment)
+# noinspection PyUnresolvedReferences
+from . import cutils
 from KDEpy.utils import cartesian
 
 grid_is_sorted = cutils.grid_is_sorted
