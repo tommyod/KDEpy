@@ -35,13 +35,12 @@ import operator
 
 import numpy as np
 
-# Import compiled cutils module locally (not declared in __init__)
+# Import compiled _cutils module (not declared in __init__)
 # and ignore unresolved reference (may not be build in dev environment)
-# noinspection PyUnresolvedReferences
-from . import cutils
+# noinspection PyProtectedMember, PyUnresolvedReferences
+from KDEpy import _cutils
 from KDEpy.utils import cartesian
 
-grid_is_sorted = cutils.grid_is_sorted
 
 # This parameter was in use when a NumPy implementation and a Cython
 # implementation were both used. Now only Cython is used.
@@ -110,10 +109,10 @@ def linbin_cython(data, grid_points, weights=None):
     # Two Cython functions are implemented, one for weighted data and one
     # for unweighted data, since creating equal weights is costly w.r.t time
     if weights is None:
-        result = cutils.iterate_data_1D(transformed_data, result)
+        result = _cutils.iterate_data_1D(transformed_data, result)
         return np.asfarray(result[:-1]) / transformed_data.shape[0]
     else:
-        res = cutils.iterate_data_1D_weighted(transformed_data, weights, result)
+        res = _cutils.iterate_data_1D_weighted(transformed_data, weights, result)
         return np.asfarray(res[:-1])  # Remove last, outside of grid
 
 
@@ -358,9 +357,9 @@ def linbin_Ndim(data, grid_points, weights=None):
     if weights is not None:
         if data_dims >= 3:
             binary_flgs = cartesian(([0, 1],) * dims)
-            result = cutils.iterate_data_ND_weighted(data, weights, result, grid_num, obs_tot, binary_flgs)
+            result = _cutils.iterate_data_ND_weighted(data, weights, result, grid_num, obs_tot, binary_flgs)
         else:
-            result = cutils.iterate_data_2D_weighted(data, weights, result, grid_num, obs_tot)
+            result = _cutils.iterate_data_2D_weighted(data, weights, result, grid_num, obs_tot)
         result = np.asarray_chkfinite(result, dtype=float)
 
     # Unweighted data has two specific routines too. This is because creating
@@ -369,9 +368,9 @@ def linbin_Ndim(data, grid_points, weights=None):
     else:
         if data_dims >= 3:
             binary_flgs = cartesian(([0, 1],) * dims)
-            result = cutils.iterate_data_ND(data, result, grid_num, obs_tot, binary_flgs)
+            result = _cutils.iterate_data_ND(data, result, grid_num, obs_tot, binary_flgs)
         else:
-            result = cutils.iterate_data_2D(data, result, grid_num, obs_tot)
+            result = _cutils.iterate_data_2D(data, result, grid_num, obs_tot)
         result = np.asarray_chkfinite(result, dtype=float)
         result = result / data_obs
 

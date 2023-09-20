@@ -15,5 +15,5 @@ setup(
     packages=["KDEpy"],
     cmdclass={"build_ext": build_ext},
     include_dirs=[np.get_include()],
-    ext_modules=[Extension("KDEpy.cutils", ["KDEpy/cutils_ext/cutils.pyx"])],
+    ext_modules=[Extension("KDEpy._cutils", ["KDEpy/cutils_ext/cutils.pyx"])],
 )

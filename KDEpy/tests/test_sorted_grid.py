@@ -6,7 +6,10 @@ Tests for verifying that grids obeys the sorting properties required for linear 
 import numpy as np
 import pytest
 
-from KDEpy.binning import grid_is_sorted  # Imported from .pyx to binning.py, then here
+# Import compiled _cutils module (not declared in __init__)
+# and ignore unresolved reference (may not be build in dev environment)
+# noinspection PyProtectedMember, PyUnresolvedReferences
+from KDEpy._cutils import grid_is_sorted  # Imported from .pyx to binning.py, then here
 
 
 class TestGridSorted:
