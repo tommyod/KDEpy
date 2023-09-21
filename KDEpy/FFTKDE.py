@@ -12,6 +12,7 @@ from scipy.signal import convolve
 from KDEpy.BaseKDE import BaseKDE
 from KDEpy.binning import linear_binning
 from KDEpy.utils import cartesian
+
 # noinspection PyProtectedMember, PyUnresolvedReferences
 from KDEpy._cutils import grid_is_sorted
 
