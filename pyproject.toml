@@ -1,10 +1,9 @@
 [project]
 name = "KDEpy"
-version = "1.1.6"
+version = "1.1.7"
 dependencies = [
     "numpy>=1.14.2,<2.0",
     "scipy>=1.0.1,<2.0",
-    "matplotlib>=2.2.2",
 ]
 description = "Kernel Density Estimation in Python."
 readme = {file = "README.md", content-type = "text/markdown"}
@@ -29,10 +28,12 @@ dev = [
     "numpydoc>=0.7.0",
     "nbsphinx>=0.3.2",
     "ipython>=6.4.0",
-    "build>=0.10.0"
+    "build>=0.10.0",
+    "matplotlib>=2.2.2"
 ]
 test = [
-    "pytest>=3.6.2"
+    "pytest>=3.6.2",
+    "matplotlib>=2.2.2"
 ]
 lint = [
   "black",
