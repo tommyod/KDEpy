@@ -1,0 +1,13 @@
+name: Build & test (develop)
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  test:
+    uses: tommyod/KDEpy/.github/workflows/test-base.yml@develop
