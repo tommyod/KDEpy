@@ -10,4 +10,4 @@ on:
 
 jobs:
   test:
-    uses: tommyod/KDEpy/.github/workflows/test-base.yml@master
+    uses: tommyod/KDEpy/.github/workflows/test_base.yml@master
