@@ -1,6 +1,6 @@
 ## Deployment
 
-The KDEpy project uses TravisCI and Appveyor to build wheels for Linux, Mac and Windows.
+The KDEpy project uses GitHub Actions to build wheels for Linux, Mac and Windows.
 Wheels are built using the [cibuildwheel](https://github.com/joerick/cibuildwheel) Python package.
 After developing, the following will push a tagged commit -- from there CI will build wheels to distribute to PyPI automatically.
 
