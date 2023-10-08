@@ -11,6 +11,8 @@ KDEpy/cutils_ext/cutils.c
 .Python
 env/
 build/
+_build/
+html/
 develop-eggs/
 dist/
 downloads/
