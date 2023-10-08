@@ -1,4 +1,8 @@
-[![DOI](https://zenodo.org/badge/118142261.svg)](https://zenodo.org/badge/latestdoi/118142261) ![Build Status](https://github.com/tommyod/KDEpy/workflows/Python%20CI/badge.svg?branch=master) [![Documentation Status](https://readthedocs.org/projects/kdepy/badge/?version=latest)](http://kdepy.readthedocs.io/en/latest/?badge=latest) [![PyPI version](https://badge.fury.io/py/KDEpy.svg)](https://badge.fury.io/py/KDEpy) [![Downloads](https://pepy.tech/badge/kdepy)](https://pepy.tech/project/kdepy)
+[![DOI](https://zenodo.org/badge/118142261.svg)](https://zenodo.org/badge/latestdoi/118142261)
+[![Build & test (master)](https://github.com/tommyod/KDEpy/actions/workflows/test_master.yml/badge.svg)](https://github.com/tommyod/KDEpy/actions/workflows/test_master.yml)
+[![Documentation Status](https://readthedocs.org/projects/kdepy/badge/?version=latest)](http://kdepy.readthedocs.io/en/latest/?badge=latest)
+[![PyPI version](https://badge.fury.io/py/KDEpy.svg)](https://badge.fury.io/py/KDEpy)
+[![Downloads](https://pepy.tech/badge/kdepy)](https://pepy.tech/project/kdepy)
 ---------
 
 Want to cite KDEpy in your work? See the [bottom right part of this website](https://zenodo.org/record/2392268) for citation information.
@@ -10,7 +14,7 @@ Want to cite KDEpy in your work? See the [bottom right part of this website](htt
 This Python 3.7+ package implements various kernel density estimators (KDE).
 Three algorithms are implemented through the same API: [`NaiveKDE`](https://kdepy.readthedocs.io/en/latest/API.html#naivekde), [`TreeKDE`](https://kdepy.readthedocs.io/en/latest/API.html#treekde) and [`FFTKDE`](https://kdepy.readthedocs.io/en/latest/API.html#fftkde).
 The class [`FFTKDE`](https://kdepy.readthedocs.io/en/latest/API.html#fftkde) outperforms other popular implementations, see the [comparison page](https://kdepy.readthedocs.io/en/latest/comparison.html).
-**The code is stable and in widespread by practitioners and in other packages.**
+**The code is stable and in widespread use by practitioners and in other packages.**
 
 ![Plot](https://raw.githubusercontent.com/tommyod/KDEpy/master/docs/source/_static/img/showcase.png)
 
