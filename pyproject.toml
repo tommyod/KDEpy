@@ -43,5 +43,5 @@ lint = [
 ]
 
 [build-system]
-requires = ["setuptools>=45", "wheel", "cython>=0.29,<1.0.0", "numpy>=1.14.2,<2.0"]
+requires = ["setuptools>=45", "wheel", "cython>=0.29,<1.0.0", "oldest-supported-numpy"]
 build-backend = "setuptools.build_meta"
