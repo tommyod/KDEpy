@@ -1,6 +1,6 @@
 [project]
 name = "KDEpy"
-version = "1.1.7"
+version = "1.1.8"
 dependencies = [
     "numpy>=1.14.2,<2.0",
     "scipy>=1.0.1,<2.0",
@@ -18,6 +18,7 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
 ]
 
 [project.urls]
@@ -25,8 +26,9 @@ Repository = "https://github.com/tommyod/KDEpy"
 
 [project.optional-dependencies]
 dev = [
+    "sphinx<7",
     "numpydoc>=0.7.0",
-    "nbsphinx>=0.3.2",
+    "nbsphinx==0.9.1",
     "ipython>=6.4.0",
     "build>=0.10.0",
     "matplotlib>=2.2.2"
