@@ -70,6 +70,7 @@ jobs:
       - build_wheels
       - package_source
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'  # Only publish from the master branch
 
     steps:
       - name: Download build files
