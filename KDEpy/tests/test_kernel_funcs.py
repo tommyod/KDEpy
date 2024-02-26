@@ -56,7 +56,8 @@ class TestKernelFunctions:
             a, b = -function.support, function.support
         else:
             a, b = -5 * function.var, 5 * function.var
-        integral, abserr = quad(function, a=a, b=b)
+        ff=lambda x:function(x)[0] # converts array of single float to float for compatibility with numpy >= 1.25
+        integral, abserr = quad(ff, a=a, b=b)
         assert np.isclose(integral, 1)
 
     @pytest.mark.parametrize(
@@ -75,7 +76,7 @@ class TestKernelFunctions:
 
         # Perform integration 2D
         def int2D(x1, x2):
-            return function([[x1, x2]], norm=p)
+            return function([[x1, x2]], norm=p)[0]
 
         ans, err = scipy.integrate.nquad(int2D, [[a, b], [a, b]], opts={"epsabs": 10e-2, "epsrel": 10e-2})
 
@@ -94,7 +95,7 @@ class TestKernelFunctions:
 
         # Perform integration 2D
         def int2D(x1, x2, x3):
-            return function([[x1, x2, x3]], norm=p)
+            return function([[x1, x2, x3]], norm=p)[0]
 
         ans, err = scipy.integrate.nquad(int2D, [[a, b], [a, b], [a, b]], opts={"epsabs": 10e-1, "epsrel": 10e-1})
 
@@ -122,7 +123,7 @@ class TestKernelFunctions:
 
         # Perform integration 2D
         def int2D(x1, x2):
-            return function([[x1, x2]], norm=p)
+            return function([[x1, x2]], norm=p)[0]
 
         ans, err = scipy.integrate.nquad(int2D, [[a, b], [a, b]], opts={"epsabs": 10e-1, "epsrel": 10e-1})
 
@@ -151,7 +152,7 @@ class TestKernelFunctions:
 
         # Perform integration 2D
         def int2D(x1, x2, x3):
-            return function([[x1, x2, x3]], norm=p)
+            return function([[x1, x2, x3]], norm=p)[0]
 
         ans, err = scipy.integrate.nquad(int2D, [[a, b], [a, b], [a, b]], opts={"epsabs": 10e-1, "epsrel": 10e-1})
 
