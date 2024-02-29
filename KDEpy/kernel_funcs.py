@@ -292,7 +292,7 @@ class Kernel(collections.abc.Callable):
         else:
 
             def f(x):
-                return self.evaluate(x, bw=bw) - atol
+                return self.evaluate(x, bw=bw)[0] - atol
 
             try:
                 xtol = 1e-3
