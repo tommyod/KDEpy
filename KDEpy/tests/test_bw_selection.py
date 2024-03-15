@@ -14,6 +14,7 @@ from KDEpy.bw_selection import _bw_methods, improved_sheather_jones, silvermans_
 def data() -> np.ndarray:
     return np.random.randn(100, 1)
 
+
 @pytest.fixture(scope="module")
 def multidim_data() -> np.ndarray:
     return np.random.randn(100, 2)
