@@ -195,7 +195,7 @@ class BaseKDE(ABC):
         """
         # Must convert to float to avoid possible interger overflow
         if isinstance(sequence_array_like, Sequence):
-            out = np.asfarray(sequence_array_like).reshape(-1, 1)
+            out = np.asarray(sequence_array_like, dtype=float).reshape(-1, 1)
         elif isinstance(sequence_array_like, np.ndarray):
             if len(sequence_array_like.shape) == 1:
                 out = sequence_array_like.reshape(-1, 1)

@@ -136,7 +136,7 @@ class TreeKDE(BaseKDE):
         obs, dims = self.data.shape
         bw = self.bw
         if isinstance(bw, numbers.Number):
-            bw = np.asfarray(np.ones(obs) * bw)
+            bw = np.asarray(np.ones(obs) * bw, dtype=float)
         else:
             bw = np.asarray_chkfinite(bw, dtype=float)
 

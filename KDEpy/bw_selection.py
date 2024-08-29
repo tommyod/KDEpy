@@ -55,8 +55,8 @@ def _fixed_point(t, N, I_sq, a2):
     """
 
     # This is important, as the powers might overflow if not done
-    I_sq = np.asfarray(I_sq, dtype=FLOAT)
-    a2 = np.asfarray(a2, dtype=FLOAT)
+    I_sq = np.asarray(I_sq, dtype=FLOAT)
+    a2 = np.asarray(a2, dtype=FLOAT)
 
     # ell = 7 corresponds to the 5 steps recommended in the paper
     ell = 7
