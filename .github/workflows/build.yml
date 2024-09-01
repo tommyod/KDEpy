@@ -28,14 +28,14 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('pyproject.toml') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install -e .[dev,test,lint]
+          pip install .[dev,test,lint]
           pip install cibuildwheel==2.15.0
 
       - name: Run tests and linting
@@ -46,7 +46,7 @@ jobs:
 
       - name: Build wheels
         env:
-          CIBW_BUILD: cp${{ matrix.python-version == '3.10' && '310' || matrix.python-version == '3.11' && '311' || matrix.python-version == '3.12' && '312' || matrix.python-version }}*
+          CIBW_BUILD: cp${{ matrix.python-version == '3.8' && '38' || matrix.python-version == '3.9' && '39' || matrix.python-version == '3.10' && '310' || matrix.python-version == '3.11' && '311' || matrix.python-version == '3.12' && '312' }}*
           CIBW_ARCHS_MACOS: x86_64 arm64
           CIBW_SKIP: pp* *-musllinux_* *-manylinux_i686
         run: |
@@ -79,13 +79,13 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-docs-${{ hashFiles('**/pyproject.toml') }}
+          key: ${{ runner.os }}-pip-docs-${{ hashFiles('pyproject.toml') }}
           restore-keys: |
             ${{ runner.os }}-pip-docs-
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install -e .[dev]
+          pip install .[dev]
           sudo apt install pandoc -y
       - name: Build docs
         run: sphinx-build docs/source _build/html -W
