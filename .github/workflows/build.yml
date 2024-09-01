@@ -35,7 +35,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install .[dev,test,lint]
+          pip install -e .[dev,test,lint]
           pip install cibuildwheel==2.15.0
 
       - name: Run tests and linting
@@ -85,7 +85,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install .[dev]
+          pip install -e .[dev]
           sudo apt install pandoc -y
       - name: Build docs
         run: sphinx-build docs/source _build/html -W
