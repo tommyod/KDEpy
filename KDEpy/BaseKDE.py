@@ -190,8 +190,7 @@ class BaseKDE(ABC):
         Examples
         --------
         >>> res = BaseKDE._process_sequence([1, 2, 3])
-        >>> (res == np.array([[1], [2], [3]])).all()
-        np.True_
+        >>> assert (res == np.array([[1], [2], [3]])).all()
         """
         # Must convert to float to avoid possible interger overflow
         if isinstance(sequence_array_like, Sequence):
