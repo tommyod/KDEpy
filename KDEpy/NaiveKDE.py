@@ -123,7 +123,7 @@ class NaiveKDE(BaseKDE):
         # For every data point, compute the kernel and add to the grid
         bw = self.bw
         if isinstance(bw, numbers.Number):
-            bw = np.asfarray(np.ones(self.data.shape[0]) * bw)
+            bw = np.asarray(np.ones(self.data.shape[0]) * bw, dtype=float)
 
         # TODO: Implementation w.r.t grid points for faster evaluation
         # See the SciPy evaluation for how this can be done
