@@ -104,16 +104,16 @@ def linbin_cython(data, grid_points, weights=None):
     dx = (max_grid - min_grid) / num_intervals
     transformed_data = (data - min_grid) / dx
 
-    result = np.asfarray(np.zeros(num_intervals + 2))
+    result = np.asarray(np.zeros(num_intervals + 2), dtype=float)
 
     # Two Cython functions are implemented, one for weighted data and one
     # for unweighted data, since creating equal weights is costly w.r.t time
     if weights is None:
         result = _cutils.iterate_data_1D(transformed_data, result)
-        return np.asfarray(result[:-1]) / transformed_data.shape[0]
+        return np.asarray(result[:-1], dtype=float) / transformed_data.shape[0]
     else:
         res = _cutils.iterate_data_1D_weighted(transformed_data, weights, result)
-        return np.asfarray(res[:-1])  # Remove last, outside of grid
+        return np.asarray(res[:-1], dtype=float)  # Remove last, outside of grid
 
 
 def linbin_numpy(data, grid_points, weights=None):
@@ -197,7 +197,7 @@ def linbin_numpy(data, grid_points, weights=None):
     unique_integrals = np.unique(integral)
     unique_integrals = unique_integrals[(unique_integrals >= 0) & (unique_integrals <= len(grid_points))]
 
-    result = np.asfarray(np.zeros(len(grid_points) + 1))
+    result = np.asarray(np.zeros(len(grid_points) + 1), dtype=float)
     for grid_point in unique_integrals:
         # Use binary search to find indices for the grid point
         # Then sum the data assigned to that grid point
@@ -337,7 +337,7 @@ def linbin_Ndim(data, grid_points, weights=None):
 
     # Compute the number of grid points for each dimension in the grid
     grid_num = (grid_points[:, i] for i in range(dims))
-    grid_num = np.array(list(len(np.unique(g)) for g in grid_num))
+    grid_num = np.array(list(len(np.unique(g)) for g in grid_num), dtype="long")
 
     # Scale the data to the grid
     min_grid = np.min(grid_points, axis=0)
@@ -356,7 +356,7 @@ def linbin_Ndim(data, grid_points, weights=None):
     # Weighted data has two specific routines
     if weights is not None:
         if data_dims >= 3:
-            binary_flgs = cartesian(([0, 1],) * dims)
+            binary_flgs = cartesian(([0, 1],) * dims).astype("long")
             result = _cutils.iterate_data_ND_weighted(data, weights, result, grid_num, obs_tot, binary_flgs)
         else:
             result = _cutils.iterate_data_2D_weighted(data, weights, result, grid_num, obs_tot)
@@ -367,7 +367,7 @@ def linbin_Ndim(data, grid_points, weights=None):
     # specialize routine for this case.
     else:
         if data_dims >= 3:
-            binary_flgs = cartesian(([0, 1],) * dims)
+            binary_flgs = cartesian(([0, 1],) * dims).astype("long")
             result = _cutils.iterate_data_ND(data, result, grid_num, obs_tot, binary_flgs)
         else:
             result = _cutils.iterate_data_2D(data, result, grid_num, obs_tot)

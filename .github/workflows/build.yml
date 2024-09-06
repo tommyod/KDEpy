@@ -79,10 +79,11 @@ jobs:
         with:
           name: python-package-distributions
           path: dist/
-
-      - name: Upload to PyPI
-        env:
-          PYPI_PASSWORD: ${{ secrets.pypi_password }}
-        run: |
-          pip install twine;
-          python -m twine upload dist/* -u tommyod -p "$PYPI_PASSWORD" --skip-existing;
+          
+      # https://github.com/pypa/gh-action-pypi-publish
+      - name: Publish Python distribution to PyPI
+        uses: pypa/gh-action-pypi-publish@e53eb8b103ffcb59469888563dc324e3c8ba6f06
+        with:
+          skip-existing: true
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}

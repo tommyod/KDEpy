@@ -55,8 +55,8 @@ def _fixed_point(t, N, I_sq, a2):
     """
 
     # This is important, as the powers might overflow if not done
-    I_sq = np.asfarray(I_sq, dtype=FLOAT)
-    a2 = np.asfarray(a2, dtype=FLOAT)
+    I_sq = np.asarray(I_sq, dtype=FLOAT)
+    a2 = np.asarray(a2, dtype=FLOAT)
 
     # ell = 7 corresponds to the 5 steps recommended in the paper
     ell = 7
@@ -72,7 +72,8 @@ def _fixed_point(t, N, I_sq, a2):
         # but this is faster so and requires an import less
 
         # Step one: estimate t_s from |f^(s+1)|^2
-        odd_numbers_prod = np.product(np.arange(1, 2 * s + 1, 2, dtype=FLOAT))
+        # odd_numbers_prod = np.product(np.arange(1, 2 * s + 1, 2, dtype=FLOAT))
+        odd_numbers_prod = np.prod(np.arange(1, 2 * s + 1, 2, dtype=FLOAT))
         K0 = odd_numbers_prod / np.sqrt(2 * np.pi)
         const = (1 + (1 / 2) ** (s + 1 / 2)) / 3
         time = np.power((2 * const * K0 / (N * f)), (2.0 / (3.0 + 2.0 * s)))

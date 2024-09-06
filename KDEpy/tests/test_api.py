@@ -51,7 +51,7 @@ def test_api_models_kernels_bandwidths(kde1, kde2, bw, kernel):
         assert err < 0.002
 
 
-type_functions = [tuple, np.array, np.asfarray, lambda x: np.asfarray(x).reshape(-1, 1)]
+type_functions = [tuple, np.array, np.asarray, lambda x: np.asarray(x, dtype=float).reshape(-1, 1)]
 
 
 @pytest.mark.parametrize(
