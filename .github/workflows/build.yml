@@ -18,25 +18,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      
+    
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: Cache pip packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('pyproject.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+          cache: 'pip'  # Enable built-in pip caching
 
       - name: Install dependencies
         run: |
           pip install --upgrade pip
           pip install -e .[dev,test,lint]
           pip install cibuildwheel==2.21.3
+        continue-on-error: false
 
       - name: Run tests and linting
         run: |
@@ -118,8 +112,7 @@ jobs:
           name: python-package-distributions
           path: dist/
       - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@e53eb8b103ffcb59469888563dc324e3c8ba6f06
+        uses: pypa/gh-action-pypi-publish@v1
         with:
           skip-existing: true
-          user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
