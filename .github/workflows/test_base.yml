@@ -25,7 +25,7 @@ jobs:
       - name: Install
         run: |
           pip install pip --upgrade
-          pip install -e .[dev,test,lint]
+          pip install -e .[dev,test,lint] --verbose
 
       - name: Run tests and linting
         run: |
