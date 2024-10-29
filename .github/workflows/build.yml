@@ -2,9 +2,9 @@ name: CI/CD
 
 on:
   push:
-    branches: [master, develop]
+    branches: [master]
   pull_request:
-    branches: [master, develop]
+    branches: [master]
   workflow_dispatch:
 
 jobs:
@@ -73,8 +73,7 @@ jobs:
     if: >-
       ${{
         github.event_name == 'push' &&
-        (github.ref == 'refs/heads/master' ||
-        github.ref == 'refs/heads/develop')
+        github.ref == 'refs/heads/master'
       }}
     steps:
       - uses: actions/checkout@v4
