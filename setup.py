@@ -12,8 +12,6 @@ import numpy as np
 from Cython.Distutils import build_ext
 from setuptools import Extension, setup
 
-print("MEssage to mee")
-
 setup(
     packages=["KDEpy"],
     cmdclass={"build_ext": build_ext},
