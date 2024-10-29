@@ -26,7 +26,7 @@ from libc.math cimport floor
 # for nor correctly handle negative indices
 
 # cdivision(True) -> If set to False, Cython will adjust the remainder and 
-# quotient operators C types to match those of Pyethon ints (which differ
+# quotient operators C types to match those of Python ints (which differ
 # when the operands have opposite signs) and raise a ZeroDivisionError 
 # when the right operand is 0
 @cython.boundscheck(False)
