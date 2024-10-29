@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
 
     steps:
       - uses: actions/checkout@v4
@@ -36,7 +36,7 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -e .[dev,test,lint]
-          pip install cibuildwheel==2.15.0
+          pip install cibuildwheel==2.21.3
 
       - name: Run tests and linting
         run: |
@@ -46,14 +46,19 @@ jobs:
 
       - name: Build wheels
         env:
-          CIBW_BUILD: cp${{ matrix.python-version == '3.8' && '38' || matrix.python-version == '3.9' && '39' || matrix.python-version == '3.10' && '310' || matrix.python-version == '3.11' && '311' || matrix.python-version == '3.12' && '312' }}*
+          CIBW_BUILD: cp${{ matrix.python-version == '3.8' && '38' || 
+                            matrix.python-version == '3.9' && '39' || 
+                            matrix.python-version == '3.10' && '310' || 
+                            matrix.python-version == '3.11' && '311' || 
+                            matrix.python-version == '3.12' && '312' ||
+                            matrix.python-version == '3.32' && '313' }}*
           CIBW_ARCHS_MACOS: x86_64 arm64
           CIBW_SKIP: pp* *-musllinux_* *-manylinux_i686
         run: |
           python -m cibuildwheel --output-dir wheelhouse
 
       - name: Build source distribution
-        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.13'
         run: |
           pip install build
           python -m build --sdist --outdir dist
@@ -68,7 +73,9 @@ jobs:
 
   build_docs:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop')
+    if: github.event_name == 'push' && 
+        (github.ref == 'refs/heads/master' || 
+        github.ref == 'refs/heads/develop')
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python

@@ -252,8 +252,7 @@ class Kernel(collections.abc.Callable):
         ...     return np.exp(-x) / normalization
         >>> kernel = Kernel(exp, var=4, support=np.inf)
         >>> # The function is scaled so that the standard deviation (bw) = 1
-        >>> kernel(0, bw=1, norm=2)[0] > kernel(1, bw=1, norm=2)[0]
-        True
+        >>> assert kernel(0, bw=1, norm=2)[0] > kernel(1, bw=1, norm=2)[0]
         >>> np.allclose(kernel(np.array([0, 1, 2])), kernel([0, 1, 2]))
         True
         >>> np.allclose(kernel(0), kernel([0]))
