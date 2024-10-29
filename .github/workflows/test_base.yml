@@ -2,7 +2,6 @@ name: Build & test
 
 on:
   workflow_call:
-  push:
 
 jobs:
   build:
@@ -11,7 +10,7 @@ jobs:
       fail-fast: false # Allow one of the matrix builds to fail without failing others
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ['3.12', '3.13'] #'3.8', '3.9', '3.10', '3.11',
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
 
     steps:
       - name: Checkout
@@ -25,7 +24,7 @@ jobs:
       - name: Install
         run: |
           pip install pip --upgrade
-          pip install -e .[dev,test,lint] --verbose
+          pip install -e .[dev,test,lint]
 
       - name: Run tests and linting
         run: |

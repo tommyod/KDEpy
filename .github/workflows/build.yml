@@ -2,7 +2,6 @@ name: Build wheels
 
 on: 
   workflow_dispatch:
-  push:
 
 jobs:
   build_wheels:
@@ -20,16 +19,16 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.13
+          python-version: 3.11
 
       - name: Install cibuildwheel
         run: |
-          pip install --upgrade pip Cython setuptools wheel
+          pip install --upgrade pip
           pip install cibuildwheel==2.21.3
 
       - name: Build wheels
         env:
-          CIBW_BUILD: 'cp312-* cp313-*'
+          CIBW_BUILD: 'cp38-* cp39-* cp310-* cp311-* cp312-* cp313-*'
           CIBW_ARCHS_MACOS: x86_64 arm64
           CIBW_SKIP: pp* *-musllinux_* *-manylinux_i686  # skip PyPy, musllinux, 32-bit Linux
         run: |
@@ -82,9 +81,9 @@ jobs:
           path: dist/
           
       # https://github.com/pypa/gh-action-pypi-publish
-#      - name: Publish Python distribution to PyPI
-#        uses: pypa/gh-action-pypi-publish@e53eb8b103ffcb59469888563dc324e3c8ba6f06
-#        with:
-#          skip-existing: true
-#          user: __token__
-#          password: ${{ secrets.PYPI_API_TOKEN }}
+      - name: Publish Python distribution to PyPI
+        uses: pypa/gh-action-pypi-publish@e53eb8b103ffcb59469888563dc324e3c8ba6f06
+        with:
+          skip-existing: true
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}

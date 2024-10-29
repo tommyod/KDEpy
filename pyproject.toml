@@ -46,6 +46,3 @@ lint = [
 [build-system]
 requires = ["setuptools>=45", "wheel", "cython>=3.0,<4.0", "oldest-supported-numpy"]
 build-backend = "setuptools.build_meta"
-
-[tool.cython]
-language_level = "3"
