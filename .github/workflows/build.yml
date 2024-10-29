@@ -46,12 +46,15 @@ jobs:
 
       - name: Build wheels
         env:
-          CIBW_BUILD: cp${{ matrix.python-version == '3.8' && '38' || 
-                            matrix.python-version == '3.9' && '39' || 
-                            matrix.python-version == '3.10' && '310' || 
-                            matrix.python-version == '3.11' && '311' || 
-                            matrix.python-version == '3.12' && '312' ||
-                            matrix.python-version == '3.32' && '313' }}*
+          CIBW_BUILD: >-
+            cp${{
+              matrix.python-version == '3.8' && '38' ||
+              matrix.python-version == '3.9' && '39' ||
+              matrix.python-version == '3.10' && '310' ||
+              matrix.python-version == '3.11' && '311' ||
+              matrix.python-version == '3.12' && '312' ||
+              matrix.python-version == '3.13' && '313'
+            }}*
           CIBW_ARCHS_MACOS: x86_64 arm64
           CIBW_SKIP: pp* *-musllinux_* *-manylinux_i686
         run: |
@@ -73,9 +76,12 @@ jobs:
 
   build_docs:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && 
-        (github.ref == 'refs/heads/master' || 
+    if: >-
+      ${{
+        github.event_name == 'push' &&
+        (github.ref == 'refs/heads/master' ||
         github.ref == 'refs/heads/develop')
+      }}
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
