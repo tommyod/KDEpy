@@ -26,7 +26,7 @@ from libc.math cimport floor
 # for nor correctly handle negative indices
 
 # cdivision(True) -> If set to False, Cython will adjust the remainder and 
-# quotient operators C types to match those of Python ints (which differ 
+# quotient operators C types to match those of Python ints (which differ
 # when the operands have opposite signs) and raise a ZeroDivisionError 
 # when the right operand is 0
 @cython.boundscheck(False)
@@ -213,7 +213,7 @@ def iterate_data_ND(double[:, :] data, double[:] result, long[:] grid_num,
     grid_num : number of grid points in each dimension
     obs_tot : total number of observations (grid points)
     binary_flgs : array of shape (dims, 2**dims), counting in binary
-                 this is used to to go every corner point efficiently
+                 this is used to go every corner point efficiently
     """
     cdef int obs, result_index, i, dims, corners, j, flg, corner, integer_xi
     cdef double corner_value, fraction
@@ -223,7 +223,7 @@ def iterate_data_ND(double[:, :] data, double[:] result, long[:] grid_num,
     obs, dims = data.shape[0], data.shape[1]
     
     # For every dimension, there are two directions to find corners in
-    corners = 2**dims
+    corners = int(2**dims)
 
     # Loop through every data point
     for i in range(obs):
@@ -246,11 +246,11 @@ def iterate_data_ND(double[:, :] data, double[:] result, long[:] grid_num,
             # Since we use flags to indicate x_1 or x_1 + 1, the following
             # code does the job:
             result_index = int(x_i[0])
-            result_index += 0**binary_flgs[corner, 0]
+            result_index += int(0**binary_flgs[corner, 0])
             for j in range(1, dims):
                 result_index *= grid_num[j]
                 integer_xi = <int> floor(x_i[j])
-                result_index += (integer_xi + 0**binary_flgs[corner, j])
+                result_index += (integer_xi + int(0**binary_flgs[corner, j]))
                 
             # (2) The value is found by
             # PROD_{i=0} (1 - frac(x[i))**flg * frac(x[i]) ** (1 - flg)
@@ -281,7 +281,7 @@ def iterate_data_ND_weighted(double[:, :] data, double[:] weights, double[:] res
     cdef double[:] x_i
     
     obs, dims = data.shape[0], data.shape[1]
-    corners = 2**dims
+    corners = int(2**dims)
     
     for i in range(obs):
         x_i = data[i, :]
@@ -290,11 +290,11 @@ def iterate_data_ND_weighted(double[:, :] data, double[:] weights, double[:] res
         for corner in range(corners):
             
             result_index = int(x_i[0])
-            result_index += 0**binary_flgs[corner, 0]
+            result_index += int(0**binary_flgs[corner, 0])
             for j in range(1, dims):
                 result_index *= grid_num[j]
                 integer_xi = <int> floor(x_i[j])
-                result_index += (integer_xi + 0**binary_flgs[corner, j])
+                result_index += (integer_xi + int(0**binary_flgs[corner, j]))
 
             corner_value = 1.0
             for j in range(dims):
