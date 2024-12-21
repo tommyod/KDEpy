@@ -14,6 +14,7 @@ from setuptools import Extension, setup
 
 setup(
     packages=["KDEpy"],
+    package_data={"": ["*pyx"]},
     cmdclass={"build_ext": build_ext},
     include_dirs=[np.get_include()],
     ext_modules=cythonize(

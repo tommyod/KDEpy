@@ -25,10 +25,17 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install cibuildwheel==2.21.3
+      
+      - name: Set up QEMU
+        if: runner.os == 'Linux'
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: all
 
       - name: Build wheels
         env:
           CIBW_BUILD: 'cp38-* cp39-* cp310-* cp311-* cp312-* cp313-*'
+          CIBW_ARCHS_LINUX: auto aarch64
           CIBW_ARCHS_MACOS: x86_64 arm64
           CIBW_SKIP: pp* *-musllinux_* *-manylinux_i686  # skip PyPy, musllinux, 32-bit Linux
         run: |
