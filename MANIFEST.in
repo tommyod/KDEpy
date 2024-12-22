@@ -1,2 +1,3 @@
 recursive-include KDEpy *.c
+recursive-include KDEpy *.pyx
 include MANIFEST.in
