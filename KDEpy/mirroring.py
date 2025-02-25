@@ -20,19 +20,32 @@ def mirror_data(data, boundaries,  pdf_values = None, decimals=10):
     Returns:
     pd.DataFrame: The mirrored data array (N x D) , and column ['value'] containing the rescaled PDF.
     """
+    def sum_together(mirrored_data, updated_values):
+            ### Group all the values together and add them up using groupby and sum
+        df = pd.DataFrame(mirrored_data)
+        df['values'] = updated_values
+
+        # Drop all the values that are 0, as they are outside the boundaries.
+        # df = df[df['values']!=0]
+        
+        df.iloc[:, :-1] = df.iloc[:, :-1].round(decimals) # Due to numerical precision, when mirroring, we do not get the numbers to match. If we round them the problem is gone.
+        final_df = df.groupby(df.columns[:-1].tolist()).sum().reset_index() # Group all the numbers together and add the PDF. 
+
+
+        mirrored_data = final_df.iloc[:, :-1].values
+        updated_values = final_df['values'].values
+
+        return mirrored_data, updated_values
+
+
+
     if pdf_values is None:
         pdf_values = np.ones(data.shape[0])/data.shape[0] # If no PDF values are provided, assume uniform distribution.
 
     mirrored_data = data.copy()
     updated_values = pdf_values.copy()
     
-    sum_together = 1
-
-    # Each boundary is 'folding' the data, and creating a copy. Quite memory exhaustive if we have many dimensions and boundaries in each dimension.
-    # Perhaps better to perform the sum in every iteration and drop all the extra copies of the mirrored data? 
-    
-    print([(i,j) for (i,j) in enumerate(boundaries)])
-
+    # Each boundary is 'folding' the data, and creating a copy, and adding the PDF values.    
     for dim, boundary in enumerate(boundaries):
         if boundary is not None:
             lower, upper = boundary
@@ -43,7 +56,8 @@ def mirror_data(data, boundaries,  pdf_values = None, decimals=10):
                     mirrored_points = np.column_stack([lower_mirror if i == dim else data[:, i] for i in range(data.shape[1])])
                     mirrored_data = np.vstack([mirrored_data, mirrored_points])
                     updated_values = np.concatenate([updated_values, pdf_values])
-                    sum_together+=1
+                    
+                    mirrored_data, updated_values = sum_together(mirrored_data, updated_values)
                 except:
                     pass
             if upper is not None:
@@ -53,10 +67,11 @@ def mirror_data(data, boundaries,  pdf_values = None, decimals=10):
                     mirrored_points = np.column_stack([upper_mirror if i == dim else data[:, i] for i in range(data.shape[1])])
                     mirrored_data = np.vstack([mirrored_data, mirrored_points])
                     updated_values = np.concatenate([updated_values, pdf_values])
-                    sum_together+=1
+                    
+                    mirrored_data, updated_values = sum_together(mirrored_data, updated_values)   
                 except:
                     pass
-                
+
     # # Have to do a second pass. After the mirroring. Drop values out of boundaries.
     for dim, boundary in enumerate(boundaries):
         if boundary is not None:
@@ -76,20 +91,11 @@ def mirror_data(data, boundaries,  pdf_values = None, decimals=10):
                 except:
                     pass
     
-    ### Group all the values together and add them up using groupby and sum
-    df = pd.DataFrame(mirrored_data)
-    df['values'] = updated_values
-
-    # Drop all the values that are 0, as they are outside the boundaries.
-    df = df[df['values']!=0]
-    
-    df.iloc[:, :-1] = df.iloc[:, :-1].round(decimals) # Due to numerical precision, when mirroring, we do not get the numbers to match. If we round them the problem is gone.
-    final_df = df.groupby(df.columns[:-1].tolist()).sum().reset_index() # Group all the numbers together and add the PDF. 
 
     # Adjusting pdf to make the sum = 1
-    final_df['values'] = final_df['values']/final_df['values'].sum()
+    updated_values = updated_values/updated_values.sum()
 
-    return final_df 
+    return mirrored_data, updated_values 
 
 
 
@@ -166,9 +172,10 @@ axs[0].set_title('Original KDE')
 
 # MODIFIED, MIRRORED KDE, tricontour
 # Define boundaries for mirroring
-final_df = mirror_data(X, boundaries, Z)
-x, y = final_df[0], final_df[1]
-z = final_df['values']
+mirrored_data, updated_pdf = mirror_data(X, boundaries, Z)
+x, y = mirrored_data[:,0], mirrored_data[:,1]
+z = updated_pdf
+
 # Plot the contours
 axs[1].tricontour(x, y, z, N, colors="k")
 axs[1].plot(data[:, 0], data[:, 1], "ok", ms=2)
@@ -205,9 +212,9 @@ axs[0].set_title('Original KDE')
 
 # MODIFIED, MIRRORED KDE, tricontour
 # Define boundaries for mirroring
-final_df = mirror_data(X, boundaries, Z)
-x, y = final_df[0], final_df[1]
-z = final_df['values']
+mirrored_data, updated_pdf = mirror_data(X, boundaries, Z)
+x, y = mirrored_data[:,0], mirrored_data[:,1]
+z = updated_pdf
 # Plot the contours
 axs[1].tricontour(x, y, z, N, colors="k")
 axs[1].plot(data[:, 0], data[:, 1], "ok", ms=2)
@@ -245,9 +252,9 @@ axs[0].set_title('Original KDE')
 
 # MODIFIED, MIRRORED KDE, tricontour
 # Define boundaries for mirroring
-final_df = mirror_data(X, boundaries, Z)
-x, y = final_df[0], final_df[1]
-z = final_df['values']
+mirrored_data, updated_pdf = mirror_data(X, boundaries, Z)
+x, y = mirrored_data[:,0], mirrored_data[:,1]
+z = updated_pdf
 # Plot the contours
 axs[1].tricontour(x, y, z, N, colors="k")
 axs[1].plot(data[:, 0], data[:, 1], "ok", ms=2)
@@ -273,14 +280,13 @@ size = 5000
 resampled_data = data[np.random.choice(data.shape[0], size=size, replace=True)]
 resampled_data = resampled_data + np.random.randn(size, data.shape[1]) * kernel_std
 
-resampled_df = mirror_data(resampled_data, boundaries)
-print(resampled_data.shape)
-
+mirrored_data, _ = mirror_data(resampled_data, boundaries)
+print(mirrored_data.shape)
 
 # Plot the results
 plt.scatter(data[:,0], data[:,1], alpha=0.5, label='Original Data')
 plt.scatter(resampled_data[:,0], resampled_data[:,1], c='b', alpha=0.5, label='Unbounded resampling')
-plt.scatter(resampled_df.iloc[:, 0], resampled_df.iloc[:, 1], c='r', alpha=0.5, label='Bounded Mirrored resampling')
+plt.scatter(mirrored_data[:, 0], mirrored_data[:, 1], c='r', alpha=0.5, label='Bounded Mirrored resampling')
 plt.title('Bounded and unbounded KDE')
 plt.tight_layout(); 
 plt.legend(loc='upper left');
