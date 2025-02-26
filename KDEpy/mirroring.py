@@ -2,6 +2,17 @@ from KDEpy import FFTKDE
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import time
+
+def time_it(func):
+    def wrapper(*args, **kwargs):
+        t1 = time.time()
+        result = func(*args, **kwargs)
+        t2 = time.time()
+        print(f"Time taken: {t2-t1:.6f} seconds")
+        return result
+    return wrapper
+
 
 def mirror_data(data, boundaries,  pdf_values = None, decimals=10):
     """
@@ -20,24 +31,51 @@ def mirror_data(data, boundaries,  pdf_values = None, decimals=10):
     Returns:
     pd.DataFrame: The mirrored data array (N x D) , and column ['value'] containing the rescaled PDF.
     """
-    def sum_together(mirrored_data, updated_values):
-            ### Group all the values together and add them up using groupby and sum
-        df = pd.DataFrame(mirrored_data)
-        df['values'] = updated_values
+    # def sum_together(mirrored_data, updated_values, decimals=10):
+    #         ### Group all the values together and add them up using groupby and sum
+    #     print('pandas')
+    #     df = pd.DataFrame(mirrored_data)
+    #     df['values'] = updated_values
 
-        # Drop all the values that are 0, as they are outside the boundaries.
-        # df = df[df['values']!=0]
+    #     # Drop all the values that are 0, as they are outside the boundaries.
+    #     # df = df[df['values']!=0]
         
-        df.iloc[:, :-1] = df.iloc[:, :-1].round(decimals) # Due to numerical precision, when mirroring, we do not get the numbers to match. If we round them the problem is gone.
-        final_df = df.groupby(df.columns[:-1].tolist()).sum().reset_index() # Group all the numbers together and add the PDF. 
+    #     df.iloc[:, :-1] = df.iloc[:, :-1].round(decimals) # Due to numerical precision, when mirroring, we do not get the numbers to match. If we round them the problem is gone.
+    #     final_df = df.groupby(df.columns[:-1].tolist()).sum().reset_index() # Group all the numbers together and add the PDF. 
 
 
-        mirrored_data = final_df.iloc[:, :-1].values
-        updated_values = final_df['values'].values
+    #     mirrored_data = final_df.iloc[:, :-1].values
+    #     updated_values = final_df['values'].values
 
-        return mirrored_data, updated_values
+    #     return mirrored_data, updated_values
 
-
+    def sum_together_np(mirrored_data, updated_values, decimals=10):
+        """
+        Group by unique rows in data and sum the corresponding values.
+        
+        Parameters:
+        data (np.ndarray): The input data array (N x D).
+        values (np.ndarray): The values array (N,).
+        decimals (int): Number of decimal places to round to for grouping.
+        
+        Returns:
+        np.ndarray: The grouped data array (M x D).
+        np.ndarray: The summed values array (M,).
+        """
+        print('numpy')
+        # Round the data to the specified number of decimals
+        rounded_data = np.round(mirrored_data, decimals=decimals)
+        
+        # Find unique rows and their indices
+        unique_data, indices = np.unique(rounded_data, axis=0, return_inverse=True)
+        
+        # Initialize an array to store the summed values
+        summed_values = np.zeros(unique_data.shape[0])
+        
+        # Use np.add.at to sum the values for each unique row
+        np.add.at(summed_values, indices, updated_values)
+        
+        return unique_data, summed_values
 
     if pdf_values is None:
         pdf_values = np.ones(data.shape[0])/data.shape[0] # If no PDF values are provided, assume uniform distribution.
@@ -57,7 +95,9 @@ def mirror_data(data, boundaries,  pdf_values = None, decimals=10):
                     mirrored_data = np.vstack([mirrored_data, mirrored_points])
                     updated_values = np.concatenate([updated_values, pdf_values])
                     
-                    mirrored_data, updated_values = sum_together(mirrored_data, updated_values)
+                    # mirrored_data, updated_values = sum_together(mirrored_data, updated_values)
+
+                    mirrored_data, updated_values = sum_together_np(mirrored_data, updated_values)
                 except:
                     pass
             if upper is not None:
@@ -68,7 +108,10 @@ def mirror_data(data, boundaries,  pdf_values = None, decimals=10):
                     mirrored_data = np.vstack([mirrored_data, mirrored_points])
                     updated_values = np.concatenate([updated_values, pdf_values])
                     
-                    mirrored_data, updated_values = sum_together(mirrored_data, updated_values)   
+                    # mirrored_data, updated_values = sum_together(mirrored_data, updated_values)  
+
+                    mirrored_data, updated_values = sum_together_np(mirrored_data, updated_values)
+
                 except:
                     pass
 
@@ -163,7 +206,7 @@ x, y = X[:, 0], X[:, 1]
 z = Z
 # Plot the contours
 # Create subplots
-fig, axs = plt.subplots(1, 2, figsize=(16, 8))
+fig, axs = plt.subplots(1, 2, figsize=(10, 8))
 axs[0].tricontour(x, y, z, N, colors="k")
 axs[0].plot(data[:, 0], data[:, 1], "ok", ms=2)
 axs[0].set_yticks([])
@@ -203,7 +246,7 @@ x, y = X[:, 0], X[:, 1]
 z = Z
 # Plot the contours
 # Create subplots
-fig, axs = plt.subplots(1, 2, figsize=(16, 8))
+fig, axs = plt.subplots(1, 2, figsize=(10, 8))
 axs[0].tricontour(x, y, z, N, colors="k")
 axs[0].plot(data[:, 0], data[:, 1], "ok", ms=2)
 axs[0].set_yticks([])
@@ -243,7 +286,7 @@ x, y = X[:, 0], X[:, 1]
 z = Z
 # Plot the contours
 # Create subplots
-fig, axs = plt.subplots(1, 2, figsize=(16, 8))
+fig, axs = plt.subplots(1, 2, figsize=(10, 8))
 axs[0].tricontour(x, y, z, N, colors="k")
 axs[0].plot(data[:, 0], data[:, 1], "ok", ms=2)
 axs[0].set_yticks([])
