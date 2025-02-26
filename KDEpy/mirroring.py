@@ -31,23 +31,6 @@ def mirror_data(data, boundaries,  pdf_values = None, decimals=10):
     Returns:
     pd.DataFrame: The mirrored data array (N x D) , and column ['value'] containing the rescaled PDF.
     """
-    # def sum_together(mirrored_data, updated_values, decimals=10):
-    #         ### Group all the values together and add them up using groupby and sum
-    #     print('pandas')
-    #     df = pd.DataFrame(mirrored_data)
-    #     df['values'] = updated_values
-
-    #     # Drop all the values that are 0, as they are outside the boundaries.
-    #     # df = df[df['values']!=0]
-        
-    #     df.iloc[:, :-1] = df.iloc[:, :-1].round(decimals) # Due to numerical precision, when mirroring, we do not get the numbers to match. If we round them the problem is gone.
-    #     final_df = df.groupby(df.columns[:-1].tolist()).sum().reset_index() # Group all the numbers together and add the PDF. 
-
-
-    #     mirrored_data = final_df.iloc[:, :-1].values
-    #     updated_values = final_df['values'].values
-
-    #     return mirrored_data, updated_values
 
     def sum_together_np(mirrored_data, updated_values, decimals=10):
         """
@@ -63,17 +46,12 @@ def mirror_data(data, boundaries,  pdf_values = None, decimals=10):
         np.ndarray: The summed values array (M,).
         """
         print('numpy')
-        # Round the data to the specified number of decimals
+        # Round the data to the specified number of decimals. Important! Otherwise, due to numerical precision, the numbers won't match
         rounded_data = np.round(mirrored_data, decimals=decimals)
-        
-        # Find unique rows and their indices
-        unique_data, indices = np.unique(rounded_data, axis=0, return_inverse=True)
-        
-        # Initialize an array to store the summed values
-        summed_values = np.zeros(unique_data.shape[0])
-        
-        # Use np.add.at to sum the values for each unique row
-        np.add.at(summed_values, indices, updated_values)
+
+        unique_data, indices = np.unique(rounded_data, axis=0, return_inverse=True) # Find unique rows and their indices
+        summed_values = np.zeros(unique_data.shape[0]) # Preallocate the summed values array
+        np.add.at(summed_values, indices, updated_values) # Use np.add.at to sum the values for each unique row
         
         return unique_data, summed_values
 
