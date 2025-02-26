@@ -73,8 +73,6 @@ def mirror_data(data, boundaries,  pdf_values = None, decimals=10):
                     mirrored_data = np.vstack([mirrored_data, mirrored_points])
                     updated_values = np.concatenate([updated_values, pdf_values])
                     
-                    # mirrored_data, updated_values = sum_together(mirrored_data, updated_values)
-
                     mirrored_data, updated_values = sum_together_np(mirrored_data, updated_values)
                 except:
                     pass
@@ -85,15 +83,12 @@ def mirror_data(data, boundaries,  pdf_values = None, decimals=10):
                     mirrored_points = np.column_stack([upper_mirror if i == dim else data[:, i] for i in range(data.shape[1])])
                     mirrored_data = np.vstack([mirrored_data, mirrored_points])
                     updated_values = np.concatenate([updated_values, pdf_values])
-                    
-                    # mirrored_data, updated_values = sum_together(mirrored_data, updated_values)  
 
                     mirrored_data, updated_values = sum_together_np(mirrored_data, updated_values)
-
                 except:
                     pass
 
-    # # Have to do a second pass. After the mirroring. Drop values out of boundaries.
+    # Have to do a second pass. After the mirroring, drop values out of boundaries.
     for dim, boundary in enumerate(boundaries):
         if boundary is not None:
             lower, upper = boundary
@@ -184,7 +179,7 @@ x, y = X[:, 0], X[:, 1]
 z = Z
 # Plot the contours
 # Create subplots
-fig, axs = plt.subplots(1, 2, figsize=(10, 8))
+fig, axs = plt.subplots(1, 2, figsize=(10, 6))
 axs[0].tricontour(x, y, z, N, colors="k")
 axs[0].plot(data[:, 0], data[:, 1], "ok", ms=2)
 axs[0].set_yticks([])
@@ -224,7 +219,7 @@ x, y = X[:, 0], X[:, 1]
 z = Z
 # Plot the contours
 # Create subplots
-fig, axs = plt.subplots(1, 2, figsize=(10, 8))
+fig, axs = plt.subplots(1, 2, figsize=(10, 6))
 axs[0].tricontour(x, y, z, N, colors="k")
 axs[0].plot(data[:, 0], data[:, 1], "ok", ms=2)
 axs[0].set_yticks([])
@@ -264,7 +259,7 @@ x, y = X[:, 0], X[:, 1]
 z = Z
 # Plot the contours
 # Create subplots
-fig, axs = plt.subplots(1, 2, figsize=(10, 8))
+fig, axs = plt.subplots(1, 2, figsize=(10, 6))
 axs[0].tricontour(x, y, z, N, colors="k")
 axs[0].plot(data[:, 0], data[:, 1], "ok", ms=2)
 axs[0].set_yticks([])
