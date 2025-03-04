@@ -67,7 +67,11 @@ def mirror_data(data, boundaries, pdf_values=None, decimals=10):
             np.ones(data.shape[0]) / data.shape[0]
         )  # If no PDF values are provided, assume uniform distribution.
 
+    # Check if the amount of rows of pdf_values matches the ones on data.
     assert pdf_values.shape[0] == data.shape[0], "PDF values must match the data size."
+
+    # Check if the data and boundaries have the same dimensions
+    assert data.shape[1] == len(boundaries), "Data dimensions must match the boundaries."
 
     mirrored_data = data.copy()
     updated_values = pdf_values.copy()
@@ -89,9 +93,9 @@ def mirror_data(data, boundaries, pdf_values=None, decimals=10):
                     updated_values = np.concatenate([updated_values, pdf_values])
 
                     mirrored_data, updated_values = sum_together_np(mirrored_data, updated_values)
-                except Exception as e:
-                    print(f"Failed to mirror lower boundary: {e}")
-                    pass
+                except ValueError:
+                    pass  # If there are no points below the lower boundary, they can't be mirrored.
+
             if upper is not None:
                 try:
                     closest_upper = np.min(
@@ -105,30 +109,21 @@ def mirror_data(data, boundaries, pdf_values=None, decimals=10):
                     updated_values = np.concatenate([updated_values, pdf_values])
 
                     mirrored_data, updated_values = sum_together_np(mirrored_data, updated_values)
-                except Exception as e:
-                    print(f"Failed to mirror upper boundary: {e}")
-                    pass
+                except ValueError:
+                    pass  # If there are no points above the upper boundary, they can't be mirrored.
 
     # Have to do a second pass. After the mirroring, drop values out of boundaries.
     for dim, boundary in enumerate(boundaries):
         if boundary is not None:
             lower, upper = boundary
             if lower is not None:
-                try:
-                    mask = mirrored_data[:, dim] >= lower
-                    mirrored_data = mirrored_data[mask]
-                    updated_values = updated_values[mask]
-                except Exception as e:
-                    print(f"Failed to drop lower boundary: {e}")
-                    pass
+                mask = mirrored_data[:, dim] >= lower
+                mirrored_data = mirrored_data[mask]
+                updated_values = updated_values[mask]
             if upper is not None:
-                try:
-                    mask = mirrored_data[:, dim] <= upper
-                    mirrored_data = mirrored_data[mask]
-                    updated_values = updated_values[mask]
-                except Exception as e:
-                    print(f"Failed to drop upper boundary: {e}")
-                    pass
+                mask = mirrored_data[:, dim] <= upper
+                mirrored_data = mirrored_data[mask]
+                updated_values = updated_values[mask]
 
     # Adjusting pdf to make the sum = 1
     updated_values = updated_values / updated_values.sum()
