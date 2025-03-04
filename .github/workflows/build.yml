@@ -1,6 +1,6 @@
 name: Build wheels
 
-on: 
+on:
   workflow_dispatch:
 
 jobs:
@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
@@ -25,17 +25,10 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install cibuildwheel==2.21.3
-      
-      - name: Set up QEMU
-        if: runner.os == 'Linux'
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: all
 
       - name: Build wheels
         env:
           CIBW_BUILD: 'cp38-* cp39-* cp310-* cp311-* cp312-* cp313-*'
-          CIBW_ARCHS_LINUX: auto aarch64
           CIBW_ARCHS_MACOS: x86_64 arm64
           CIBW_SKIP: pp* *-musllinux_* *-manylinux_i686  # skip PyPy, musllinux, 32-bit Linux
         run: |
@@ -86,7 +79,7 @@ jobs:
         with:
           name: python-package-distributions
           path: dist/
-          
+
       # https://github.com/pypa/gh-action-pypi-publish
       - name: Publish Python distribution to PyPI
         uses: pypa/gh-action-pypi-publish@e53eb8b103ffcb59469888563dc324e3c8ba6f06
