@@ -6,6 +6,12 @@ def mirror_data(data, boundaries, pdf_values=None, decimals=10):
     Mirrors the data based on the provided boundaries and adds up the values onto the unmirrored parts.
     Sets everything below or above the boundaries to 0 in the values.
 
+    By the nature of the folding and copying procedure, if there is any data exactly in the boundary 
+    it will be duplicated.
+
+    Datapoints in 'data' should be unique determined, if there are repeated points, they will be aggregated, 
+    and the PDF values will be summed. 
+
     Parameters
     ----------
     data : np.ndarray
@@ -76,30 +82,38 @@ def mirror_data(data, boundaries, pdf_values=None, decimals=10):
     mirrored_data = data.copy()
     updated_values = pdf_values.copy()
 
-    # Each boundary is 'folding' the data, and creating a copy, and adding the PDF values.
+    # Each boundary is 'folding' the data; creating a copy, adding the PDF values, 
+    # and then deleting the values which are beyond the boundary.
     for dim, boundary in enumerate(boundaries):
         if boundary is not None:
             lower, upper = boundary
             if lower is not None:
                 try:
+
                     closest_lower = np.max(
-                        data[data[:, dim] <= lower, dim]
-                    )  # Mirror using the closest data point as pivot
+                        data[data[:, dim] < lower, dim]
+                    )  # Mirror using the closest inner data point as pivot
                     lower_mirror = 2 * closest_lower - data[:, dim]
                     mirrored_points = np.column_stack(
                         [lower_mirror if i == dim else data[:, i] for i in range(data.shape[1])]
                     )
                     mirrored_data = np.vstack([mirrored_data, mirrored_points])
                     updated_values = np.concatenate([updated_values, pdf_values])
-
                     mirrored_data, updated_values = sum_together_np(mirrored_data, updated_values)
                 except ValueError:
+                    print("No points below the lower boundary.")
                     pass  # If there are no points below the lower boundary, they can't be mirrored.
+                    # Equivalent as mirroring -inf
+
+                # Deleting the points that are out of the boundaries.
+                mask = mirrored_data[:, dim] >= lower
+                mirrored_data = mirrored_data[mask]
+                updated_values = updated_values[mask]                
 
             if upper is not None:
                 try:
                     closest_upper = np.min(
-                        data[data[:, dim] >= upper, dim]
+                        data[data[:, dim] > upper, dim]
                     )  # Mirror using the closest data point as pivot
                     upper_mirror = 2 * closest_upper - data[:, dim]
                     mirrored_points = np.column_stack(
@@ -107,10 +121,17 @@ def mirror_data(data, boundaries, pdf_values=None, decimals=10):
                     )
                     mirrored_data = np.vstack([mirrored_data, mirrored_points])
                     updated_values = np.concatenate([updated_values, pdf_values])
-
                     mirrored_data, updated_values = sum_together_np(mirrored_data, updated_values)
                 except ValueError:
+                    print("No points above the upper boundary.")	
                     pass  # If there are no points above the upper boundary, they can't be mirrored.
+                    # Equivalent as mirroring inf
+
+                # Deleting the points that are out of the boundaries.
+                mask = mirrored_data[:, dim] <= upper
+                mirrored_data = mirrored_data[mask]
+                updated_values = updated_values[mask]
+
 
     # Have to do a second pass. After the mirroring, drop values out of boundaries.
     for dim, boundary in enumerate(boundaries):
