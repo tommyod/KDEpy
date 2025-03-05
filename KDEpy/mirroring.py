@@ -39,19 +39,20 @@ def mirror_data(data, boundaries, pdf_values=None, decimals=10):
 
     Example
     -------
+    >>> from KDEpy.mirroring import mirror_data
     >>> import numpy as np
     >>> data = np.arange(10).reshape(-1, 1)
     >>> boundaries = [(1, 7)]
     >>> mirror_data(data, boundaries)
-    array([[1],[2],[3],[4],[5],[6],[7]]), array(0.166, 0.166, 0.083, 0.083, 0.166, 0.166, 0.166)
+    (array([[1],[2],[3],[4],[5],[6],[7]]),
+     array([0.166667, 0.166667, 0.083333, 0.083333, 0.166667, 0.166667, 0.166667]))
     >>> from KDEpy import FFTKDE
-    >>> from KDEpy.mirroring import mirror_data
+    >>> np.random.seed(42)
     >>> data = np.random.rand(1000, 2) * 10
-    >>> gridpoints = 100
-    >>> boundaries = [[1, 10], (1, 10)] # 2-dimensional dataframe.
+    >>> grid_points = 100
+    >>> boundaries = [[1, 10], (1, 10)] # 2-dimensional dataframe. Accepts tuple or list
     >>> X, Z = FFTKDE(bw=1).fit(data)((grid_points, grid_points))
     >>> X_mirrored, Z_mirrored = mirror_data(X, boundaries, Z)
-
     """
 
     def sum_together_np(mirrored_data, updated_values, decimals=10):
