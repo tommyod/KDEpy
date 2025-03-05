@@ -95,7 +95,6 @@ def mirror_data(data, boundaries, pdf_values=None, decimals=10):
     assert pdf_values.shape[0] == data.shape[0], "PDF values must match the data size."
 
     # Check if the data and boundaries have the same dimensions
-    print(data.shape, pdf_values.shape, len(boundaries))
     assert data.shape[1] == len(boundaries), "Data dimensions must match the boundaries."
 
     mirrored_data = data.copy()
@@ -107,8 +106,6 @@ def mirror_data(data, boundaries, pdf_values=None, decimals=10):
         if boundary is not None:
             lower, upper = boundary
             if lower is not None:
-                print(mirrored_data.shape, updated_values.shape)
-
                 try:
                     closest_lower = np.max(
                         mirrored_data[mirrored_data[:, dim] <= lower, dim]
@@ -125,15 +122,12 @@ def mirror_data(data, boundaries, pdf_values=None, decimals=10):
                     pass  # If there are no points below the lower boundary, they can't be mirrored.
                     # Equivalent as mirroring -inf
 
-                print(mirrored_data.shape, updated_values.shape)
-
                 # Deleting the points that are out of the boundaries.
                 mask = mirrored_data[:, dim] >= lower
                 mirrored_data = mirrored_data[mask]
                 updated_values = updated_values[mask]
 
             if upper is not None:
-                print(mirrored_data.shape, updated_values.shape)
                 try:
                     closest_upper = np.min(
                         mirrored_data[mirrored_data[:, dim] >= upper, dim]
@@ -149,7 +143,6 @@ def mirror_data(data, boundaries, pdf_values=None, decimals=10):
                     print("No points above the upper boundary.")
                     pass  # If there are no points above the upper boundary, they can't be mirrored.
                     # Equivalent as mirroring inf
-                print(mirrored_data.shape, updated_values.shape)
 
                 # Deleting the points that are out of the boundaries.
                 mask = mirrored_data[:, dim] <= upper

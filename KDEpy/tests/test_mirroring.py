@@ -268,8 +268,6 @@ def test_mirror_pdf(boundaries, pdf_values):
 
     # Testing only the pdf now, as the mirrored data is already tested
     mirror, pdf = mirror_data(data, boundaries, pdf_values)
-    print(data, boundaries, pdf_values, mirror, pdf)
-    print(expected_results_pdf[boundaries])
     assert np.allclose(pdf, expected_results_pdf[boundaries], atol=1e-7)
 
 
