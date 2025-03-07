@@ -174,7 +174,7 @@ def mirror_data(data, boundaries, pdf_values=None, decimals=10):
     return mirrored_data, updated_values
 
 
-
 if __name__ == "__main__":
     import doctest
+
     doctest.testmod()
