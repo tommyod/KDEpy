@@ -41,11 +41,17 @@ def mirror_data(data, boundaries, pdf_values=None, decimals=10):
     -------
     >>> from KDEpy.mirroring import mirror_data
     >>> import numpy as np
-    >>> data = np.arange(10).reshape(-1, 1)
+    >>> data = np.arange(8).reshape(-1, 1)
     >>> boundaries = [(1, 7)]
     >>> mirror_data(data, boundaries)
-    (array([[1],[2],[3],[4],[5],[6],[7]]),
-     array([0.166667, 0.166667, 0.083333, 0.083333, 0.166667, 0.166667, 0.166667]))
+    (array([[1],
+        [2],
+        [3],
+        [4],
+        [5],
+        [6],
+        [7]]),
+        array([0.2, 0.2, 0.1, 0.1, 0.1, 0.1, 0.2]))
     >>> from KDEpy import FFTKDE
     >>> np.random.seed(42)
     >>> data = np.random.rand(1000, 2) * 10
