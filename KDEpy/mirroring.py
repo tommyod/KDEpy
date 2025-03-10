@@ -60,6 +60,45 @@ def mirror_data(data, boundaries, pdf_values=None, decimals=10):
     >>> X_mirrored, Z_mirrored = mirror_data(X, boundaries, Z)
     """
 
+    def check_grid_and_width(data):
+        """
+        Check if the sequence of points in a multidimensional grid are living in a grid (equidistant)
+        and find the width of the grid.
+
+        Parameters
+        ----------
+        data : np.ndarray
+            The input data array (N x D). N data points in D dimensions.
+
+        Returns
+        -------
+        bool
+            True if the points are living in a grid (equidistant) for each dimension, False otherwise.
+        list
+            A list of grid widths for each dimension if the points are equidistant, None otherwise.
+        """
+        # Initialize list to store grid widths for each dimension
+        grid_widths = []
+
+        # Iterate over each dimension (column)
+        for dim in range(data.shape[1]):
+            # Get unique values of the current column
+            unique_values = np.unique(data[:, dim])
+
+            # Calculate the differences between consecutive unique values
+            differences = np.diff(unique_values)
+
+            # Check if all differences are equal (equidistant)
+            is_grid = np.all(np.isclose(differences, differences))
+
+            # If the points are equidistant, store the width of the grid for the current dimension
+            if is_grid:
+                grid_widths.append(differences[0])  # Store the width of the grid for the current dimension
+            else:
+                return False, None
+
+        return True, grid_widths
+
     def sum_together_np(mirrored_data, updated_values, decimals=10):
         """
         Group by unique rows in data and sum the corresponding values.
@@ -106,6 +145,9 @@ def mirror_data(data, boundaries, pdf_values=None, decimals=10):
 
     # Check if the data and boundaries have the same dimensions
     assert data.shape[1] == len(boundaries), "Data dimensions must match the boundaries."
+
+    # Check if the data is living in a grid (equidistant) for each dimension
+    is_grid, grid_widths = check_grid_and_width(data)
 
     mirrored_data = data.copy()
     updated_values = pdf_values.copy()
@@ -174,11 +216,47 @@ def mirror_data(data, boundaries, pdf_values=None, decimals=10):
 
     # Adjusting pdf to make the sum = 1
     updated_values = updated_values / updated_values.sum()
+    # Adjusting pdf according to bin width if the data is in a grid
+    if is_grid:
+        updated_values = updated_values / np.prod(grid_widths)
 
     return mirrored_data, updated_values
 
 
 if __name__ == "__main__":
-    import doctest
+    import subprocess
+    import sys
+    import os
 
-    doctest.testmod()
+    def run_command(command):
+        result = subprocess.run(command, capture_output=True, text=True)
+        print(f"{command} Output:")
+        print(result.stdout)
+        print(result.stderr)
+
+    # Get the path to the virtual environment's Python executable
+    venv_python = (
+        os.path.join(sys.prefix, "bin", "python")
+        if os.name != "nt"
+        else os.path.join(sys.prefix, "Scripts", "python.exe")
+    )
+
+    # Run black check
+    run_command([venv_python, "-m", "black", "KDEpy", "-l", "120"])
+
+    # Run flake8 check
+    run_command(
+        [
+            venv_python,
+            "-m",
+            "flake8",
+            "--show-source",
+            "--ignore=F811,W293,W391,W292,W291,W504,W503,E231",
+            "--max-line-length=120",
+            "--exclude=*examples.py,testing.py,*kde.py",
+            "KDEpy",
+        ]
+    )
+
+    # Run pytest
+    run_command([venv_python, "-m", "pytest", "KDEpy", "--doctest-modules", "--capture=sys"])
