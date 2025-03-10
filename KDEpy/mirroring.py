@@ -97,6 +97,10 @@ def mirror_data(data, boundaries, pdf_values=None, decimals=10):
             np.ones(data.shape[0]) / data.shape[0]
         )  # If no PDF values are provided, assume uniform distribution.
 
+    # Check if dimension is 1 and reshape if necessary
+    if data.ndim == 1:
+        data = data.reshape(-1, 1)
+
     # Check if the amount of rows of pdf_values matches the ones on data.
     assert pdf_values.shape[0] == data.shape[0], "PDF values must match the data size."
 
