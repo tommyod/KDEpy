@@ -39,25 +39,27 @@ def mirror_data(data, boundaries, pdf_values=None, decimals=10):
 
     Example
     -------
+    >>> # FIRST EXAMPLE (mirroring synthetic data):
     >>> from KDEpy.mirroring import mirror_data
+    >>> from KDEpy.bw_selection import silvermans_rule
     >>> import numpy as np
-    >>> data = np.arange(8).reshape(-1, 1)
-    >>> boundaries = [(1, 7)]
-    >>> mirror_data(data, boundaries)
-    (array([[1],
-           [2],
-           [3],
-           [4],
-           [5],
-           [6],
-           [7]]), array([0.2, 0.2, 0.1, 0.1, 0.1, 0.1, 0.2]))
+    >>> np.random.seed(42)
+    >>> boundaries = [(0, 1), (0, 1)] # Both dimensions are bounded between 0 and 1
+    >>> data = np.random.rand(15,2) # Generate random uniform data
+    >>> kernel_std = [silvermans_rule(data[:, column].reshape(-1, 1)) for column in range(data.shape[1])]
+    >>> synthetic_data_size = 1000
+    >>> resampled_data = data[np.random.choice(data.shape[0], size=synthetic_data_size, replace=True)]
+    >>> resampled_data = resampled_data + np.random.randn(synthetic_data_size, data.shape[1]) * kernel_std
+    >>> mirrored_data, _ = mirror_data(resampled_data, boundaries, decimals=16)
+    >>> # Mirrored the data with same boundaries as original data:
+    >>> # SECOND EXAMPLE (mirroring KDE evaluation):
     >>> from KDEpy import FFTKDE
     >>> np.random.seed(42)
-    >>> data = np.random.rand(1000, 2) * 10
+    >>> data = np.random.rand(15, 2)
     >>> grid_points = 100
-    >>> boundaries = [[1, 10], (1, 10)] # 2-dimensional dataframe. Accepts tuple or list
-    >>> X, Z = FFTKDE(bw=1).fit(data)((grid_points, grid_points))
-    >>> X_mirrored, Z_mirrored = mirror_data(X, boundaries, Z)
+    >>> boundaries = [[0, 1], (0, 1)] # 2-dimensional dataframe. Accepts tuple or list
+    >>> X, Z = FFTKDE(bw=1).fit(data)((grid_points, grid_points)) # Fit KDE to data
+    >>> X_mirrored, Z_mirrored = mirror_data(X, boundaries, Z) # Mirror KDE evaluation
     """
 
     def check_grid_and_width(data):
@@ -89,7 +91,7 @@ def mirror_data(data, boundaries, pdf_values=None, decimals=10):
             differences = np.diff(unique_values)
 
             # Check if all differences are equal (equidistant)
-            is_grid = np.all(np.isclose(differences, differences))
+            is_grid = np.all(np.isclose(differences, np.mean(differences), rtol=0.000001))
 
             # If the points are equidistant, store the width of the grid for the current dimension
             if is_grid:
@@ -99,7 +101,7 @@ def mirror_data(data, boundaries, pdf_values=None, decimals=10):
 
         return True, grid_widths
 
-    def sum_together_np(mirrored_data, updated_values, decimals=10):
+    def sum_together_np(mirrored_data, updated_values, decimals):
         """
         Group by unique rows in data and sum the corresponding values.
 
@@ -159,16 +161,19 @@ def mirror_data(data, boundaries, pdf_values=None, decimals=10):
             lower, upper = boundary
             if lower is not None:
                 try:
-                    closest_lower = np.max(
-                        mirrored_data[mirrored_data[:, dim] <= lower, dim]
-                    )  # Mirror using the closest inner data point as pivot
+                    if is_grid:
+                        closest_lower = np.max(
+                            mirrored_data[mirrored_data[:, dim] <= lower, dim]
+                        )  # Mirror using the closest outer data point as pivot
+                    else:
+                        closest_lower = lower
                     lower_mirror = 2 * closest_lower - mirrored_data[:, dim]
                     mirrored_points = np.column_stack(
                         [lower_mirror if i == dim else mirrored_data[:, i] for i in range(mirrored_data.shape[1])]
                     )
                     mirrored_data = np.vstack([mirrored_data, mirrored_points])
                     updated_values = np.concatenate([updated_values, updated_values])
-                    mirrored_data, updated_values = sum_together_np(mirrored_data, updated_values)
+                    mirrored_data, updated_values = sum_together_np(mirrored_data, updated_values, decimals)
                 except ValueError:
                     print("No points below the lower boundary.")
                     pass  # If there are no points below the lower boundary, they can't be mirrored.
@@ -181,16 +186,19 @@ def mirror_data(data, boundaries, pdf_values=None, decimals=10):
 
             if upper is not None:
                 try:
-                    closest_upper = np.min(
-                        mirrored_data[mirrored_data[:, dim] >= upper, dim]
-                    )  # Mirror using the closest data point as pivot
+                    if is_grid:
+                        closest_upper = np.min(
+                            mirrored_data[mirrored_data[:, dim] >= upper, dim]
+                        )  # Mirror using the closest outer data point as pivot
+                    else:
+                        closest_upper = upper
                     upper_mirror = 2 * closest_upper - mirrored_data[:, dim]
                     mirrored_points = np.column_stack(
                         [upper_mirror if i == dim else mirrored_data[:, i] for i in range(mirrored_data.shape[1])]
                     )
                     mirrored_data = np.vstack([mirrored_data, mirrored_points])
                     updated_values = np.concatenate([updated_values, updated_values])
-                    mirrored_data, updated_values = sum_together_np(mirrored_data, updated_values)
+                    mirrored_data, updated_values = sum_together_np(mirrored_data, updated_values, decimals)
                 except ValueError:
                     print("No points above the upper boundary.")
                     pass  # If there are no points above the upper boundary, they can't be mirrored.
