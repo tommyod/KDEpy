@@ -94,7 +94,7 @@ jobs:
           
       - name: Install build
         run: |
-          python -m pip install build twine pkginfo --upgrade
+          python -m pip install build twine pkginfo packaging --upgrade
           twine check dist/*
           
       # https://github.com/pypa/gh-action-pypi-publish
