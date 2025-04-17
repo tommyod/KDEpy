@@ -65,7 +65,7 @@ jobs:
       - name: Install build
         run: |
           python -m pip install build twine pkginfo --upgrade
-          twine check
+          twine check dist
         
 
       - name: Run sdist
@@ -95,7 +95,7 @@ jobs:
       - name: Install build
         run: |
           python -m pip install build twine pkginfo --upgrade
-          twine check
+          twine check dist
           
       # https://github.com/pypa/gh-action-pypi-publish
       - name: Publish Python distribution to PyPI
