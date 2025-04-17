@@ -47,6 +47,7 @@ jobs:
         with:
           name: python-package-distributions
           path: dist/*.whl
+          overwrite: true
 
   package_source:
     name: Package source distribution
@@ -72,6 +73,7 @@ jobs:
         with:
           name: python-package-distributions
           path: ./dist/*.tar.gz
+          overwrite: true
 
   publish_to_pypi:
     needs:
