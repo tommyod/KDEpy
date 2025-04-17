@@ -63,10 +63,13 @@ jobs:
           python-version: 3.11
 
       - name: Install build
-        run: python -m pip install build
+        run: |
+          python -m pip install build twine pkginfo --upgrade
 
       - name: Run sdist
-        run: python -m build --sdist
+        run: |
+          python -m build --sdist
+          twine check dist/*
 
       - name: Store artifacts
         uses: actions/upload-artifact@v4
@@ -89,9 +92,14 @@ jobs:
           name: python-package-distributions
           path: dist/
           
+      - name: Install build
+        run: |
+          python -m pip install build twine pkginfo --upgrade
+          twine check dist/*
+          
       # https://github.com/pypa/gh-action-pypi-publish
       - name: Publish Python distribution to PyPI
-        uses: pypa/gh-action-pypi-publish@e53eb8b103ffcb59469888563dc324e3c8ba6f06
+        uses: pypa/gh-action-pypi-publish@v1.12.4
         with:
           skip-existing: true
           user: __token__
