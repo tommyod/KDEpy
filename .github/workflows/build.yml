@@ -45,9 +45,9 @@ jobs:
       - name: Store artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: python-package-distributions
+          name: python-package-distributions-${{ matrix.os }}  # Unique name per OS
           path: dist/*.whl
-          overwrite: true
+          # Remove overwrite: true
 
   package_source:
     name: Package source distribution
@@ -74,9 +74,9 @@ jobs:
       - name: Store artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: python-package-distributions
+          name: python-package-distributions-source  # Unique name for source
           path: ./dist/*.tar.gz
-          overwrite: true
+          # Remove overwrite: true
 
   publish_to_pypi:
     needs:
@@ -86,16 +86,21 @@ jobs:
     if: github.ref == 'refs/heads/master'  # Only publish from the master branch
 
     steps:
-      - name: Download build files
+      - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          name: python-package-distributions
-          path: dist/
+          path: dist/  # Downloads all artifacts to this directory
+          
+      - name: Merge artifacts
+        run: |
+          mkdir final_dist
+          find dist -type f -name "*.whl" -exec cp {} final_dist/ \;
+          find dist -type f -name "*.tar.gz" -exec cp {} final_dist/ \;
           
       - name: Install build
         run: |
           python -m pip install build twine pkginfo packaging --upgrade
-          twine check dist/*
+          twine check final_dist/*
           
       # https://github.com/pypa/gh-action-pypi-publish
       - name: Publish Python distribution to PyPI
@@ -104,3 +109,4 @@ jobs:
           skip-existing: true
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
+          packages-dir: final_dist/  # Point to the merged directory
