@@ -76,7 +76,6 @@ jobs:
         with:
           name: python-package-distributions-source  # Unique name for source
           path: ./dist/*.tar.gz
-          # Remove overwrite: true
 
   publish_to_pypi:
     needs:
