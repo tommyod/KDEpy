@@ -4,6 +4,7 @@
 Module for the FFTKDE.
 """
 import numbers
+from typing import Callable, Optional, Union
 import warnings
 
 import numpy as np
@@ -42,8 +43,8 @@ class FFTKDE(BaseKDE):
 
     Parameters
     ----------
-    kernel : str
-        The kernel function. See cls._available_kernels.keys() for choices.
+    kernel : str or callable
+        Kernel function, or string matching available options. See cls._available_kernels.keys() for choices.
     bw : float or str
         Bandwidth or bandwidth selection method. If a float is passed, it
         is the standard deviation of the kernel. If a string it passed, it
@@ -72,12 +73,12 @@ class FFTKDE(BaseKDE):
 
     """
 
-    def __init__(self, kernel="gaussian", bw=1, norm=2):
+    def __init__(self, kernel: Union[str, Callable] = "gaussian", bw: Union[float, str] = 1, norm: int = 2):
         self.norm = norm
         super().__init__(kernel, bw)
         assert isinstance(self.norm, numbers.Number) and self.norm > 0
 
-    def fit(self, data, weights=None):
+    def fit(self, data: np.ndarray, weights: Optional[np.ndarray] = None) -> "FFTKDE":
         """
         Fit the KDE to the data. This validates the data and stores it.
         Computations are performed upon evaluation on a specific grid.
@@ -107,7 +108,7 @@ class FFTKDE(BaseKDE):
         super().fit(data, weights)
         return self
 
-    def evaluate(self, grid_points=None):
+    def evaluate(self, grid_points: Optional[Union[np.ndarray, int, tuple]] = None) -> Union[np.ndarray, tuple]:
         """
         Evaluate on equidistant grid points.
 

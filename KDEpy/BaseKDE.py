@@ -6,6 +6,7 @@ Module for the BaseKDE class.
 import numbers
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
+from typing import Callable, Optional, Union
 
 import numpy as np
 
@@ -33,7 +34,7 @@ class BaseKDE(ABC):
     _bw_methods = _bw_methods
 
     @abstractmethod
-    def __init__(self, kernel: str, bw: float):
+    def __init__(self, kernel: Union[str, Callable], bw: Union[float, str, np.ndarray]):
         """Initialize the kernel density estimator.
 
         The return type must be duplicated in the docstring to comply
@@ -41,9 +42,9 @@ class BaseKDE(ABC):
 
         Parameters
         ----------
-        kernel
-            Kernel function, or string matching available options.
-        bw
+        kernel : str or callable
+            Kernel function, or string matching available options. See cls._available_kernels.keys() for choices.
+        bw : float, str or array-like
             The bandwidth, either a number, a string or an array-like.
         """
 
@@ -81,7 +82,7 @@ class BaseKDE(ABC):
         assert isinstance(self.bw_method, (np.ndarray, Sequence, numbers.Number)) or callable(self.bw_method)
 
     @abstractmethod
-    def fit(self, data, weights=None):
+    def fit(self, data: np.ndarray, weights: Optional[np.ndarray] = None) -> "BaseKDE":
         """
         Fit the kernel density estimator to the data.
         This method converts the data to shape (obs, dims) and the weights
@@ -95,6 +96,11 @@ class BaseKDE(ABC):
         weights : array-like, Sequence or None
             May be array-like of shape (obs,), shape (obs, dims), a
             Python Sequence, e.g. a list or tuple, or None.
+
+        Returns
+        -------
+        self
+            Returns the instance.
         """
 
         # -------------- Set up the data depending on input -------------------
@@ -132,8 +138,12 @@ class BaseKDE(ABC):
         else:
             self.bw = self.bw_method
 
+        return self
+
     @abstractmethod
-    def evaluate(self, grid_points=None, bw_to_scalar=True):
+    def evaluate(
+        self, grid_points: Optional[Union[np.ndarray, int, tuple]] = None, bw_to_scalar: bool = True
+    ) -> Union[np.ndarray, tuple]:
         """
         Evaluate the kernel density estimator on the grid points.
 
