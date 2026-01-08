@@ -4,6 +4,7 @@
 Module for the TreeKDE.
 """
 import numbers
+from typing import Callable, Optional, Union
 
 import numpy as np
 from scipy.spatial import cKDTree
@@ -24,8 +25,8 @@ class TreeKDE(BaseKDE):
 
     Parameters
     ----------
-    kernel : str
-        The kernel function. See cls._available_kernels.keys() for choices.
+    kernel : str or callable
+        Kernel function, or string matching available options. See cls._available_kernels.keys() for choices.
     bw : float, str or array-like
         Bandwidth or bandwidth selection method. If a float is passed, it
         is the standard deviation of the kernel. If a string it passed, it
@@ -61,11 +62,13 @@ class TreeKDE(BaseKDE):
     - Scipy implementation, at ``scipy.spatial.KDTree``.
     """
 
-    def __init__(self, kernel="gaussian", bw=1, norm=2.0):
+    def __init__(
+        self, kernel: Union[str, Callable] = "gaussian", bw: Union[float, str, np.ndarray] = 1, norm: float = 2.0
+    ):
         super().__init__(kernel, bw)
         self.norm = norm
 
-    def fit(self, data, weights=None):
+    def fit(self, data: np.ndarray, weights: Optional[np.ndarray] = None) -> "TreeKDE":
         """
         Fit the KDE to the data. This validates the data and stores it.
         Computations are performed upon evaluation on a grid.
@@ -95,7 +98,9 @@ class TreeKDE(BaseKDE):
         super().fit(data, weights)
         return self
 
-    def evaluate(self, grid_points=None, eps=10e-4):
+    def evaluate(
+        self, grid_points: Optional[Union[np.ndarray, int, tuple]] = None, eps: float = 10e-4
+    ) -> Union[np.ndarray, tuple]:
         """
         Evaluate on grid points.
 
