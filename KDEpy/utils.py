@@ -3,6 +3,7 @@
 """
 Module for utility functions.
 """
+
 import numbers
 
 import numpy as np

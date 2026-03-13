@@ -3,6 +3,7 @@
 """
 Test the implemented estimators against each other on simple data sets.
 """
+
 import itertools
 
 import numpy as np
