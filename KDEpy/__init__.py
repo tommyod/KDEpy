@@ -8,7 +8,6 @@ from KDEpy.FFTKDE import FFTKDE
 from KDEpy.NaiveKDE import NaiveKDE
 from KDEpy.TreeKDE import TreeKDE
 
-
 __version__ = importlib.metadata.version("KDEpy")
 __author__ = "tommyod"
 

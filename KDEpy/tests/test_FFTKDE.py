@@ -3,6 +3,7 @@
 """
 Tests for the FFTKDE.
 """
+
 import itertools
 
 import numpy as np

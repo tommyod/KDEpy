@@ -3,6 +3,7 @@
 """
 Module for the TreeKDE.
 """
+
 import numbers
 from typing import Callable, Optional, Union
 

@@ -3,6 +3,7 @@
 """
 Module for the NaiveKDE.
 """
+
 import itertools
 import numbers
 from typing import Callable, Optional, Union
