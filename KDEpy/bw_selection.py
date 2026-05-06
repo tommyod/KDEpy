@@ -3,6 +3,7 @@
 """
 Functions for bandwidth selection.
 """
+
 import warnings
 
 import numpy as np
@@ -282,12 +283,8 @@ def silvermans_rule(data, weights=None):
         IQR = (np.percentile(data, q=99) - np.percentile(data, q=1)) / 4.6526957480816815
         if IQR > 0:
             bw = IQR * (obs * 3 / 4.0) ** (-1 / 5)
-            warnings.warn(
-                "Silverman's rule failed. Too many idential values. \
-Setting bw = {}".format(
-                    bw
-                )
-            )
+            warnings.warn("Silverman's rule failed. Too many idential values. \
+Setting bw = {}".format(bw))
             return bw
 
         # Here, all values are basically constant

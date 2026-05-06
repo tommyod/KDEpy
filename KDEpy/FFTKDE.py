@@ -3,6 +3,7 @@
 """
 Module for the FFTKDE.
 """
+
 import numbers
 from typing import Callable, Optional, Union
 import warnings

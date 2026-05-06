@@ -3,6 +3,7 @@
 """
 Tests for binning functions.
 """
+
 import itertools
 import random
 

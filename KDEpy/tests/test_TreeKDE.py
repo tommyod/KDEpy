@@ -3,6 +3,7 @@
 """
 Tests for the TreeKDE.
 """
+
 import itertools
 
 import numpy as np

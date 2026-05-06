@@ -3,6 +3,7 @@
 """
 Tests for verifying that grids obeys the sorting properties required for linear binning.
 """
+
 import numpy as np
 import pytest
 

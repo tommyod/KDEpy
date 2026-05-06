@@ -3,6 +3,7 @@
 """
 Module for the BaseKDE class.
 """
+
 import numbers
 from abc import ABC, abstractmethod
 from collections.abc import Sequence

@@ -18,7 +18,6 @@
 from KDEpy import __version__
 import datetime as dt
 
-
 # -- Project information -----------------------------------------------------
 
 project = "KDEpy"
@@ -42,7 +41,7 @@ release = __version__
 # ones.
 extensions = [
     "sphinx.ext.autodoc",
-    #"sphinx.ext.doctest",
+    # "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
     "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
@@ -55,10 +54,10 @@ extensions = [
     "matplotlib.sphinxext.plot_directive",
     "IPython.sphinxext.ipython_directive",
     "IPython.sphinxext.ipython_console_highlighting",
-   # "sphinx.ext.inheritance_diagram",
+    # "sphinx.ext.inheritance_diagram",
 ]
 
-numpydoc_show_class_members = False 
+numpydoc_show_class_members = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -211,4 +210,4 @@ texinfo_documents = [
 # -- Options for intersphinx extension ---------------------------------------
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'python': ('https://docs.python.org/3', None)}
+intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}

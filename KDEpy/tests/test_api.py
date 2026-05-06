@@ -5,6 +5,7 @@ Test the API. The API should be considered fixed in future releases and should
 be equal for every implementation. Therefore it's important to have unit tests
 for the API.
 """
+
 import itertools
 
 import matplotlib

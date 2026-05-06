@@ -29,6 +29,7 @@ References
   Journal of Computational and Graphical Statistics 3, no. 1 (March 1, 1994).
   https://doi.org/10.1080/10618600.1994.10474629.
 """
+
 import functools
 import itertools
 import operator
@@ -40,7 +41,6 @@ import numpy as np
 # noinspection PyProtectedMember, PyUnresolvedReferences
 from KDEpy import _cutils
 from KDEpy.utils import cartesian
-
 
 # This parameter was in use when a NumPy implementation and a Cython
 # implementation were both used. Now only Cython is used.
