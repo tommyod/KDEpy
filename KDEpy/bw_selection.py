@@ -166,7 +166,7 @@ def improved_sheather_jones(data, weights=None):
     xmesh = xmesh.ravel()
 
     # Create an equidistant grid
-    R = np.max(data) - np.min(data)
+    R = xmesh[-1] - xmesh[0]
     # dx = R / (n - 1)
     data = data.ravel()
     N = len(np.unique(data))
@@ -204,6 +204,8 @@ def improved_sheather_jones(data, weights=None):
 
     # Due to overflow, some values might be smaller than zero, correct it
     # density[density < 0] = 0.
+
+    # map [0, 1] back to xmesh grid
     bandwidth = np.sqrt(t_star) * R
     return bandwidth
 
