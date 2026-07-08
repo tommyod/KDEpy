@@ -160,8 +160,15 @@ def improved_sheather_jones(data, weights=None):
         data = data[weights > 0]
         weights = weights[weights > 0]
 
-    # Setting `percentile` higher decreases the chance of overflow
-    xmesh = autogrid(data, boundary_abs=6, num_points=n, boundary_rel=0.5)
+    # Scale-aware absolute padding. The historical constant "6" is calibrated
+    # for standardized (sigma ~ 1) data; expressed in units of the sample
+    # standard deviation it keeps that behavior for standardized data while
+    # making the grid construction -- and therefore the returned bandwidth --
+    # equivariant under affine scaling of the data (bw(a*x) == a*bw(x)).
+    data_std = float(np.std(data))
+    boundary_abs = 6.0 * data_std if data_std > 0 else 6.0
+    xmesh = autogrid(data, boundary_abs=boundary_abs, num_points=n, boundary_rel=0.5)
+
     data = data.ravel()
     xmesh = xmesh.ravel()
 

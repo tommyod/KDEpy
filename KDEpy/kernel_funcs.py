@@ -278,9 +278,9 @@ class Kernel(collections.abc.Callable):
         --------
         >>> kernel = Kernel(gaussian, var=1, support=np.inf)
         >>> kernel.practical_support(bw=1)
-        3.8994...
+        4.2...
         >>> kernel.practical_support(bw=2)
-        7.4331...
+        8.5...
         """
         # If the kernel has finite support, return the support accounting for
         # the bw
@@ -290,12 +290,20 @@ class Kernel(collections.abc.Callable):
         # If the function does not have finite support, find a practical value
         else:
 
+            # `atol` is interpreted RELATIVE to the kernel's peak value.
+            # An absolute cutoff makes the truncation radius (in units of bw)
+            # depend on the numeric scale of bw, since the peak density is
+            # ~ 1/bw: large bandwidths get truncated close to the peak and
+            # eventually fail outright when peak < atol. Relative tolerance
+            # gives a scale-invariant truncation radius for every bw.
+            peak = self.evaluate(0.0, bw=bw)[0]
+
             def f(x):
-                return self.evaluate(x, bw=bw)[0] - atol
+                return self.evaluate(x, bw=bw)[0] - atol * peak
 
             try:
-                xtol = 1e-3
-                ans = brentq(f, a=0, b=8 * bw, xtol=xtol, full_output=False)
+                xtol = 1e-3 * bw
+                ans = brentq(f, a=0, b=20 * bw, xtol=xtol, full_output=False)
                 return ans + xtol
             except ValueError:
                 msg = (
