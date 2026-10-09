@@ -7,6 +7,7 @@ for the API.
 """
 
 import itertools
+import pickle
 
 import matplotlib
 import numpy as np
@@ -21,6 +22,21 @@ matplotlib.use("Agg")  # For testing on servers
 kernels = list(NaiveKDE._available_kernels.keys())
 kdes = [NaiveKDE, TreeKDE, FFTKDE]
 kde_pairs = list(itertools.combinations(kdes, 2))
+
+
+@pytest.mark.parametrize("estimator", kdes)
+@pytest.mark.parametrize("kernel", kernels)
+def test_pickle_fitted_estimator(estimator, kernel):
+    """Fitted estimators retain their density and weights after serialization."""
+    model = estimator(kernel=kernel, bw=0.5).fit([-1, 0, 0.5, 1], weights=[1, 2, 3, 1])
+    grid = np.linspace(-5, 5, 128)
+    expected = model.evaluate(grid)
+
+    restored = pickle.loads(pickle.dumps(model))
+
+    np.testing.assert_array_equal(restored.data, model.data)
+    np.testing.assert_array_equal(restored.weights, model.weights)
+    np.testing.assert_array_equal(restored.evaluate(grid), expected)
 
 
 @pytest.mark.parametrize(
