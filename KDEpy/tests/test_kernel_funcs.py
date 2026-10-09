@@ -6,6 +6,7 @@ i.e. it's a composition of a norm and a function defined on positive reals.
 """
 
 import itertools
+import pickle
 
 import numpy as np
 import pytest
@@ -13,7 +14,15 @@ import scipy
 from scipy.integrate import quad
 
 from KDEpy.BaseKDE import BaseKDE
-from KDEpy.kernel_funcs import gauss_integral, trig_integral
+from KDEpy.kernel_funcs import gauss_integral, logistic, sigmoid, trig_integral
+
+
+@pytest.mark.parametrize("kernel", [logistic, sigmoid])
+def test_pickle_additional_kernel(kernel):
+    """The kernels outside the estimator registry are also serializable."""
+    restored = pickle.loads(pickle.dumps(kernel))
+    points = np.linspace(-3, 3, 21)
+    np.testing.assert_array_equal(restored(points), kernel(points))
 
 
 class TestKernelHelperFunctions:

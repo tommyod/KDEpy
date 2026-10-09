@@ -164,13 +164,13 @@ def epanechnikov(x, dims=1):
     return out
 
 
-def gaussian(x, dims=1):
+def _gaussian(x, dims=1):
     normalization = dims * gauss_integral(dims - 1)
     dist_sq = x**2
     return np.exp(-dist_sq / 2) / normalization
 
 
-def box(x, dims=1):
+def _box(x, dims=1):
     normalization = 1
     out = np.zeros_like(x)
     mask = x < 1
@@ -183,7 +183,7 @@ def exponential(x, dims=1):
     return np.exp(-x) / normalization
 
 
-def tri(x, dims=1):
+def _tri(x, dims=1):
     normalization = 1 / (dims + 1)
     out = np.zeros_like(x)
     mask = x < 1
@@ -191,7 +191,7 @@ def tri(x, dims=1):
     return out
 
 
-def biweight(x, dims=1):
+def _biweight(x, dims=1):
     normalization = 8 / ((dims + 2) * (dims + 4))
     dist_sq = x**2
     out = np.zeros_like(dist_sq)
@@ -200,7 +200,7 @@ def biweight(x, dims=1):
     return out
 
 
-def triweight(x, dims=1):
+def _triweight(x, dims=1):
     normalization = 48 / ((dims + 2) * (dims + 4) * (dims + 6))
     dist_sq = x**2
     out = np.zeros_like(dist_sq)
@@ -209,7 +209,7 @@ def triweight(x, dims=1):
     return out
 
 
-def tricube(x, dims=1):
+def _tricube(x, dims=1):
     normalization = 162 / ((dims + 3) * (dims + 6) * (dims + 9))
     out = np.zeros_like(x)
     mask = x < 1
@@ -217,7 +217,7 @@ def tricube(x, dims=1):
     return out
 
 
-def cosine(x, dims=1):
+def _cosine(x, dims=1):
     Is, Ic = trig_integral(dims - 1)
     normalization = Ic
     out = np.zeros_like(x)
@@ -226,11 +226,11 @@ def cosine(x, dims=1):
     return out
 
 
-def logistic(x, dims=1):
+def _logistic(x, dims=1):
     return 1 / (2 + 2 * np.cosh(x))
 
 
-def sigmoid(x, dims=1):
+def _sigmoid(x, dims=1):
     return 1 / (np.pi * np.cosh(x))
 
 
@@ -343,17 +343,17 @@ class Kernel(collections.abc.Callable):
     __call__ = evaluate
 
 
-gaussian = Kernel(gaussian, var=1, support=np.inf)
+gaussian = Kernel(_gaussian, var=1, support=np.inf)
 exp = Kernel(exponential, var=2, support=np.inf)
-box = Kernel(box, var=1 / 3, support=1)
-tri = Kernel(tri, var=1 / 6, support=1)
+box = Kernel(_box, var=1 / 3, support=1)
+tri = Kernel(_tri, var=1 / 6, support=1)
 epa = Kernel(epanechnikov, var=1 / 5, support=1)
-biweight = Kernel(biweight, var=1 / 7, support=1)
-triweight = Kernel(triweight, var=1 / 9, support=1)
-tricube = Kernel(tricube, var=35 / 243, support=1)
-cosine = Kernel(cosine, var=(1 - (8 / np.pi**2)), support=1)
-logistic = Kernel(logistic, var=(np.pi**2 / 3), support=np.inf)
-sigmoid = Kernel(sigmoid, var=(np.pi**2 / 4), support=np.inf)
+biweight = Kernel(_biweight, var=1 / 7, support=1)
+triweight = Kernel(_triweight, var=1 / 9, support=1)
+tricube = Kernel(_tricube, var=35 / 243, support=1)
+cosine = Kernel(_cosine, var=(1 - (8 / np.pi**2)), support=1)
+logistic = Kernel(_logistic, var=(np.pi**2 / 3), support=np.inf)
+sigmoid = Kernel(_sigmoid, var=(np.pi**2 / 4), support=np.inf)
 
 _kernel_functions = {
     "gaussian": gaussian,
