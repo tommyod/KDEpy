@@ -169,7 +169,10 @@ class BaseKDE(ABC):
         types_for_autogrid = (numbers.Integral, tuple)
         if grid_points is None or isinstance(grid_points, types_for_autogrid):
             self._user_supplied_grid = False
-            bw_grid = self.kernel.practical_support(bw)
+            if isinstance(bw, numbers.Number):
+                bw_grid = self.kernel.practical_support(bw)
+            else:
+                bw_grid = max(self.kernel.practical_support(b) for b in bw)
             grid_points = autogrid(self.data, bw_grid, grid_points)
             # Set it here, so as not to call kernel.practical_support(bw) again
             self._kernel_practical_support = bw_grid
