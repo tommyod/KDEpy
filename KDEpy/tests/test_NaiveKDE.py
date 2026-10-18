@@ -188,3 +188,40 @@ def test_constant_values_silverman():
 if __name__ == "__main__":
     # --durations=10  <- May be used to show potentially slow tests
     pytest.main(args=[".", "--doctest-modules", "-v", "-k constant"])
+
+
+@pytest.mark.parametrize("kernel", ["gaussian", "epa"])
+@pytest.mark.parametrize("bw_type", [list, tuple, np.array])
+@pytest.mark.parametrize("weights", [None, [1, 2, 3]])
+@pytest.mark.parametrize(
+    "data, grid_points",
+    [
+        ([0, 1, 2], None),
+        ([0, 1, 2], 64),
+        ([0, 1, 2], (64,)),
+        (np.array([[0, 0], [1, 2], [2, 1]]), (8, 9)),
+    ],
+)
+def test_variable_bandwidth_autogrid(kernel, bw_type, weights, data, grid_points):
+    """Automatic grids support per-point bandwidths, as explicit grids do."""
+    bandwidths = [0.5, 1.0, 1.5]
+    kde = NaiveKDE(kernel=kernel, bw=bw_type(bandwidths)).fit(data, weights=weights)
+    grid, density = kde.evaluate(grid_points)
+    np.testing.assert_allclose(density, kde.evaluate(grid))
+
+    points = np.asarray(data).reshape(3, -1)
+    normalized_weights = np.ones(3) / 3 if weights is None else np.asarray(weights) / np.sum(weights)
+    expected = np.zeros_like(density)
+    for point, bw, weight in zip(points, bandwidths, normalized_weights):
+        expected += weight * NaiveKDE(kernel=kernel, bw=bw).fit(point.reshape(1, -1)).evaluate(grid)
+    np.testing.assert_allclose(density, expected)
+
+
+def test_variable_bandwidth_autogrid_nonmonotone_support():
+    """The largest bandwidth need not have the largest absolute-cutoff radius."""
+    kde = NaiveKDE(bw=[2000.0, 3900.0]).fit([0.0, 1.0])
+    grid, density = kde.evaluate(64)
+    # Gaussian density crosses the default cutoff of 1e-4 at this radius.
+    radius = 2000 * np.sqrt(-2 * np.log(np.sqrt(2 * np.pi) * 2000 * 1e-4))
+    np.testing.assert_allclose([grid.min(), grid.max()], [-radius, 1 + radius], atol=0.003)
+    np.testing.assert_allclose(density, kde.evaluate(grid))
